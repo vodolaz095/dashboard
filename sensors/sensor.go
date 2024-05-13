@@ -21,7 +21,7 @@ type UnimplementedSensor struct {
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
-	Type string `yaml:"type" validate:"required, oneof=mysql redis postgres sqlite curl shell endpoint"`
+	Type string `yaml:"type" validate:"required, oneof=mysql redis postgres curl shell endpoint"`
 	// DatabaseConnectionString is used to dial database, remote url
 	DatabaseConnectionString string `yaml:"database_connection_string"`
 	// Query is used to either execute against remote resource or to process raw data
