@@ -25,6 +25,14 @@ func (s *Sensor) Init(ctx context.Context) error {
 	return s.client.Ping(ctx).Err()
 }
 
+func (s *Sensor) Ping(ctx context.Context) error {
+	return s.client.Ping(ctx).Err()
+}
+
+func (s *Sensor) Close(ctx context.Context) error {
+	return s.client.Close()
+}
+
 func (s *Sensor) Value() float64 {
 	return s.val
 }
@@ -47,8 +55,4 @@ func (s *Sensor) Update(ctx context.Context, _ float64) error {
 
 func (s *Sensor) UpdatedAt() time.Time {
 	return s.updatedAt
-}
-
-func (s *Sensor) Close(ctx context.Context) error {
-	return s.client.Close()
 }

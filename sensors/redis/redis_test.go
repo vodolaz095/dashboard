@@ -2,35 +2,54 @@ package redis
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"testing"
 	"time"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/vodolaz095/dashboard/sensors"
 )
 
-func TestSensor(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func TestRedisSensor(t *testing.T) {
+	redisConnectionString := os.Getenv("REDIS_URL")
+	if redisConnectionString == "" {
+		redisConnectionString = "redis://localhost:6379"
+	}
+	expected := 5.3
+
 	var err error
 	sensor := Sensor{}
 	sensor.Name = "test_redis"
 	sensor.Type = "redis"
-	sensor.DatabaseConnectionString = "redis://localhost:6379"
+	sensor.DatabaseConnectionString = redisConnectionString
 	sensor.Query = "get a"
 	sensor.RefreshRate = time.Second
 	sensor.Description = "test redis sensor"
 	sensor.Link = "http://redis.io/"
 	sensor.Minimum = 0
 	sensor.Maximum = 10
-	err = sensor.Init(ctx)
+
+	opts, err := redis.ParseURL(redisConnectionString)
 	if err != nil {
-		t.Errorf("error initializing: %s", err)
+		t.Errorf("error parsing redis connection string: %s", err)
+		return
 	}
-	err = sensor.Update(ctx, 0)
+	client := redis.NewClient(opts)
+	err = client.Set(context.Background(), "a", fmt.Sprintf("%.2f", expected), time.Second).Err()
 	if err != nil {
-		t.Errorf("error updating value: %s", err)
+		t.Errorf("error setting redis key: %s", err)
+		return
 	}
-	t.Logf("Value: %f", sensor.Value())
-	err = sensor.Close(ctx)
+
+	err = sensors.DoTestSensor(t, &sensor, 5.3)
 	if err != nil {
-		t.Errorf("error closing value: %s", err)
+		t.Errorf("error executing test: %s", err)
+	}
+
+	err = client.Close()
+	if err != nil {
+		t.Errorf("error closing redis connection: %s", err)
+		return
 	}
 }

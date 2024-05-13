@@ -1,0 +1,30 @@
+version: "3.8"
+
+volumes:
+  redis_data:
+  mariadb_data:
+  pg_data:
+
+
+services:
+  # https://hub.docker.com/_/mariadb
+  mariadb:
+    image: mariadb:10.11.6
+    environment:
+      MYSQL_ROOT_PASSWORD:  "dashboard"
+      MYSQL_DATABASE: "dashboard"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  # https://hub.docker.com/_/postgres
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: "dashboard"
+      POSTGRES_PASSWORD: "dashboard"
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
