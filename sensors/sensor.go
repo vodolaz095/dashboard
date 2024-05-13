@@ -11,8 +11,17 @@ type ISensor interface {
 	Ping(ctx context.Context) error
 	Close(ctx context.Context) error
 
-	Update(context.Context, float64) error
+	GetName() string
+	GetType() string
+	GetDescription() string
+	GetLink() string
+	GetMinimum() float64
+	GetMaximum() float64
 
+	/*
+		To be implemented in custom sensors
+	*/
+	Update(context.Context, float64) error
 	Value() float64
 	UpdatedAt() time.Time
 }
@@ -36,6 +45,30 @@ type UnimplementedSensor struct {
 	Minimum float64 `yaml:"minimum"`
 	// Maximum is used to warn, when something is above safe value
 	Maximum float64 `yaml:"maximum"`
+}
+
+func (u *UnimplementedSensor) GetName() string {
+	return u.Name
+}
+
+func (u *UnimplementedSensor) GetType() string {
+	return u.Type
+}
+
+func (u *UnimplementedSensor) GetDescription() string {
+	return u.Description
+}
+
+func (u *UnimplementedSensor) GetLink() string {
+	return u.Link
+}
+
+func (u *UnimplementedSensor) GetMinimum() float64 {
+	return u.Minimum
+}
+
+func (u *UnimplementedSensor) GetMaximum() float64 {
+	return u.Maximum
 }
 
 const DefaultTestTimeout = time.Second
