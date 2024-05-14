@@ -46,8 +46,9 @@ func (s *Sensor) Value() float64 {
 
 func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
 	var val float64
-	args := strings.Split(s.DatabaseConnectionString, " ")
+	args := strings.Split(s.Command, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	//cmd.Env = append(cmd.Env, "a=b")
 	raw, err := cmd.Output()
 	if err != nil {
 		return

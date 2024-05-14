@@ -29,7 +29,10 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	tr.engine.GET("/ping", func(c *gin.Context) {
 		c.AbortWithStatus(http.StatusNoContent)
 	})
+	tr.exposeIndex()
 	tr.exposeJSON()
+	tr.exposeMetrics()
+	tr.exposeEndpoint()
 
 	listener, err := net.Listen("tcp", tr.Address)
 	if err != nil {

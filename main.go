@@ -15,6 +15,7 @@ import (
 	"github.com/vodolaz095/dashboard/pkg/zerologger"
 	"github.com/vodolaz095/dashboard/sensors"
 	"github.com/vodolaz095/dashboard/transport/webserver"
+	"github.com/vodolaz095/dqueue"
 
 	"github.com/vodolaz095/dashboard/config"
 	"github.com/vodolaz095/dashboard/sensors/curl"
@@ -61,6 +62,7 @@ func main() {
 	}
 
 	// generate sensors from config
+	updateQueue := dqueue.New()
 	byIndex := make([]string, len(cfg.Sensors))
 	byName := make(map[string]sensors.ISensor, 0)
 	for i := range cfg.Sensors {
@@ -85,7 +87,7 @@ func main() {
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
-
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 			break
 		case "redis":
 			ms := &redis.Sensor{}
@@ -103,6 +105,7 @@ func main() {
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 
 			break
 		case "postgres":
@@ -121,6 +124,7 @@ func main() {
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 
 			break
 		case "curl":
@@ -142,6 +146,7 @@ func main() {
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 
 			break
 		case "shell":
@@ -155,16 +160,19 @@ func main() {
 			ms.Maximum = cfg.Sensors[i].Maximum
 			ms.Tags = cfg.Sensors[i].Tags
 
+			ms.Command = cfg.Sensors[i].Command
 			ms.Environment = cfg.Sensors[i].Environment
 			ms.JsonPath = cfg.Sensors[i].JsonPath
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+
 			break
 		case "endpoint":
 			ms := &shell.Sensor{}
 			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "shell"
+			ms.Type = "endpoint"
 			ms.RefreshRate = cfg.Sensors[i].RefreshRate
 			ms.Description = cfg.Sensors[i].Description
 			ms.Link = cfg.Sensors[i].Link
@@ -176,6 +184,8 @@ func main() {
 
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
+			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+
 			break
 		default:
 			log.Fatal().Msgf("Element %v has unknown sensor type %s", i, cfg.Sensors[i].Type)
@@ -184,8 +194,10 @@ func main() {
 
 	// init service
 	srv := service.SensorsService{
-		ListOfSensors: byIndex,
-		Sensors:       byName,
+		UpdateQueue:    &updateQueue,
+		UpdateInterval: 100 * time.Millisecond,
+		ListOfSensors:  byIndex,
+		Sensors:        byName,
 	}
 	// set systemd watchdog
 	systemdWatchdogEnabled, err := healthcheck.Ready()
@@ -241,6 +253,8 @@ func main() {
 	}()
 
 	// main loop
+	go srv.StartKeepingSensorsUpToDate(ctx)
+
 	go func() {
 		log.Debug().Msgf("Preparing to start webserver on %s...", webServerTransport.Address)
 		errWeb := webServerTransport.Start(ctx, &wg)

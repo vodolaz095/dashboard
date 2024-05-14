@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,9 @@ func (tr *Transport) exposeMetrics() {
 	tr.engine.GET("/metrics", func(c *gin.Context) {
 		sensors := tr.SensorsService.List()
 		c.Header("Content-Type", "text/plain; version=0.0.4")
-		c.HTML(http.StatusOK, "metrics.html", gin.H{
-			"sensors": sensors,
-		})
+		for i := range sensors {
+			fmt.Fprint(c.Writer, sensors[i].String())
+		}
+		c.AbortWithStatus(http.StatusNotFound)
 	})
 }

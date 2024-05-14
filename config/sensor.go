@@ -12,7 +12,7 @@ type Sensor struct {
 	// Link is used to help visitor read more about sensor
 	Link string `yaml:"link" validate:"http_url"`
 	// Tags helps to group sensors
-	Tags []string `yaml:"tags"`
+	Tags map[string]string `yaml:"tags"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres

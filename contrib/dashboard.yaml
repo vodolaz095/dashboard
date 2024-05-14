@@ -17,3 +17,8 @@ sensors:
   - name: dummy
     type: shell
     command: "echo 21"
+    description: "Does nothing"
+    link: "https://example.org"
+    tags:
+      a: b
+      c: d

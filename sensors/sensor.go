@@ -17,7 +17,7 @@ type ISensor interface {
 	GetLink() string
 	GetMinimum() float64
 	GetMaximum() float64
-
+	GetTags() map[string]string
 	/*
 		To be implemented in custom sensors
 	*/
@@ -36,7 +36,7 @@ type UnimplementedSensor struct {
 	// Link is used to help visitor read more about sensor
 	Link string `yaml:"link" validate:"http_url"`
 	// Tags helps to group sensors
-	Tags []string `yaml:"tags"`
+	Tags map[string]string `yaml:"tags"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres
@@ -106,6 +106,14 @@ func (u *UnimplementedSensor) GetMinimum() float64 {
 
 func (u *UnimplementedSensor) GetMaximum() float64 {
 	return u.Maximum
+}
+
+func (u *UnimplementedSensor) GetTags() map[string]string {
+	return u.Tags
+}
+
+func (u *UnimplementedSensor) NextUpdateOn() time.Time {
+	return time.Now().Add(u.RefreshRate)
 }
 
 const DefaultTestTimeout = time.Second

@@ -5,13 +5,20 @@ import (
 	"errors"
 	"time"
 
+	"github.com/rs/zerolog/log"
+	"github.com/vodolaz095/dqueue"
+
 	"github.com/vodolaz095/dashboard/model"
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
+const DefaultSensorTimeout = 5 * time.Second
+
 type SensorsService struct {
-	ListOfSensors []string
-	Sensors       map[string]sensors.ISensor
+	ListOfSensors  []string
+	Sensors        map[string]sensors.ISensor
+	UpdateInterval time.Duration
+	UpdateQueue    *dqueue.Handler
 }
 
 var SensorNotFoundErr = errors.New("sensor not found")
@@ -30,6 +37,7 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 			s.Maximum = sensor.GetMaximum()
 			s.Value = sensor.Value()
 			s.UpdatedAt = sensor.UpdatedAt()
+			s.Tags = sensor.GetTags()
 			ret[i] = s
 		} else {
 			ret[i] = model.Sensor{
@@ -73,4 +81,33 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 		return SensorNotFoundErr
 	}
 	return sensor.Update(ctx, val)
+}
+
+func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
+	var name string
+	pacemaker := time.NewTicker(ss.UpdateInterval)
+	for {
+		select {
+		case <-ctx.Done():
+			pacemaker.Stop()
+			return
+		case <-pacemaker.C:
+			task, ready := ss.UpdateQueue.Get()
+			if ready {
+				rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
+				name = task.Payload.(string)
+				log.Debug().Msgf("Updating sensor %s...", name)
+				err := ss.Update(rtc, name, 0)
+				cancel()
+				if err != nil {
+					log.Error().Err(err).Msgf("Sensor %s update failed with %s",
+						task.Payload.(string), err,
+					)
+				} else {
+					log.Debug().Msgf("Sensor %s is updated!", name)
+				}
+				ss.UpdateQueue.ExecuteAfter(name, time.Second)
+			}
+		}
+	}
 }
