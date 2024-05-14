@@ -27,6 +27,9 @@ type Sensor struct {
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
+	if s.Method == "" {
+		s.Method = http.MethodGet
+	}
 	if s.ExpectedStatusCode == 0 {
 		s.ExpectedStatusCode = http.StatusOK
 	}

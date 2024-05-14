@@ -1,0 +1,19 @@
+listen: "0.0.0.0:3000"
+domain: "localhost"
+title: "dashboard"
+description: "dashboard"
+keywords:
+  - "dashboard"
+  - "vodolaz095"
+  - "golang"
+  - "redis"
+  - "postgresql"
+  - "mysql"
+do_index: true
+log:
+  level: trace
+  to_journald: false
+sensors:
+  - name: dummy
+    type: shell
+    command: "echo 21"
