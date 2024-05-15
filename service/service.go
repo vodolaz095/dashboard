@@ -83,8 +83,8 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 		return SensorNotFoundErr
 	}
 	err = sensor.Update(ctx, val)
-	n := ss.Broadcast(name, err.Error(), val)
 	if err != nil {
+		n := ss.Broadcast(name, err.Error(), val)
 		log.Error().Err(err).
 			Str("name", name).
 			Float64("value", val).
@@ -92,6 +92,7 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 			Msgf("Error updating sensor %s with value %v and %v notified: %s", name, val, n, err)
 		return err
 	}
+	n := ss.Broadcast(name, "", val)
 	log.Debug().
 		Str("name", name).
 		Float64("value", sensor.Value()).
@@ -136,6 +137,9 @@ func (ss *SensorsService) Subscribe(ctx context.Context, name string) (chan mode
 	}
 	log.Debug().Msgf("Creating subscription channel for %s...", name)
 	ch := make(chan model.Update, 10)
+	if ss.subscribers == nil {
+		ss.subscribers = make(map[string]chan model.Update, 0)
+	}
 	ss.subscribers[name] = ch
 	go func() {
 		<-ctx.Done()

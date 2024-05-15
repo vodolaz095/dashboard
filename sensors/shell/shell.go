@@ -21,13 +21,13 @@ type Sensor struct {
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
-	args := strings.Split(s.DatabaseConnectionString, " ")
+	args := strings.Split(s.Command, " ")
 	stat, err := os.Stat(args[0])
 	if err != nil {
 		return err
 	}
 	if stat.Mode()&0111 == 0 {
-		return fmt.Errorf("file %s is not executable", s.DatabaseConnectionString)
+		return fmt.Errorf("file %s is not executable", s.Command)
 	}
 	return nil
 }
@@ -54,7 +54,7 @@ func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
 		return
 	}
 	// no processing script output
-	if s.Query == "" {
+	if s.JsonPath == "" {
 		val, err = strconv.ParseFloat(strings.TrimSpace(string(raw)), 64)
 		if err != nil {
 			return
@@ -69,7 +69,7 @@ func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
 	if err != nil {
 		return
 	}
-	res, err := jsonpath.JsonPathLookup(data, s.Query)
+	res, err := jsonpath.JsonPathLookup(data, s.JsonPath)
 	if err != nil {
 		return
 	}
