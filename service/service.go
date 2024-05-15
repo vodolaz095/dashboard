@@ -19,6 +19,8 @@ type SensorsService struct {
 	Sensors        map[string]sensors.ISensor
 	UpdateInterval time.Duration
 	UpdateQueue    *dqueue.Handler
+
+	subscribers map[string]chan model.Update
 }
 
 var SensorNotFoundErr = errors.New("sensor not found")
@@ -80,7 +82,22 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 	if !found {
 		return SensorNotFoundErr
 	}
-	return sensor.Update(ctx, val)
+	err = sensor.Update(ctx, val)
+	n := ss.Broadcast(name, err.Error(), val)
+	if err != nil {
+		log.Error().Err(err).
+			Str("name", name).
+			Float64("value", val).
+			Int("notified", n).
+			Msgf("Error updating sensor %s with value %v and %v notified: %s", name, val, n, err)
+		return err
+	}
+	log.Debug().
+		Str("name", name).
+		Float64("value", sensor.Value()).
+		Int("notified", n).
+		Msgf("Sensor %s updated with value %v - %v notified", name, val, n)
+	return nil
 }
 
 func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
@@ -110,4 +127,38 @@ func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
 			}
 		}
 	}
+}
+
+func (ss *SensorsService) Subscribe(ctx context.Context, name string) (chan model.Update, error) {
+	_, found := ss.subscribers[name]
+	if found {
+		return nil, errors.New("duplicate subscriber name")
+	}
+	log.Debug().Msgf("Creating subscription channel for %s...", name)
+	ch := make(chan model.Update, 10)
+	ss.subscribers[name] = ch
+	go func() {
+		<-ctx.Done()
+		log.Debug().Msgf("Closing subscription channel for %s...", name)
+		close(ch)
+		delete(ss.subscribers, name)
+		log.Debug().Msgf("Subscription channel for %s is closed", name)
+
+	}()
+
+	return ch, nil
+}
+
+func (ss *SensorsService) Broadcast(name, error string, value float64) (subscribersNotified int) {
+	upd := model.Update{
+		Name:      name,
+		Value:     value,
+		Error:     error,
+		Timestamp: time.Now(),
+	}
+	for k := range ss.subscribers {
+		subscribersNotified += 1
+		ss.subscribers[k] <- upd
+	}
+	return subscribersNotified
 }
