@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dqueue"
 
@@ -21,6 +23,11 @@ type SensorsService struct {
 	UpdateQueue    *dqueue.Handler
 
 	subscribers map[string]chan model.Update
+
+	// cached database connections
+	MysqlConnections      map[string]*sql.Conn
+	PostgresqlConnections map[string]*sql.Conn
+	RedisConnections      map[string]*redis.Client
 }
 
 var SensorNotFoundErr = errors.New("sensor not found")
@@ -63,7 +70,33 @@ func (ss *SensorsService) Ping(ctx context.Context) (err error) {
 		if err != nil {
 			return
 		}
+		log.Trace().Msgf("Sensor %s online!", k)
 	}
+	log.Debug().Msgf("Sensors online")
+	for k := range ss.MysqlConnections {
+		err = ss.MysqlConnections[k].PingContext(ctx)
+		if err != nil {
+			return
+		}
+		log.Trace().Msgf("Mysql connection %s online!", k)
+	}
+	log.Debug().Msgf("Mysql connections online")
+	for k := range ss.PostgresqlConnections {
+		err = ss.PostgresqlConnections[k].PingContext(ctx)
+		if err != nil {
+			return
+		}
+		log.Trace().Msgf("Postgres connection %s online!", k)
+	}
+	log.Debug().Msgf("Postgres connections online")
+	for k := range ss.RedisConnections {
+		err = ss.RedisConnections[k].Ping(ctx).Err()
+		if err != nil {
+			return
+		}
+		log.Trace().Msgf("Redis connection %s online!", k)
+	}
+	log.Debug().Msgf("Redis connections online")
 	return nil
 }
 
@@ -97,7 +130,7 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 		Str("name", name).
 		Float64("value", sensor.Value()).
 		Int("notified", n).
-		Msgf("Sensor %s updated with value %v - %v notified", name, val, n)
+		Msgf("Sensor %s updated with value %v - %v notified", name, sensor.Value(), n)
 	return nil
 }
 

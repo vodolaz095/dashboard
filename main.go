@@ -14,6 +14,7 @@ import (
 	"github.com/vodolaz095/dashboard/pkg/healthcheck"
 	"github.com/vodolaz095/dashboard/pkg/zerologger"
 	"github.com/vodolaz095/dashboard/sensors"
+	"github.com/vodolaz095/dashboard/sensors/endpoint"
 	"github.com/vodolaz095/dashboard/transport/webserver"
 	"github.com/vodolaz095/dqueue"
 
@@ -170,7 +171,7 @@ func main() {
 
 			break
 		case "endpoint":
-			ms := &shell.Sensor{}
+			ms := &endpoint.Sensor{}
 			ms.Name = cfg.Sensors[i].Name
 			ms.Type = "endpoint"
 			ms.RefreshRate = cfg.Sensors[i].RefreshRate

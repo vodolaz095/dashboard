@@ -3,7 +3,6 @@ package webserver
 import (
 	"context"
 	"net"
-	"net/http"
 	"strings"
 	"sync"
 
@@ -26,13 +25,11 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	middlewares.Secure(tr.engine, tr.Domain)
 	middlewares.EmulatePHP(tr.engine)
 
-	tr.engine.GET("/ping", func(c *gin.Context) {
-		c.AbortWithStatus(http.StatusNoContent)
-	})
 	tr.exposeIndex()
 	tr.exposeJSON()
 	tr.exposeMetrics()
 	tr.exposeEndpoint()
+	tr.exposeHealthcheck()
 
 	listener, err := net.Listen("tcp", tr.Address)
 	if err != nil {

@@ -64,7 +64,11 @@ func (ts *testSensor) Update(_ context.Context, val float64) error {
 	return errors.New("zero value not allowed")
 }
 
-func TestSensorsService(t *testing.T) {
+func TestSensorsServiceKeepUpdated(t *testing.T) {
+	t.Skipf("not implemented")
+}
+
+func TestSensorsServiceBroadcast(t *testing.T) {
 	updates := []model.Update{
 		{
 			Name:  "testSensor",
