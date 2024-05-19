@@ -1,3 +1,4 @@
+
 listen: "0.0.0.0:3000"
 domain: "localhost"
 title: "dashboard"
@@ -10,15 +11,69 @@ keywords:
   - "postgresql"
   - "mysql"
 do_index: true
+
 log:
   level: trace
   to_journald: false
+database_connections:
+  - name: redis@container
+    type: redis
+    connection_string: "redis://127.0.0.1:6379"
+  - name: mysql@container
+    type: mysql
+    connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
+  - name: postgres@container
+    type: postgres
+    connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
 sensors:
-  - name: dummy
+  - name: echo
     type: shell
-    command: "echo 21"
-    description: "Does nothing"
+    command: 'echo 4'
+    description: "Get random value from shell"
+    link: "http://example.org"
+    tags:
+      a: b
+      c: d
+
+  - name: endpoint
+    type: endpoint
+    description: "Updates value by incoming POST requests"
+    link: "http://localhost:3000/endpoint"
+    token: "test321"
+    tags:
+      a: b
+      c: d
+
+  - name: redis
+    type: redis
+    description: "Get key A"
     link: "https://example.org"
+    connection_name: "redis@container"
+    query: "get a"
+    tags:
+      a: b
+      c: d
+
+  - name: mysql
+    type: mysql
+    description: "Select random number from range"
+    link: "https://dev.mysql.com/doc/refman/8.0/en/mathematical-functions.html#function_rand"
+    connection_name: "mysql@container"
+    query: "SELECT rand()*99+1 as random"
+    minimum: 1
+    maximum: 100
+    tags:
+      a: b
+      c: d
+
+  - name: postgres
+    type: postgres
+    description: "Select random number from range"
+    link: "https://www.postgresql.org/docs/current/functions-math.html"
+    connection_name: "postgres@container"
+    query: "SELECT random()*99+1 as random"
+    minimum: 1
+    maximum: 100
     tags:
       a: b
       c: d

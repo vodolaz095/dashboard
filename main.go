@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"os"
 	"os/signal"
@@ -10,21 +11,22 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"github.com/vodolaz095/dashboard/pkg/healthcheck"
-	"github.com/vodolaz095/dashboard/pkg/zerologger"
-	"github.com/vodolaz095/dashboard/sensors"
-	"github.com/vodolaz095/dashboard/sensors/endpoint"
-	"github.com/vodolaz095/dashboard/transport/webserver"
 	"github.com/vodolaz095/dqueue"
 
 	"github.com/vodolaz095/dashboard/config"
+	"github.com/vodolaz095/dashboard/pkg/healthcheck"
+	"github.com/vodolaz095/dashboard/pkg/zerologger"
+	"github.com/vodolaz095/dashboard/sensors"
 	"github.com/vodolaz095/dashboard/sensors/curl"
+	"github.com/vodolaz095/dashboard/sensors/endpoint"
 	"github.com/vodolaz095/dashboard/sensors/mysql"
 	"github.com/vodolaz095/dashboard/sensors/postgres"
 	"github.com/vodolaz095/dashboard/sensors/redis"
 	"github.com/vodolaz095/dashboard/sensors/shell"
 	"github.com/vodolaz095/dashboard/service"
+	"github.com/vodolaz095/dashboard/transport/webserver"
 )
 
 var Version = "development"
@@ -62,8 +64,34 @@ func main() {
 		log.Fatal().Msgf("No sensors configured in %s!", pathToConfig)
 	}
 
-	// generate sensors from config
+	// init service
 	updateQueue := dqueue.New()
+	srv := service.SensorsService{
+		UpdateQueue:           &updateQueue,
+		UpdateInterval:        100 * time.Millisecond,
+		MysqlConnections:      make(map[string]*sql.Conn, 0),
+		PostgresqlConnections: make(map[string]*sql.Conn, 0),
+		RedisConnections:      make(map[string]*redisClient.Client, 0),
+	}
+	// init database connections
+	for i := range cfg.DatabaseConnections {
+		err = srv.MakeConnection(ctx,
+			cfg.DatabaseConnections[i].Name,
+			service.DatabaseConnectionType(cfg.DatabaseConnections[i].Type),
+			cfg.DatabaseConnections[i].DatabaseConnectionString,
+		)
+		if err != nil {
+			log.Fatal().Err(err).Msgf("Error initializing connection %s (%s): %s",
+				cfg.DatabaseConnections[i].Name,
+				cfg.DatabaseConnections[i].Type,
+				err,
+			)
+		}
+	}
+	log.Info().Msgf("Database connections (%v) initialized", len(cfg.DatabaseConnections))
+
+	// generate sensors from config
+	var connectionIsFound bool
 	byIndex := make([]string, len(cfg.Sensors))
 	byName := make(map[string]sensors.ISensor, 0)
 	for i := range cfg.Sensors {
@@ -72,7 +100,7 @@ func main() {
 				cfg.Sensors[i].Name, cfg.Sensors[i].Type,
 			)
 		switch cfg.Sensors[i].Type {
-		case "mysql":
+		case "mysql", "mariadb":
 			ms := &mysql.Sensor{}
 			ms.Name = cfg.Sensors[i].Name
 			ms.Type = "mysql"
@@ -83,109 +111,125 @@ func main() {
 			ms.Maximum = cfg.Sensors[i].Maximum
 			ms.Tags = cfg.Sensors[i].Tags
 
-			ms.DatabaseConnectionString = cfg.Sensors[i].DatabaseConnectionString
 			ms.Query = cfg.Sensors[i].Query
-
+			ms.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
+			ms.Con, connectionIsFound = srv.MysqlConnections[cfg.Sensors[i].ConnectionName]
+			if !connectionIsFound {
+				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
+					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+				)
+			}
 			byName[ms.Name] = ms
 			byIndex[i] = ms.Name
 			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 			break
 		case "redis":
-			ms := &redis.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "redis"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
+			rs := &redis.Sensor{}
+			rs.Name = cfg.Sensors[i].Name
+			rs.Type = "redis"
+			rs.RefreshRate = cfg.Sensors[i].RefreshRate
+			rs.Description = cfg.Sensors[i].Description
+			rs.Link = cfg.Sensors[i].Link
+			rs.Minimum = cfg.Sensors[i].Minimum
+			rs.Maximum = cfg.Sensors[i].Maximum
+			rs.Tags = cfg.Sensors[i].Tags
 
-			ms.DatabaseConnectionString = cfg.Sensors[i].DatabaseConnectionString
-			ms.Query = cfg.Sensors[i].Query
+			rs.Query = cfg.Sensors[i].Query
+			rs.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
+			rs.Client, connectionIsFound = srv.RedisConnections[cfg.Sensors[i].ConnectionName]
+			if !connectionIsFound {
+				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
+					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+				)
+			}
 
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+			byName[rs.Name] = rs
+			byIndex[i] = rs.Name
+			updateQueue.ExecuteAfter(rs.Name, 50*time.Millisecond)
 
 			break
 		case "postgres":
-			ms := &postgres.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "postgres"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
+			ps := &postgres.Sensor{}
+			ps.Name = cfg.Sensors[i].Name
+			ps.Type = "postgres"
+			ps.RefreshRate = cfg.Sensors[i].RefreshRate
+			ps.Description = cfg.Sensors[i].Description
+			ps.Link = cfg.Sensors[i].Link
+			ps.Minimum = cfg.Sensors[i].Minimum
+			ps.Maximum = cfg.Sensors[i].Maximum
+			ps.Tags = cfg.Sensors[i].Tags
 
-			ms.DatabaseConnectionString = cfg.Sensors[i].DatabaseConnectionString
-			ms.Query = cfg.Sensors[i].Query
+			ps.Query = cfg.Sensors[i].Query
+			ps.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
+			ps.Con, connectionIsFound = srv.PostgresqlConnections[cfg.Sensors[i].ConnectionName]
+			if !connectionIsFound {
+				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
+					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+				)
+			}
 
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+			byName[ps.Name] = ps
+			byIndex[i] = ps.Name
+			updateQueue.ExecuteAfter(ps.Name, 50*time.Millisecond)
 
 			break
 		case "curl":
-			ms := &curl.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "curl"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
+			cs := &curl.Sensor{}
+			cs.Name = cfg.Sensors[i].Name
+			cs.Type = "curl"
+			cs.RefreshRate = cfg.Sensors[i].RefreshRate
+			cs.Description = cfg.Sensors[i].Description
+			cs.Link = cfg.Sensors[i].Link
+			cs.Minimum = cfg.Sensors[i].Minimum
+			cs.Maximum = cfg.Sensors[i].Maximum
+			cs.Tags = cfg.Sensors[i].Tags
 
-			ms.HttpMethod = cfg.Sensors[i].HttpMethod
-			ms.Endpoint = cfg.Sensors[i].Endpoint
-			ms.Headers = cfg.Sensors[i].Headers
-			ms.Body = cfg.Sensors[i].Body
-			ms.JsonPath = cfg.Sensors[i].JsonPath
+			cs.HttpMethod = cfg.Sensors[i].HttpMethod
+			cs.Endpoint = cfg.Sensors[i].Endpoint
+			cs.Headers = cfg.Sensors[i].Headers
+			cs.Body = cfg.Sensors[i].Body
+			cs.JsonPath = cfg.Sensors[i].JsonPath
 
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+			byName[cs.Name] = cs
+			byIndex[i] = cs.Name
+			updateQueue.ExecuteAfter(cs.Name, 50*time.Millisecond)
 
 			break
 		case "shell":
-			ms := &shell.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "shell"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
+			ss := &shell.Sensor{}
+			ss.Name = cfg.Sensors[i].Name
+			ss.Type = "shell"
+			ss.RefreshRate = cfg.Sensors[i].RefreshRate
+			ss.Description = cfg.Sensors[i].Description
+			ss.Link = cfg.Sensors[i].Link
+			ss.Minimum = cfg.Sensors[i].Minimum
+			ss.Maximum = cfg.Sensors[i].Maximum
+			ss.Tags = cfg.Sensors[i].Tags
 
-			ms.Command = cfg.Sensors[i].Command
-			ms.Environment = cfg.Sensors[i].Environment
-			ms.JsonPath = cfg.Sensors[i].JsonPath
+			ss.Command = cfg.Sensors[i].Command
+			ss.Environment = cfg.Sensors[i].Environment
+			ss.JsonPath = cfg.Sensors[i].JsonPath
 
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+			byName[ss.Name] = ss
+			byIndex[i] = ss.Name
+			updateQueue.ExecuteAfter(ss.Name, 50*time.Millisecond)
 
 			break
 		case "endpoint":
-			ms := &endpoint.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "endpoint"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
+			es := &endpoint.Sensor{}
+			es.Name = cfg.Sensors[i].Name
+			es.Type = "endpoint"
+			es.RefreshRate = cfg.Sensors[i].RefreshRate
+			es.Description = cfg.Sensors[i].Description
+			es.Link = cfg.Sensors[i].Link
+			es.Minimum = cfg.Sensors[i].Minimum
+			es.Maximum = cfg.Sensors[i].Maximum
+			es.Tags = cfg.Sensors[i].Tags
+			es.Token = cfg.Sensors[i].Token
 
-			ms.Token = cfg.Sensors[i].Token
-
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
+			byName[es.Name] = es
+			byIndex[i] = es.Name
+			updateQueue.ExecuteAfter(es.Name, 50*time.Millisecond)
 
 			break
 		default:
@@ -193,13 +237,15 @@ func main() {
 		}
 	}
 
+	srv.ListOfSensors = byIndex
+	srv.Sensors = byName
 	// init service
-	srv := service.SensorsService{
-		UpdateQueue:    &updateQueue,
-		UpdateInterval: 100 * time.Millisecond,
-		ListOfSensors:  byIndex,
-		Sensors:        byName,
+	err = srv.InitSensors(ctx)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("error initializing sensors: %s", err)
 	}
+	log.Info().Msgf("Sensors (%v) initialized", len(srv.Sensors))
+
 	// set systemd watchdog
 	systemdWatchdogEnabled, err := healthcheck.Ready()
 	if err != nil {
@@ -231,11 +277,17 @@ func main() {
 		}
 	}
 
-	// configure transports
+	// configure webserver transport
 	webServerTransport := webserver.Transport{
-		Address:        cfg.Listen,
+		Address:     cfg.Listen,
+		Version:     Version,
+		Domain:      cfg.Domain,
+		Title:       cfg.Title,
+		Description: cfg.Description,
+		Keywords:    cfg.Keywords,
+		DoIndex:     cfg.DoIndex,
+
 		SensorsService: &srv,
-		Domain:         cfg.Domain,
 	}
 
 	// handle signals

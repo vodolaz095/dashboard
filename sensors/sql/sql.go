@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -25,7 +26,13 @@ func (s *Sensor) Ping(ctx context.Context) error {
 }
 
 func (s *Sensor) Close(ctx context.Context) error {
-	return s.Con.Close()
+	err := s.Con.Close()
+	if err != nil {
+		if errors.Is(err, sql.ErrConnDone) {
+			return nil
+		}
+	}
+	return err
 }
 
 func (s *Sensor) Value() float64 {

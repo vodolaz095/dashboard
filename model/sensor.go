@@ -33,7 +33,7 @@ func (s *Sensor) String() string {
 	tags := make([]string, len(s.Tags))
 	i := 0
 	for k := range s.Tags {
-		tags[i] = fmt.Sprintf("%s=%q", k, s.Tags[k])
+		tags[i] = fmt.Sprintf("%q=%q", k, s.Tags[k])
 		i++
 	}
 	buh := bytes.NewBufferString("")

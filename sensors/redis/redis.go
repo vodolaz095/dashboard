@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -11,26 +12,27 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	client    *redis.Client
+	Client    *redis.Client
 	val       float64
 	updatedAt time.Time
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
-	opts, err := redis.ParseURL(s.DatabaseConnectionString)
-	if err != nil {
-		return err
-	}
-	s.client = redis.NewClient(opts)
-	return s.client.Ping(ctx).Err()
+	return s.Ping(ctx)
 }
 
 func (s *Sensor) Ping(ctx context.Context) error {
-	return s.client.Ping(ctx).Err()
+	return s.Client.Ping(ctx).Err()
 }
 
 func (s *Sensor) Close(ctx context.Context) error {
-	return s.client.Close()
+	err := s.Client.Close()
+	if err != nil {
+		if errors.Is(err, redis.ErrClosed) {
+			return nil
+		}
+	}
+	return err
 }
 
 func (s *Sensor) Value() float64 {
@@ -44,7 +46,7 @@ func (s *Sensor) Update(ctx context.Context, _ float64) error {
 	for i := range args {
 		b[i] = args[i]
 	}
-	val, err := s.client.Do(ctx, b...).Float64()
+	val, err := s.Client.Do(ctx, b...).Float64()
 	if err != nil {
 		return err
 	}

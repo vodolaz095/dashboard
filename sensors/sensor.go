@@ -42,8 +42,8 @@ type UnimplementedSensor struct {
 	 * Parameters used for mysql, redis and postgres
 	 */
 
-	// DatabaseConnectionString is used to dial database
-	DatabaseConnectionString string `yaml:"database_connection_string"`
+	// DatabaseConnectionName is used to dial database
+	DatabaseConnectionName string `yaml:"database_connection_name"`
 	// Query is send to remote database in order to receive data from it
 	Query string `yaml:"query"`
 

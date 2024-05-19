@@ -3,8 +3,6 @@ package shell
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -20,16 +18,10 @@ type Sensor struct {
 	updatedAt time.Time
 }
 
-func (s *Sensor) Init(ctx context.Context) error {
+func (s *Sensor) Init(ctx context.Context) (err error) {
 	args := strings.Split(s.Command, " ")
-	stat, err := os.Stat(args[0])
-	if err != nil {
-		return err
-	}
-	if stat.Mode()&0111 == 0 {
-		return fmt.Errorf("file %s is not executable", s.Command)
-	}
-	return nil
+	_, err = exec.LookPath(args[0])
+	return err
 }
 
 func (s *Sensor) Ping(ctx context.Context) error {

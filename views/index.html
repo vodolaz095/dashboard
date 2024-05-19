@@ -1,0 +1,48 @@
+{{define "index.html"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{.title}}</title>
+  <meta name="description" content="{{.description}}" />
+  <meta name="keywords" content="{{.keywords}}" />
+{{if .doIndex}}
+  <meta name="robots" content="index,follow" />
+{{end}}
+</head>
+<body>
+<h1>{{.title}}</h1>
+<p>{{.description}}</p>
+<p>{{.keywords}}</p>
+<hr>
+<table>
+  <thead>
+  <tr>
+    <th>#</th>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Minimum</th>
+    <th>Value</th>
+    <th>Maximum</th>
+    <th>Error</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+{{ range $index, $value := .sensors }}
+<tr>
+  <td>{{$index}}</td>
+  <td>{{$value.Name}}</td>
+  <td>{{$value.Type}}</td>
+  <td>{{$value.Minimum}}</td>
+  <td id="value_{{$value.Name}}">{{$value.Value}}</td>
+  <td>{{$value.Maximum}}</td>
+  <td>{{$value.Error}}</td>
+  <td>{{$value.Description}}</td>
+</tr>
+{{ end }}
+  </tbody>
+</table>
+</body>
+</html>
+{{end}}

@@ -13,8 +13,14 @@ import (
 )
 
 type Transport struct {
-	Address        string
-	Domain         string
+	Address     string
+	Domain      string
+	Version     string
+	Title       string
+	Description string
+	Keywords    []string
+	DoIndex     bool
+
 	SensorsService *service.SensorsService
 	engine         *gin.Engine
 }
@@ -24,6 +30,11 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	tr.engine = gin.New()
 	middlewares.Secure(tr.engine, tr.Domain)
 	middlewares.EmulatePHP(tr.engine)
+
+	err = injectTemplates(tr.engine)
+	if err != nil {
+		return err
+	}
 
 	tr.exposeIndex()
 	tr.exposeJSON()
