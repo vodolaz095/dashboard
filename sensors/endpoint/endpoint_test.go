@@ -1,6 +1,7 @@
 package endpoint
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -14,8 +15,12 @@ func TestEndpointSensor(t *testing.T) {
 	sensor.Name = "endpoint"
 	sensor.Type = "endpoint"
 	sensor.RefreshRate = time.Second
-
-	err := sensors.DoTestSensor(t, &sensor, expected)
+	err := sensor.Init(context.TODO())
+	if err != nil {
+		t.Errorf("error initializing endpoint: %s", err)
+	}
+	sensor.Set(expected)
+	err = sensors.DoTestSensor(t, &sensor, expected)
 	if err != nil {
 		t.Errorf("error testing endpoint: %s", err)
 	}

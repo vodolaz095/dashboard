@@ -39,7 +39,7 @@ func (s *Sensor) Value() float64 {
 	return s.val
 }
 
-func (s *Sensor) Update(ctx context.Context, _ float64) error {
+func (s *Sensor) Update(ctx context.Context) error {
 	s.updatedAt = time.Now()
 	args := strings.Split(s.Query, " ")
 	b := make([]interface{}, len(args))

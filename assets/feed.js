@@ -17,6 +17,11 @@ feed.onmessage = function (event) {
   console.log('Feed: event received:', event.data);
 };
 
+function formatTimestamp(input) {
+  const now = new Date(input);
+  return now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+}
+
 function doSubscribeOn(eventTypeName) {
   const itemValue = document.getElementById('value_' + eventTypeName);
   const itemError = document.getElementById('error_' + eventTypeName);
@@ -28,8 +33,7 @@ function doSubscribeOn(eventTypeName) {
       const params = JSON.parse(e.data);
       itemValue.innerText = params.value;
       itemError.innerText = params.error;
-      const now = new Date(params.timestamp);
-      itemTimestamp.innerText = now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+      itemTimestamp.innerText = formatTimestamp(params.timestamp)
     } catch (err) {
       console.error(err);
     }
@@ -41,8 +45,7 @@ function doClock() {
   feed.addEventListener('clock', function (e) {
     try {
       const params = JSON.parse(e.data);
-      const now = new Date(params.timestamp);
-      clock.innerText = now.getHours()+':'+now.getMinutes()+':'+now.getSeconds();
+      clock.innerText = formatTimestamp(params.timestamp)
     } catch (err) {
       console.error(err);
     }

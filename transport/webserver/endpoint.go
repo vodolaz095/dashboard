@@ -37,11 +37,8 @@ func (tr *Transport) exposeUpdate() {
 		log.Warn().Msgf("Updating endpoint sensor %s with value %v",
 			casted.Name, data.Value,
 		)
-		err = casted.Update(c.Request.Context(), data.Value)
-		if err != nil {
-			c.String(http.StatusBadRequest, "Error updating sensor: %s", err)
-			return
-		}
+		casted.Set(data.Value)
+		tr.SensorsService.Broadcast(casted.Name, "", data.Value)
 		c.AbortWithStatus(http.StatusNoContent)
 	})
 }

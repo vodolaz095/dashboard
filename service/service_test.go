@@ -19,7 +19,7 @@ type testSensor struct {
 	mu     *sync.RWMutex
 	T      *testing.T
 	Alive  bool
-	value  float64
+	inner  float64
 	Closed bool
 }
 
@@ -43,7 +43,7 @@ func (ts *testSensor) Close(_ context.Context) error {
 func (ts *testSensor) Value() float64 {
 	ts.mu.RLock()
 	defer ts.mu.RUnlock()
-	return ts.value
+	return ts.inner
 }
 
 func (ts *testSensor) UpdatedAt() time.Time {
@@ -52,16 +52,20 @@ func (ts *testSensor) UpdatedAt() time.Time {
 	return time.Now()
 }
 
-func (ts *testSensor) Update(_ context.Context, val float64) error {
+func (ts *testSensor) Update(_ context.Context) error {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
-	if val != 0 {
-		ts.T.Logf("Updating sensor to %v", val)
-		ts.value = val
+	if ts.inner != 0 {
 		return nil
 	}
 	ts.T.Logf("Zero value not allowed")
 	return errors.New("zero value not allowed")
+}
+
+func (ts *testSensor) Set(val float64) {
+	ts.mu.Lock()
+	defer ts.mu.Unlock()
+	ts.inner = val
 }
 
 func TestSensorsServiceKeepUpdated(t *testing.T) {
@@ -171,7 +175,8 @@ func TestSensorsServiceBroadcast(t *testing.T) {
 	go func() {
 		for i := range updates {
 			t.Logf("Sending update %v: %s %v...", i, updates[i].Name, updates[i].Value)
-			err1 := service.Update(ctx, updates[i].Name, updates[i].Value)
+			ts.Set(updates[i].Value)
+			err1 := service.Refresh(ctx, updates[i].Name)
 			if err1 != nil {
 				if err1.Error() != updates[i].Error {
 					t.Errorf("unexpected error %s for update %v", err1, i)

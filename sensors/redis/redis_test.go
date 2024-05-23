@@ -22,7 +22,6 @@ func TestRedisSensor(t *testing.T) {
 	sensor := Sensor{}
 	sensor.Name = "test_redis"
 	sensor.Type = "redis"
-	sensor.DatabaseConnectionString = redisConnectionString
 	sensor.Query = "get a"
 	sensor.RefreshRate = time.Second
 	sensor.Description = "test redis sensor"
@@ -42,14 +41,9 @@ func TestRedisSensor(t *testing.T) {
 		return
 	}
 
+	sensor.Client = client
 	err = sensors.DoTestSensor(t, &sensor, 5.3)
 	if err != nil {
 		t.Errorf("error executing test: %s", err)
-	}
-
-	err = client.Close()
-	if err != nil {
-		t.Errorf("error closing redis connection: %s", err)
-		return
 	}
 }

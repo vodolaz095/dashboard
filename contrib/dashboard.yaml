@@ -26,34 +26,34 @@ database_connections:
     type: postgres
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
 sensors:
-#  - name: echo
-#    type: shell
-#    command: 'echo 4'
-#    description: "Get random value from shell"
-#    link: "http://example.org"
-#    tags:
-#      a: b
-#      c: d
+  - name: echo
+    type: shell
+    command: 'echo 4'
+    description: "Get random value from shell"
+    link: "http://example.org"
+    tags:
+      a: b
+      c: d
 
-#  - name: endpoint
-#    type: endpoint
-#    description: "Updates value by incoming POST requests"
-#    link: "http://localhost:3000/endpoint"
-#    token: "test321"
-#    tags:
-#      a: b
-#      c: d
+  - name: endpoint
+    type: endpoint
+    description: "Updates value by incoming POST requests"
+    link: "http://localhost:3000/endpoint"
+    token: "test321"
+    tags:
+      a: b
+      c: d
 
-#  - name: redis
-#    type: redis
-#    description: "Get key A"
-#    link: "https://example.org"
-#    connection_name: "redis@container"
-#    query: "get a"
-#    tags:
-#      a: b
-#      c: d
-#
+  - name: redis
+    type: redis
+    description: "Get key A"
+    link: "https://example.org"
+    connection_name: "redis@container"
+    query: "get a"
+    tags:
+      a: b
+      c: d
+
   - name: mysql
     type: mysql
     description: "Select random number from range"

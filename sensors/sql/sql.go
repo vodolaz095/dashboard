@@ -39,7 +39,7 @@ func (s *Sensor) Value() float64 {
 	return s.val
 }
 
-func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
+func (s *Sensor) Update(ctx context.Context) (err error) {
 	var val float64
 	err = s.Con.QueryRowContext(ctx, s.Query).Scan(&val)
 	if err != nil {

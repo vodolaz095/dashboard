@@ -54,7 +54,7 @@ func (s *Sensor) Value() float64 {
 	return s.val
 }
 
-func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
+func (s *Sensor) Update(ctx context.Context) (err error) {
 	var val float64
 	body := bytes.NewBufferString(s.Body)
 	req, err := http.NewRequest(s.Method, s.Endpoint, body)

@@ -116,7 +116,7 @@ func main() {
 			ms.Con, connectionIsFound = srv.MysqlConnections[cfg.Sensors[i].ConnectionName]
 			if !connectionIsFound {
 				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
 				)
 			}
 			byName[ms.Name] = ms
@@ -139,7 +139,7 @@ func main() {
 			rs.Client, connectionIsFound = srv.RedisConnections[cfg.Sensors[i].ConnectionName]
 			if !connectionIsFound {
 				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
 				)
 			}
 
@@ -164,7 +164,7 @@ func main() {
 			ps.Con, connectionIsFound = srv.PostgresqlConnections[cfg.Sensors[i].ConnectionName]
 			if !connectionIsFound {
 				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, i, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
 				)
 			}
 

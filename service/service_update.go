@@ -6,19 +6,20 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (ss *SensorsService) Update(ctx context.Context, name string, val float64) (err error) {
+func (ss *SensorsService) Refresh(ctx context.Context, name string) (err error) {
 	sensor, found := ss.Sensors[name]
 	if !found {
 		return SensorNotFoundErr
 	}
-	err = sensor.Update(ctx, val)
+	err = sensor.Update(ctx)
 	if err != nil {
-		n := ss.Broadcast(name, err.Error(), val)
+		n := ss.Broadcast(name, err.Error(), sensor.Value())
 		log.Error().Err(err).
 			Str("name", name).
-			Float64("value", val).
+			Float64("value", sensor.Value()).
 			Int("notified", n).
-			Msgf("Error updating sensor %s with value %v and %v notified: %s", name, val, n, err)
+			Msgf("Error updating sensor %s with value %v and %v notified: %s",
+				name, sensor.Value(), n, err)
 		return err
 	}
 	n := ss.Broadcast(name, "", sensor.Value())

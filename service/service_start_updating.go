@@ -21,7 +21,7 @@ func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
 				rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
 				name = task.Payload.(string)
 				log.Debug().Msgf("Updating sensor %s...", name)
-				err := ss.Update(rtc, name, 0)
+				err := ss.Refresh(rtc, name)
 				cancel()
 				if err != nil {
 					log.Error().Err(err).Msgf("Sensor %s update failed with %s",

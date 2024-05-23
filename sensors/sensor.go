@@ -21,7 +21,7 @@ type ISensor interface {
 	/*
 		To be implemented in custom sensors
 	*/
-	Update(context.Context, float64) error
+	Update(context.Context) error
 	Value() float64
 	UpdatedAt() time.Time
 }
@@ -137,7 +137,7 @@ func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
 		return
 	}
 	t.Logf("Sensor pinged!")
-	err = sensor.Update(ctx, expected)
+	err = sensor.Update(ctx)
 	if err != nil {
 		t.Errorf("error updating: %s", err)
 		return

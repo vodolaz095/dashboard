@@ -36,7 +36,7 @@ func (s *Sensor) Value() float64 {
 	return s.val
 }
 
-func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
+func (s *Sensor) Update(ctx context.Context) (err error) {
 	var val float64
 	args := strings.Split(s.Command, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)

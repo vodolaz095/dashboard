@@ -34,12 +34,22 @@ func (s *Sensor) Value() float64 {
 	return s.val
 }
 
-func (s *Sensor) Update(ctx context.Context, newVal float64) error {
+func (s *Sensor) Update(_ context.Context) error {
+	return nil
+}
+
+func (s *Sensor) Set(newVal float64) {
 	s.mu.Lock()
 	s.val = newVal
 	s.updatedAt = time.Now()
 	s.mu.Unlock()
-	return nil
+}
+
+func (s *Sensor) Increment(delta float64) {
+	s.mu.Lock()
+	s.val = s.val + delta
+	s.updatedAt = time.Now()
+	s.mu.Unlock()
 }
 
 func (s *Sensor) UpdatedAt() time.Time {
