@@ -141,7 +141,7 @@ func TestSensorsServiceBroadcast(t *testing.T) {
 	}
 	_, err = service.Subscribe(ctx, "test_subscriber")
 	if err != nil {
-		if err.Error() != "duplicate subscriber name" {
+		if err.Error() != "duplicate subscriber" {
 			t.Errorf("wrong duplicate subscribber error: %s", err.Error())
 			cancel()
 			return

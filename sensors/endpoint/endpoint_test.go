@@ -19,7 +19,8 @@ func TestEndpointSensor(t *testing.T) {
 	if err != nil {
 		t.Errorf("error initializing endpoint: %s", err)
 	}
-	sensor.Set(expected)
+	sensor.Set(expected - 1)
+	sensor.Increment(1)
 	err = sensors.DoTestSensor(t, &sensor, expected)
 	if err != nil {
 		t.Errorf("error testing endpoint: %s", err)
