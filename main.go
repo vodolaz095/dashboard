@@ -307,6 +307,7 @@ func main() {
 
 	// main loop
 	go srv.StartKeepingSensorsUpToDate(ctx)
+	go srv.StartClock(ctx)
 
 	go func() {
 		log.Debug().Msgf("Preparing to start webserver on %s...", webServerTransport.Address)

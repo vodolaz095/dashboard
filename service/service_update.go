@@ -21,7 +21,7 @@ func (ss *SensorsService) Update(ctx context.Context, name string, val float64) 
 			Msgf("Error updating sensor %s with value %v and %v notified: %s", name, val, n, err)
 		return err
 	}
-	n := ss.Broadcast(name, "", val)
+	n := ss.Broadcast(name, "", sensor.Value())
 	log.Debug().
 		Str("name", name).
 		Float64("value", sensor.Value()).

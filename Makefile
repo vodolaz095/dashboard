@@ -6,7 +6,12 @@ deps:
 run: start
 
 update_endpoint:
-	curl -H "Token: test321" -X POST -f name=endpoint -f value=21 http://localhost:3000/endpoint
+	curl -v -H "Host: localhost" \
+		-H "Token: test321" \
+	    -H "Content-Type: application/x-www-form-urlencoded" \
+		-X POST \
+        -d "name=endpoint&value=21" \
+		http://localhost:3000/update
 
 start:
 	go run main.go ./contrib/dashboard.yaml

@@ -13,7 +13,7 @@ func (ss *SensorsService) Subscribe(ctx context.Context, name string) (chan mode
 		return nil, DuplicateSubscriberError
 	}
 	log.Debug().Msgf("Creating subscription channel for %s...", name)
-	ch := make(chan model.Update, 10)
+	ch := make(chan model.Update, DefaultSubscriptionChannelChannelDepth)
 	if ss.subscribers == nil {
 		ss.subscribers = make(map[string]chan model.Update, 0)
 	}

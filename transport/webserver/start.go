@@ -51,7 +51,7 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	tr.exposeFeed()
 	tr.exposeJSON()
 	tr.exposeMetrics()
-	tr.exposeEndpoint()
+	tr.exposeUpdate()
 	tr.exposeHealthcheck()
 
 	listener, err := net.Listen("tcp", tr.Address)

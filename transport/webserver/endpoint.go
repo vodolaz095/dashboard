@@ -4,12 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dashboard/sensors/endpoint"
 	"github.com/vodolaz095/dashboard/transport/webserver/dto"
 )
 
-// exposeEndpoint exposes endpoint used to update sensor value by incoming HTTP POST request
-func (tr *Transport) exposeEndpoint() {
+// exposeUpdate exposes endpoint used to update sensor value by incoming HTTP POST request
+func (tr *Transport) exposeUpdate() {
 	tr.engine.POST("/update", func(c *gin.Context) {
 		var data dto.UpdateSensorRequest
 		err := c.Bind(&data)
@@ -33,6 +34,9 @@ func (tr *Transport) exposeEndpoint() {
 				return
 			}
 		}
+		log.Warn().Msgf("Updating endpoint sensor %s with value %v",
+			casted.Name, data.Value,
+		)
 		err = casted.Update(c.Request.Context(), data.Value)
 		if err != nil {
 			c.String(http.StatusBadRequest, "Error updating sensor: %s", err)

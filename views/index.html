@@ -9,6 +9,7 @@
 {{if .doIndex}}
   <meta name="robots" content="index,follow" />
 {{end}}
+  <link href="/assets/style.css" rel="stylesheet">
 </head>
 <body>
 <h1>{{.title}}</h1>
@@ -25,6 +26,7 @@
     <th>Value</th>
     <th>Maximum</th>
     <th>Error</th>
+    <th>Time: <span id="clock">...</span></th>
     <th>Description</th>
   </tr>
   </thead>
@@ -37,13 +39,21 @@
   <td>{{$value.Minimum}}</td>
   <td id="value_{{$value.Name}}">{{$value.Value}}</td>
   <td>{{$value.Maximum}}</td>
-  <td>{{$value.Error}}</td>
+  <td id="error_{{$value.Name}}">{{$value.Error}}</td>
+  <td id="timestamp_{{$value.Name}}">{{$value.UpdatedAt.Format "15:04:05"}}</td>
   <td>{{$value.Description}}</td>
 </tr>
 {{ end }}
   </tbody>
 </table>
 <script type="application/javascript" src="/assets/feed.js"></script>
+<script type="application/javascript">
+document.addEventListener("DOMContentLoaded", function(event) {
+  doClock();
+  {{ range $index, $value := .sensors }}doSubscribeOn({{$value.Name}});
+  {{ end }}
+});
+</script>
 </body>
 </html>
 {{end}}

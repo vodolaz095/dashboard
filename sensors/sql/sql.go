@@ -43,10 +43,11 @@ func (s *Sensor) Update(ctx context.Context, _ float64) (err error) {
 	var val float64
 	err = s.Con.QueryRowContext(ctx, s.Query).Scan(&val)
 	if err != nil {
-		s.updatedAt = time.Now()
+		return err
 	}
+	s.updatedAt = time.Now()
 	s.val = val
-	return err
+	return nil
 }
 
 func (s *Sensor) UpdatedAt() time.Time {
