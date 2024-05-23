@@ -46,12 +46,12 @@ func (s *Sensor) Update(ctx context.Context) error {
 	for i := range args {
 		b[i] = args[i]
 	}
+	s.updatedAt = time.Now()
 	val, err := s.Client.Do(ctx, b...).Float64()
 	if err != nil {
 		return err
 	}
 	s.val = val
-	s.updatedAt = time.Now()
 	return nil
 }
 

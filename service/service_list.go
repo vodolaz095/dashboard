@@ -23,6 +23,7 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 			s.Value = sensor.Value()
 			s.UpdatedAt = sensor.UpdatedAt()
 			s.Tags = sensor.GetTags()
+			s.Error = ""
 			ret[i] = s
 		} else {
 			ret[i] = model.Sensor{

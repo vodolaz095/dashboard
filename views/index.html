@@ -13,8 +13,7 @@
 </head>
 <body>
 <h1>{{.title}}</h1>
-<p>{{.description}}</p>
-<p>{{.keywords}}</p>
+<p id="description">{{.description}}</p>
 <hr>
 <table>
   <thead>
@@ -23,10 +22,10 @@
     <th>Name</th>
     <th>Type</th>
     <th>Minimum</th>
-    <th>Value</th>
+    <th class="val">Value</th>
     <th>Maximum</th>
     <th>Error</th>
-    <th>Time: <span id="clock">...</span></th>
+    <th title="Server time"><span id="clock">...</span></th>
     <th>Description</th>
   </tr>
   </thead>
@@ -37,15 +36,22 @@
   <td>{{$value.Name}}</td>
   <td>{{$value.Type}}</td>
   <td>{{$value.Minimum}}</td>
-  <td id="value_{{$value.Name}}">{{$value.Value}}</td>
+  <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>
   <td>{{$value.Maximum}}</td>
-  <td id="error_{{$value.Name}}">{{$value.Error}}</td>
+  <td class="err" id="error_{{$value.Name}}">{{$value.Error}}</td>
   <td id="timestamp_{{$value.Name}}">{{$value.UpdatedAt.Format "15:04:05"}}</td>
   <td>{{$value.Description}}</td>
 </tr>
 {{ end }}
   </tbody>
 </table>
+<hr>
+<p>
+  Additional:
+  <a href="/json">JSON</a>
+  <a href="/metrics">metrics</a>
+  <a href="https://github.com/vodolaz095/dashboard">Github</a>
+</p>
 <script type="application/javascript" src="/assets/feed.js"></script>
 <script type="application/javascript">
 document.addEventListener("DOMContentLoaded", function(event) {
