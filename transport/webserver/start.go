@@ -3,11 +3,14 @@ package webserver
 import (
 	"context"
 	"net"
+	"net/http"
 	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+
+	"github.com/vodolaz095/dashboard/assets"
 	"github.com/vodolaz095/dashboard/service"
 	"github.com/vodolaz095/dashboard/transport/webserver/middlewares"
 )
@@ -36,7 +39,16 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 		return err
 	}
 
+	tr.engine.StaticFS("/assets", http.FS(assets.Assets))
+	tr.engine.GET("/favicon.ico", func(c *gin.Context) {
+		c.FileFromFS("favicon.ico", http.FS(assets.Assets))
+	})
+	tr.engine.GET("/robots.txt", func(c *gin.Context) {
+		c.FileFromFS("robots.txt", http.FS(assets.Assets))
+	})
+
 	tr.exposeIndex()
+	tr.exposeFeed()
 	tr.exposeJSON()
 	tr.exposeMetrics()
 	tr.exposeEndpoint()
