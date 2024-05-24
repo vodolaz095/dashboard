@@ -28,7 +28,7 @@ func (s *Sensor) Close(ctx context.Context) error {
 	return nil
 }
 
-func (s *Sensor) Value() float64 {
+func (s *Sensor) GetValue() float64 {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.val
@@ -52,7 +52,7 @@ func (s *Sensor) Increment(delta float64) {
 	s.mu.Unlock()
 }
 
-func (s *Sensor) UpdatedAt() time.Time {
+func (s *Sensor) GetUpdatedAt() time.Time {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.updatedAt

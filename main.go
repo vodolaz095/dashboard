@@ -306,7 +306,7 @@ func main() {
 	}()
 
 	// main loop
-	go srv.StartKeepingSensorsUpToDate(ctx)
+	go srv.StartRefreshingSensors(ctx)
 	go srv.StartClock(ctx)
 
 	go func() {

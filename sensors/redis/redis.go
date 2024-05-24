@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,12 +13,12 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	Client    *redis.Client
-	val       float64
-	updatedAt time.Time
+	mu     *sync.Mutex
+	Client *redis.Client
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
+	s.mu = &sync.Mutex{}
 	return s.Ping(ctx)
 }
 
@@ -35,26 +36,20 @@ func (s *Sensor) Close(ctx context.Context) error {
 	return err
 }
 
-func (s *Sensor) Value() float64 {
-	return s.val
-}
-
 func (s *Sensor) Update(ctx context.Context) error {
-	s.updatedAt = time.Now()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	args := strings.Split(s.Query, " ")
 	b := make([]interface{}, len(args))
 	for i := range args {
 		b[i] = args[i]
 	}
-	s.updatedAt = time.Now()
 	val, err := s.Client.Do(ctx, b...).Float64()
 	if err != nil {
+		s.Error = err
 		return err
 	}
-	s.val = val
+	s.Value = val
+	s.UpdatedAt = time.Now()
 	return nil
-}
-
-func (s *Sensor) UpdatedAt() time.Time {
-	return s.updatedAt
 }

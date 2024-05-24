@@ -40,13 +40,13 @@ func (ts *testSensor) Close(_ context.Context) error {
 	return nil
 }
 
-func (ts *testSensor) Value() float64 {
+func (ts *testSensor) GetValue() float64 {
 	ts.mu.RLock()
 	defer ts.mu.RUnlock()
 	return ts.inner
 }
 
-func (ts *testSensor) UpdatedAt() time.Time {
+func (ts *testSensor) GetUpdatedAt() time.Time {
 	ts.mu.RLock()
 	defer ts.mu.RUnlock()
 	return time.Now()

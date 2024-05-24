@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/oliveagle/jsonpath"
@@ -17,13 +18,12 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
+	mu                 *sync.Mutex
 	Headers            map[string]string
 	Method             string
 	Body               string
 	ExpectedStatusCode int
 	Client             *http.Client
-	val                float64
-	updatedAt          time.Time
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
@@ -39,6 +39,7 @@ func (s *Sensor) Init(ctx context.Context) error {
 	if s.Client == nil {
 		s.Client = http.DefaultClient
 	}
+	s.mu = &sync.Mutex{}
 	return nil
 }
 
@@ -50,11 +51,15 @@ func (s *Sensor) Close(ctx context.Context) error {
 	return nil
 }
 
-func (s *Sensor) Value() float64 {
-	return s.val
-}
-
 func (s *Sensor) Update(ctx context.Context) (err error) {
+	s.mu.Lock()
+	defer func() {
+		s.mu.Unlock()
+		if err != nil {
+			s.Error = err
+		}
+	}()
+
 	var val float64
 	body := bytes.NewBufferString(s.Body)
 	req, err := http.NewRequest(s.Method, s.Endpoint, body)
@@ -84,8 +89,8 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		if err != nil {
 			return
 		}
-		s.val = val
-		s.updatedAt = time.Now()
+		s.Value = val
+		s.UpdatedAt = time.Now()
 		return
 	}
 
@@ -98,11 +103,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
-	s.val = res.(float64)
-	s.updatedAt = time.Now()
+	s.Value = res.(float64)
+	s.UpdatedAt = time.Now()
 	return nil
-}
-
-func (s *Sensor) UpdatedAt() time.Time {
-	return s.updatedAt
 }

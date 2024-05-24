@@ -5,16 +5,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
 type Sensor struct {
+	mu *sync.Mutex
 	sensors.UnimplementedSensor
-	Con       *sql.Conn
-	val       float64
-	updatedAt time.Time
+	Con *sql.Conn
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
@@ -35,21 +35,19 @@ func (s *Sensor) Close(ctx context.Context) error {
 	return err
 }
 
-func (s *Sensor) Value() float64 {
-	return s.val
-}
-
 func (s *Sensor) Update(ctx context.Context) (err error) {
+	if s.mu == nil {
+		s.mu = &sync.Mutex{}
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	var val float64
 	err = s.Con.QueryRowContext(ctx, s.Query).Scan(&val)
 	if err != nil {
+		s.Error = err
 		return err
 	}
-	s.updatedAt = time.Now()
-	s.val = val
+	s.UpdatedAt = time.Now()
+	s.Value = val
 	return nil
-}
-
-func (s *Sensor) UpdatedAt() time.Time {
-	return s.updatedAt
 }

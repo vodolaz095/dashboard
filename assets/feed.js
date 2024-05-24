@@ -6,11 +6,11 @@ feed.onopen = function () {
   console.log('Feed: connection established');
 };
 feed.onerror = function () {
-  console.log(`Feed: error. State: ${this.readyState}`);
+  console.error(`Feed: error. State: ${this.readyState}`);
   if (this.readyState === EventSource.CONNECTING) {
     console.log('Feed: reconnecting...');
   } else {
-    console.log('Feed: fatal error...');
+    console.error('Feed: fatal error...');
   }
 };
 feed.onmessage = function (event) {
@@ -19,10 +19,11 @@ feed.onmessage = function (event) {
 
 function formatTimestamp(input) {
   const now = new Date(input);
-  const ret = [];
-  ret[0] = now.getHours();
-  ret[1] = (now.getMinutes() > 9) ? now.getMinutes() : '0'+now.getMinutes();
-  return ret.join(':');
+  return [
+    now.getHours(),
+    (now.getMinutes() > 9) ? now.getMinutes() : '0' + now.getMinutes(),
+    (now.getSeconds() > 9) ? now.getSeconds() : '0' + now.getSeconds(),
+  ].join(':');
 }
 
 function doSubscribeOn(eventTypeName) {

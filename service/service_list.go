@@ -20,8 +20,8 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 			s.Link = sensor.GetLink()
 			s.Minimum = sensor.GetMinimum()
 			s.Maximum = sensor.GetMaximum()
-			s.Value = sensor.Value()
-			s.UpdatedAt = sensor.UpdatedAt()
+			s.Value = sensor.GetValue()
+			s.UpdatedAt = sensor.GetUpdatedAt()
 			s.Tags = sensor.GetTags()
 			s.Error = ""
 			ret[i] = s

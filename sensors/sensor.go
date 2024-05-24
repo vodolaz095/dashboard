@@ -7,10 +7,9 @@ import (
 )
 
 type ISensor interface {
-	Init(ctx context.Context) error
-	Ping(ctx context.Context) error
-	Close(ctx context.Context) error
-
+	/*
+		Implemented in abstract class of UnimplementedSensor
+	*/
 	GetName() string
 	GetType() string
 	GetDescription() string
@@ -18,12 +17,17 @@ type ISensor interface {
 	GetMinimum() float64
 	GetMaximum() float64
 	GetTags() map[string]string
+	GetValue() float64
+	GetUpdatedAt() time.Time
+	GetLastError() error
+	Next() time.Time
 	/*
 		To be implemented in custom sensors
 	*/
+	Init(ctx context.Context) error
+	Ping(ctx context.Context) error
+	Close(ctx context.Context) error
 	Update(context.Context) error
-	Value() float64
-	UpdatedAt() time.Time
 }
 
 type UnimplementedSensor struct {
@@ -37,6 +41,20 @@ type UnimplementedSensor struct {
 	Link string `yaml:"link" validate:"http_url"`
 	// Tags helps to group sensors
 	Tags map[string]string `yaml:"tags"`
+
+	// Value is used to store of value of sensor
+	Value float64 `yaml:"-"`
+	// UpdatedAt is used to store moment when sensor was updated last time
+	UpdatedAt time.Time `yaml:"-"`
+	// Error is used to store most recent error of sensor update
+	Error error
+
+	// RefreshRate is used to define how often we reload data
+	RefreshRate time.Duration `yaml:"refresh_rate"`
+	// Minimum is used to warn, when something is below safe value
+	Minimum float64 `yaml:"minimum"`
+	// Maximum is used to warn, when something is above safe value
+	Maximum float64 `yaml:"maximum"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres
@@ -75,13 +93,6 @@ type UnimplementedSensor struct {
 	 */
 	// Token is Bearer strategy token used to send metrics for endpoint sensor
 	Token string `json:"token"`
-
-	// RefreshRate is used to define how often we reload data
-	RefreshRate time.Duration `yaml:"refresh_rate"`
-	// Minimum is used to warn, when something is below safe value
-	Minimum float64 `yaml:"minimum"`
-	// Maximum is used to warn, when something is above safe value
-	Maximum float64 `yaml:"maximum"`
 }
 
 func (u *UnimplementedSensor) GetName() string {
@@ -112,8 +123,25 @@ func (u *UnimplementedSensor) GetTags() map[string]string {
 	return u.Tags
 }
 
-func (u *UnimplementedSensor) NextUpdateOn() time.Time {
-	return time.Now().Add(u.RefreshRate)
+func (u *UnimplementedSensor) GetValue() float64 {
+	return u.Value
+}
+
+func (u *UnimplementedSensor) GetUpdatedAt() time.Time {
+	return u.UpdatedAt
+}
+
+func (u *UnimplementedSensor) GetLastError() error {
+	return u.Error
+}
+
+func (u *UnimplementedSensor) Next() time.Time {
+	a := time.Now().Add(u.RefreshRate)
+	b := u.UpdatedAt.Add(u.RefreshRate)
+	if a.After(b) {
+		return b
+	}
+	return a
 }
 
 const DefaultTestTimeout = time.Second
@@ -144,10 +172,10 @@ func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
 	}
 	t.Logf("Sensor updated with %.4f...", expected)
 	for i = 0; i < readAttempts; i++ {
-		val = sensor.Value()
+		val = sensor.GetValue()
 		if val != expected {
 			t.Errorf("unexpected value - %.4f vs %.4f on %v run",
-				sensor.Value(), val, i)
+				sensor.GetValue(), val, i)
 		}
 	}
 	t.Logf("Value %.4f is retrived %v times", expected, i)

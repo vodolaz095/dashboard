@@ -14,8 +14,6 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	val       float64
-	updatedAt time.Time
 }
 
 func (s *Sensor) Init(ctx context.Context) (err error) {
@@ -30,10 +28,6 @@ func (s *Sensor) Ping(ctx context.Context) error {
 
 func (s *Sensor) Close(ctx context.Context) error {
 	return nil
-}
-
-func (s *Sensor) Value() float64 {
-	return s.val
 }
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
@@ -51,8 +45,8 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		if err != nil {
 			return
 		}
-		s.val = val
-		s.updatedAt = time.Now()
+		s.Value = val
+		s.UpdatedAt = time.Now()
 		return nil
 	}
 	// command returned json we need to execute jsonpath query against
@@ -65,11 +59,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
-	s.val = res.(float64)
-	s.updatedAt = time.Now()
+	s.Value = res.(float64)
+	s.UpdatedAt = time.Now()
 	return nil
-}
-
-func (s *Sensor) UpdatedAt() time.Time {
-	return s.updatedAt
 }

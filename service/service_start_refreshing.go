@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
+func (ss *SensorsService) StartRefreshingSensors(ctx context.Context) {
 	var name string
 	pacemaker := time.NewTicker(ss.UpdateInterval)
 	for {
@@ -21,7 +21,7 @@ func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
 				rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
 				name = task.Payload.(string)
 				log.Debug().Msgf("Updating sensor %s...", name)
-				err := ss.Refresh(rtc, name)
+				nextUpdateOn, err := ss.Refresh(rtc, name)
 				cancel()
 				if err != nil {
 					log.Error().Err(err).Msgf("Sensor %s update failed with %s",
@@ -30,7 +30,7 @@ func (ss *SensorsService) StartKeepingSensorsUpToDate(ctx context.Context) {
 				} else {
 					log.Debug().Msgf("Sensor %s is updated!", name)
 				}
-				ss.UpdateQueue.ExecuteAfter(name, time.Second) // TODO
+				ss.UpdateQueue.ExecuteAt(name, nextUpdateOn)
 			}
 		}
 	}

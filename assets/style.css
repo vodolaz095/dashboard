@@ -53,7 +53,6 @@ tbody tr:last-of-type {
 }
 
 tr:hover {
-    /*font-weight: bold;*/
     background-color: #00da71 !important;
     color: white !important;
 }
