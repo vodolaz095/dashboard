@@ -176,7 +176,7 @@ func TestSensorsServiceBroadcast(t *testing.T) {
 		for i := range updates {
 			t.Logf("Sending update %v: %s %v...", i, updates[i].Name, updates[i].Value)
 			ts.Set(updates[i].Value)
-			err1 := service.Refresh(ctx, updates[i].Name)
+			_, err1 := service.Refresh(ctx, updates[i].Name)
 			if err1 != nil {
 				if err1.Error() != updates[i].Error {
 					t.Errorf("unexpected error %s for update %v", err1, i)
