@@ -38,13 +38,13 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	if err != nil {
 		return err
 	}
-
-	tr.engine.StaticFS("/assets", http.FS(assets.Assets))
+	fs := http.FS(assets.Assets)
+	tr.engine.StaticFS("/assets", fs)
 	tr.engine.GET("/favicon.ico", func(c *gin.Context) {
-		c.FileFromFS("favicon.ico", http.FS(assets.Assets))
+		c.FileFromFS("favicon.ico", fs)
 	})
 	tr.engine.GET("/robots.txt", func(c *gin.Context) {
-		c.FileFromFS("robots.txt", http.FS(assets.Assets))
+		c.FileFromFS("robots.txt", fs)
 	})
 
 	tr.exposeIndex()
