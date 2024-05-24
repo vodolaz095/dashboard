@@ -16,6 +16,7 @@ func (tr *Transport) exposeIndex() {
 			"keywords":    strings.Join(tr.Keywords, ", "),
 			"doIndex":     tr.DoIndex,
 			"sensors":     sensors,
+			"version":     tr.Version,
 		})
 	})
 }

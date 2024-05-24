@@ -4,17 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <title>{{.title}}</title>
-  <meta name="description" content="{{.description}}" />
-  <meta name="keywords" content="{{.keywords}}" />
-{{if .doIndex}}
-  <meta name="robots" content="index,follow" />
-{{end}}
+  <meta name="description" content="{{.description}}"/>
+  <meta name="keywords" content="{{.keywords}}"/>
+  {{if .doIndex}}
+  <meta name="robots" content="index,follow"/>
+  {{end}}
   <link href="/assets/style.css" rel="stylesheet">
 </head>
 <body>
-<h1>{{.title}}</h1>
-<p id="description">{{.description}}</p>
-<hr>
+<div id="header" align="center">
+  <h1>{{.title}}</h1>
+  <p id="description">{{.description}}</p>
+</div>
 <table>
   <thead>
   <tr>
@@ -30,28 +31,31 @@
   </tr>
   </thead>
   <tbody>
-{{ range $index, $value := .sensors }}
-<tr>
-  <td>{{$index}}</td>
-  <td>{{$value.Name}}</td>
-  <td>{{$value.Type}}</td>
-  <td>{{$value.Minimum}}</td>
-  <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>
-  <td>{{$value.Maximum}}</td>
-  <td class="err" id="error_{{$value.Name}}">{{$value.Error}}</td>
-  <td id="timestamp_{{$value.Name}}">{{$value.UpdatedAt.Format "15:04:05"}}</td>
-  <td>{{$value.Description}}</td>
-</tr>
-{{ end }}
+  {{ range $index, $value := .sensors }}
+  <tr>
+    <td>{{$index}}</td>
+    <td>{{$value.Name}}</td>
+    <td>{{$value.Type}}</td>
+    <td>{{$value.Minimum}}</td>
+    <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>
+    <td>{{$value.Maximum}}</td>
+    <td class="err" id="error_{{$value.Name}}">{{$value.Error}}</td>
+    <td id="timestamp_{{$value.Name}}">{{$value.UpdatedAt.Format "15:04:05"}}</td>
+    <td>{{$value.Description}}</td>
+  </tr>
+  {{ end }}
   </tbody>
 </table>
-<hr>
-<p>
-  Additional:
-  <a href="/json">JSON</a>
-  <a href="/metrics">metrics</a>
-  <a href="https://github.com/vodolaz095/dashboard">Github</a>
-</p>
+<div id="footer">
+  <p>
+    Additional representations:
+    <a href="/json">JSON</a>
+    <a href="/metrics">metrics</a>
+  </p>
+  <p>
+    <a href="https://github.com/vodolaz095/dashboard">Version: {{.version}}</a>
+  </p>
+</div>
 <script type="application/javascript" src="/assets/feed.js"></script>
 <script type="application/javascript">
 document.addEventListener("DOMContentLoaded", function(event) {

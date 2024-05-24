@@ -56,3 +56,11 @@ tr:hover {
     background-color: #00da71 !important;
     color: white !important;
 }
+
+#header {
+    text-align: center;
+}
+
+#footer {
+    text-align: center;
+}
