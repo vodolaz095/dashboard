@@ -45,7 +45,7 @@ func (p *Publisher) Start(ctx context.Context) {
 				err = p.redisSinks[i].Client.Close()
 				if err != nil {
 					if !errors.Is(err, redis.ErrClosed) {
-						log.Err(err).Msgf("error closing redis sink: %s", err)
+						log.Error().Err(err).Msgf("error closing redis sink: %s", err)
 					}
 				}
 			}
@@ -57,12 +57,11 @@ func (p *Publisher) Start(ctx context.Context) {
 					fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), upd.Pack(),
 				).Err()
 				if err != nil {
-					log.Err(err).Msgf("error publishing into %s: %s",
+					log.Error().Err(err).Msgf("error publishing into %s: %s",
 						fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), err,
 					)
 				}
 			}
 		}
 	}
-
 }
