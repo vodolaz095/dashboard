@@ -1,6 +1,11 @@
 package service
 
-import "context"
+import (
+	"context"
+	"errors"
+
+	"github.com/redis/go-redis/v9"
+)
 
 func (ss *SensorsService) Close(ctx context.Context) (err error) {
 	for k := range ss.MysqlConnections {
@@ -18,7 +23,9 @@ func (ss *SensorsService) Close(ctx context.Context) (err error) {
 	for k := range ss.RedisConnections {
 		err = ss.RedisConnections[k].Close()
 		if err != nil {
-			return
+			if !errors.Is(err, redis.ErrClosed) {
+				return err
+			}
 		}
 	}
 	for k := range ss.Sensors {

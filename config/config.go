@@ -21,6 +21,8 @@ type Config struct {
 	DatabaseConnections []DatabaseConnection `yaml:"database_connections"`
 	// Sensors defines configuration for methods of acquiring metrics data
 	Sensors []Sensor `yaml:"sensors"`
+	// Broadcasters defines configuration for sinks where we broadcast Sensors data
+	Broadcasters []Broadcaster `yaml:"broadcasters"`
 }
 
 func (c *Config) Dump() ([]byte, error) {

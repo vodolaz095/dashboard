@@ -15,6 +15,7 @@ do_index: true
 log:
   level: trace
   to_journald: false
+
 database_connections:
   - name: redis@container
     type: redis
@@ -25,6 +26,7 @@ database_connections:
   - name: postgres@container
     type: postgres
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
+
 sensors:
   - name: echo
     type: shell
@@ -81,3 +83,7 @@ sensors:
     tags:
       a: b
       c: d
+
+broadcasters:
+  - connection_name: redis@container
+    subject: "vodolaz095/dashboard/%s"
