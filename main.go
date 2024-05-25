@@ -284,8 +284,11 @@ func main() {
 	}
 	if len(cfg.Broadcasters) > 0 {
 		for i := range cfg.Broadcasters {
-			err = publisher.InitConnection(cfg.Broadcasters[i].ConnectionName,
-				cfg.Broadcasters[i].Subject)
+			err = publisher.InitConnection(
+				cfg.Broadcasters[i].ConnectionName,
+				cfg.Broadcasters[i].Subject,
+				cfg.Broadcasters[i].ValueOnly,
+			)
 			if err != nil {
 				log.Fatal().Err(err).Msgf("Error initializing broadcaster for connection %v - %s",
 					i, err,
@@ -336,8 +339,8 @@ func main() {
 		}
 	}()
 
-	// todo: redis subscribber
-	// todo: mqtt subscribber
+	// todo: redis subscriber
+	// todo: mqtt subscriber
 
 	wg.Wait()
 	terminationContext, terminationContextCancel := context.WithTimeout(context.Background(), 10*time.Second)

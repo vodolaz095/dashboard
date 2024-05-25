@@ -39,6 +39,7 @@ func (s *Sensor) Close(ctx context.Context) error {
 func (s *Sensor) Update(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.UpdatedAt = time.Now()
 	args := strings.Split(s.Query, " ")
 	b := make([]interface{}, len(args))
 	for i := range args {
@@ -50,6 +51,5 @@ func (s *Sensor) Update(ctx context.Context) error {
 		return err
 	}
 	s.Value = val
-	s.UpdatedAt = time.Now()
 	return nil
 }

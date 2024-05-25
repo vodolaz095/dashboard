@@ -11,8 +11,9 @@ import (
 )
 
 type redisSink struct {
-	Client  *redis.Client
-	Subject string
+	Client    *redis.Client
+	Subject   string
+	ValueOnly bool
 }
 
 type Publisher struct {
@@ -20,14 +21,15 @@ type Publisher struct {
 	redisSinks []redisSink
 }
 
-func (p *Publisher) InitConnection(name, subject string) error {
+func (p *Publisher) InitConnection(name, subject string, valueOnly bool) error {
 	client, found := p.Service.RedisConnections[name]
 	if !found {
 		return service.ConnectionNotFoundError
 	}
 	p.redisSinks = append(p.redisSinks, redisSink{
-		Client:  client,
-		Subject: subject,
+		Client:    client,
+		Subject:   subject,
+		ValueOnly: valueOnly,
 	})
 	return nil
 }
@@ -53,9 +55,15 @@ func (p *Publisher) Start(ctx context.Context) {
 
 		case upd := <-feed:
 			for i := range p.redisSinks {
-				err = p.redisSinks[i].Client.Publish(ctx,
-					fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), upd.Pack(),
-				).Err()
+				if p.redisSinks[i].ValueOnly {
+					err = p.redisSinks[i].Client.Publish(ctx,
+						fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), upd.Value,
+					).Err()
+				} else {
+					err = p.redisSinks[i].Client.Publish(ctx,
+						fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), upd.Pack(),
+					).Err()
+				}
 				if err != nil {
 					log.Error().Err(err).Msgf("error publishing into %s: %s",
 						fmt.Sprintf(p.redisSinks[i].Subject, upd.Name), err,

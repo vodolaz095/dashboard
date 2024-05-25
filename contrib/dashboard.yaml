@@ -86,4 +86,8 @@ sensors:
 
 broadcasters:
   - connection_name: redis@container
-    subject: "vodolaz095/dashboard/%s"
+    subject: "vodolaz095/dashboard/sensor/%s"
+    value_only: false
+  - connection_name: redis@container
+    subject: "vodolaz095/dashboard/value/%s"
+    value_only: true
