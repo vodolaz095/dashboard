@@ -35,7 +35,7 @@ function doSubscribeOn(eventTypeName) {
     console.log('Feed: %s event received:', eventTypeName, e.type, e.data);
     try {
       const params = JSON.parse(e.data);
-      itemValue.innerText = params.value;
+      itemValue.innerText = Number(params.value).toFixed(4);
       itemError.innerText = params.error;
       itemTimestamp.innerText = formatTimestamp(params.timestamp)
     } catch (err) {
