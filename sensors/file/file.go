@@ -1,9 +1,9 @@
-package shell
+package file
 
 import (
 	"context"
 	"encoding/json"
-	"os/exec"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -15,41 +15,37 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	mu *sync.Mutex
+	mu                 *sync.Mutex
+	PathToReadingsFile string
 }
 
-func (s *Sensor) Init(ctx context.Context) (err error) {
-	args := strings.Split(s.Command, " ")
+func (s *Sensor) Init(_ context.Context) error {
 	s.mu = &sync.Mutex{}
 	if s.A == 0 {
 		s.A = 1
 	}
-	_, err = exec.LookPath(args[0])
-	return err
-}
-
-func (s *Sensor) Ping(ctx context.Context) error {
 	return nil
 }
 
-func (s *Sensor) Close(ctx context.Context) error {
+func (s *Sensor) Ping(_ context.Context) error {
+	return nil
+}
+
+func (s *Sensor) Close(_ context.Context) error {
 	return nil
 }
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
-	var val float64
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.UpdatedAt = time.Now()
-	args := strings.Split(s.Command, " ")
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
-	//cmd.Env = append(cmd.Env, "a=b")
-	raw, err := cmd.Output()
+	var val float64
+	raw, err := os.ReadFile(s.PathToReadingsFile)
 	if err != nil {
-		s.Error = err
-		return
+		return err
 	}
-	// no processing script output
+
+	// readings file contains plain old raw value
 	if s.JsonPath == "" {
 		val, err = strconv.ParseFloat(strings.TrimSpace(string(raw)), 64)
 		if err != nil {
@@ -60,7 +56,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		s.UpdatedAt = time.Now()
 		return nil
 	}
-	// command returned json we need to execute jsonpath query against
+	// readings file contains json we need to execute jsonpath query against
 	var data interface{}
 	err = json.Unmarshal(raw, &data)
 	if err != nil {

@@ -17,6 +17,9 @@ type Sensor struct {
 
 func (s *Sensor) Init(ctx context.Context) error {
 	s.mu = &sync.RWMutex{}
+	if s.A == 0 {
+		s.A = 1
+	}
 	return nil
 }
 

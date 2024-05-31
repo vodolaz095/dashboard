@@ -6,13 +6,25 @@ type Sensor struct {
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
-	Type string `yaml:"type" validate:"required, oneof=mysql redis postgres curl shell endpoint"`
+	Type string `yaml:"type" validate:"required, oneof=mysql redis postgres curl shell endpoint file"`
 	// Description is used to explain meaning of this sensor
 	Description string `yaml:"description"`
 	// Link is used to help visitor read more about sensor
 	Link string `yaml:"link" validate:"http_url"`
 	// Tags helps to group sensors
 	Tags map[string]string `yaml:"tags"`
+	// RefreshRate is used to define how often we reload data
+	RefreshRate time.Duration `yaml:"refresh_rate"`
+	// Minimum is used to warn, when something is below safe value
+	Minimum float64 `yaml:"minimum"`
+	// Maximum is used to warn, when something is above safe value
+	Maximum float64 `yaml:"maximum"`
+	// A is coefficient in linear transformation Y=A*X+B used to, for example, convert
+	// Fahrenheit degrees into Celsius degrees
+	A float64 `yaml:"a"`
+	// B is constant in linear transformation Y=A*X+B used to, for example, convert
+	// Fahrenheit degrees into Celsius degrees
+	B float64 `yaml:"b"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres
@@ -52,10 +64,10 @@ type Sensor struct {
 	// Token is Bearer strategy token used to send metrics for endpoint sensor
 	Token string `json:"token"`
 
-	// RefreshRate is used to define how often we reload data
-	RefreshRate time.Duration `yaml:"refresh_rate"`
-	// Minimum is used to warn, when something is below safe value
-	Minimum float64 `yaml:"minimum"`
-	// Maximum is used to warn, when something is above safe value
-	Maximum float64 `yaml:"maximum"`
+	/*
+	 * Parameters used for file with constant sensor, for example,
+	 * cat /sys/class/thermal/thermal_zone1/temp
+	 * gives temperature sensor reading
+	 */
+	PathToReading string `yaml:"path_to_reading"`
 }

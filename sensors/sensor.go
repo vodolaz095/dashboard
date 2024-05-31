@@ -55,6 +55,12 @@ type UnimplementedSensor struct {
 	Minimum float64 `yaml:"minimum"`
 	// Maximum is used to warn, when something is above safe value
 	Maximum float64 `yaml:"maximum"`
+	// A is coefficient in linear transformation Y=A*X+B used to, for example, convert
+	// Fahrenheit degrees into Celsius degrees
+	A float64 `yaml:"a"`
+	// B is constant in linear transformation Y=A*X+B used to, for example, convert
+	// Fahrenheit degrees into Celsius degrees
+	B float64 `yaml:"b"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres
@@ -124,7 +130,7 @@ func (u *UnimplementedSensor) GetTags() map[string]string {
 }
 
 func (u *UnimplementedSensor) GetValue() float64 {
-	return u.Value
+	return u.A*u.Value + u.B
 }
 
 func (u *UnimplementedSensor) GetUpdatedAt() time.Time {

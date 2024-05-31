@@ -17,7 +17,7 @@ func TestCurlRawSensor(t *testing.T) {
 	sensor.Name = "test_mysql"
 	sensor.Type = "curl"
 	sensor.Endpoint = "http://ip-api.com/line/193.41.76.51?fields=lat"
-	sensor.Query = ""
+	sensor.JsonPath = ""
 	sensor.RefreshRate = time.Second
 	sensor.Description = "curl sensor"
 	sensor.Link = "https://www.mysql.com/"
@@ -40,7 +40,7 @@ func TestCurlJSONSensor(t *testing.T) {
 	sensor.Name = "test_mysql"
 	sensor.Type = "mysql"
 	sensor.Endpoint = "http://ip-api.com/json/193.41.76.51"
-	sensor.Query = "@.lat"
+	sensor.JsonPath = "@.lat"
 	sensor.RefreshRate = time.Second
 	sensor.Description = "curl sensor"
 	sensor.Link = "https://www.mysql.com/"

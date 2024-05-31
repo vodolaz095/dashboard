@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+	"github.com/vodolaz095/dashboard/sensors/file"
 	"github.com/vodolaz095/dashboard/transport/broadcaster"
 	"github.com/vodolaz095/dqueue"
 
@@ -100,6 +101,11 @@ func main() {
 			Msgf("Setting up sensor %v: %s of type %s", i,
 				cfg.Sensors[i].Name, cfg.Sensors[i].Type,
 			)
+		coef := cfg.Sensors[i].A
+		if coef == 0 {
+			coef = 1
+		}
+
 		switch cfg.Sensors[i].Type {
 		case "mysql", "mariadb":
 			ms := &mysql.Sensor{}
@@ -111,6 +117,8 @@ func main() {
 			ms.Minimum = cfg.Sensors[i].Minimum
 			ms.Maximum = cfg.Sensors[i].Maximum
 			ms.Tags = cfg.Sensors[i].Tags
+			ms.A = coef
+			ms.B = cfg.Sensors[i].B
 
 			ms.Query = cfg.Sensors[i].Query
 			ms.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
@@ -134,6 +142,8 @@ func main() {
 			rs.Minimum = cfg.Sensors[i].Minimum
 			rs.Maximum = cfg.Sensors[i].Maximum
 			rs.Tags = cfg.Sensors[i].Tags
+			rs.A = coef
+			rs.B = cfg.Sensors[i].B
 
 			rs.Query = cfg.Sensors[i].Query
 			rs.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
@@ -159,6 +169,8 @@ func main() {
 			ps.Minimum = cfg.Sensors[i].Minimum
 			ps.Maximum = cfg.Sensors[i].Maximum
 			ps.Tags = cfg.Sensors[i].Tags
+			ps.A = coef
+			ps.B = cfg.Sensors[i].B
 
 			ps.Query = cfg.Sensors[i].Query
 			ps.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
@@ -184,6 +196,8 @@ func main() {
 			cs.Minimum = cfg.Sensors[i].Minimum
 			cs.Maximum = cfg.Sensors[i].Maximum
 			cs.Tags = cfg.Sensors[i].Tags
+			cs.A = coef
+			cs.B = cfg.Sensors[i].B
 
 			cs.HttpMethod = cfg.Sensors[i].HttpMethod
 			cs.Endpoint = cfg.Sensors[i].Endpoint
@@ -206,6 +220,8 @@ func main() {
 			ss.Minimum = cfg.Sensors[i].Minimum
 			ss.Maximum = cfg.Sensors[i].Maximum
 			ss.Tags = cfg.Sensors[i].Tags
+			ss.A = coef
+			ss.B = cfg.Sensors[i].B
 
 			ss.Command = cfg.Sensors[i].Command
 			ss.Environment = cfg.Sensors[i].Environment
@@ -227,11 +243,33 @@ func main() {
 			es.Maximum = cfg.Sensors[i].Maximum
 			es.Tags = cfg.Sensors[i].Tags
 			es.Token = cfg.Sensors[i].Token
+			es.A = coef
+			es.B = cfg.Sensors[i].B
 
 			byName[es.Name] = es
 			byIndex[i] = es.Name
 			updateQueue.ExecuteAfter(es.Name, 50*time.Millisecond)
 
+			break
+		case "file":
+			fs := &file.Sensor{}
+			fs.Name = cfg.Sensors[i].Name
+			fs.Type = "file"
+			fs.RefreshRate = cfg.Sensors[i].RefreshRate
+			fs.Description = cfg.Sensors[i].Description
+			fs.Link = cfg.Sensors[i].Link
+			fs.Minimum = cfg.Sensors[i].Minimum
+			fs.Maximum = cfg.Sensors[i].Maximum
+			fs.Tags = cfg.Sensors[i].Tags
+			fs.Token = cfg.Sensors[i].Token
+			fs.A = coef
+			fs.B = cfg.Sensors[i].B
+
+			fs.PathToReadingsFile = cfg.Sensors[i].PathToReading
+
+			byName[fs.Name] = fs
+			byIndex[i] = fs.Name
+			updateQueue.ExecuteAfter(fs.Name, 50*time.Millisecond)
 			break
 		default:
 			log.Fatal().Msgf("Element %v has unknown sensor type %s", i, cfg.Sensors[i].Type)

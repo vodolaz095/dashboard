@@ -27,6 +27,9 @@ type Sensor struct {
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
+	if s.A == 0 {
+		s.A = 1
+	}
 	if s.Method == "" {
 		s.Method = http.MethodGet
 	}
@@ -84,7 +87,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
-	if s.Query == "" {
+	if s.JsonPath == "" {
 		val, err = strconv.ParseFloat(strings.TrimSpace(string(raw)), 64)
 		if err != nil {
 			return
@@ -99,7 +102,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	if err != nil {
 		return
 	}
-	res, err := jsonpath.JsonPathLookup(data, s.Query)
+	res, err := jsonpath.JsonPathLookup(data, s.JsonPath)
 	if err != nil {
 		return
 	}
