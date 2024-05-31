@@ -19,6 +19,7 @@ type SensorsService struct {
 	UpdateInterval time.Duration
 	UpdateQueue    *dqueue.Handler
 
+	// subscribers stores SSE connections used by real time web application
 	subscribers map[string]chan model.Update
 
 	// cached database connections

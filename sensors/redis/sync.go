@@ -11,13 +11,15 @@ import (
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
-type Sensor struct {
+// SyncSensor executes synchronous query against redis database, for example,
+// `GET A`, `ZCOUNT something 0 10000`, `LLEN some_list` and so on
+type SyncSensor struct {
 	sensors.UnimplementedSensor
 	mu     *sync.Mutex
 	Client *redis.Client
 }
 
-func (s *Sensor) Init(ctx context.Context) error {
+func (s *SyncSensor) Init(ctx context.Context) error {
 	s.mu = &sync.Mutex{}
 	if s.A == 0 {
 		s.A = 1
@@ -25,11 +27,11 @@ func (s *Sensor) Init(ctx context.Context) error {
 	return s.Ping(ctx)
 }
 
-func (s *Sensor) Ping(ctx context.Context) error {
+func (s *SyncSensor) Ping(ctx context.Context) error {
 	return s.Client.Ping(ctx).Err()
 }
 
-func (s *Sensor) Close(ctx context.Context) error {
+func (s *SyncSensor) Close(ctx context.Context) error {
 	err := s.Client.Close()
 	if err != nil {
 		if errors.Is(err, redis.ErrClosed) {
@@ -39,7 +41,7 @@ func (s *Sensor) Close(ctx context.Context) error {
 	return err
 }
 
-func (s *Sensor) Update(ctx context.Context) error {
+func (s *SyncSensor) Update(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.UpdatedAt = time.Now()

@@ -19,7 +19,7 @@ func TestRedisSensor(t *testing.T) {
 	expected := 5.3
 
 	var err error
-	sensor := Sensor{}
+	sensor := SyncSensor{}
 	sensor.Name = "test_redis"
 	sensor.Type = "redis"
 	sensor.Query = "get a"

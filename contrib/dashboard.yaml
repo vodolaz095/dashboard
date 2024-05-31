@@ -20,6 +20,9 @@ database_connections:
   - name: redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
+  - name: subscribe2redis@container
+    type: redis
+    connection_string: "redis://127.0.0.1:6379"
   - name: mysql@container
     type: mysql
     connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
@@ -28,75 +31,88 @@ database_connections:
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
 
 sensors:
-  - name: echo
-    type: shell
-    command: 'echo 4'
-    description: "Get random value from shell"
-    refresh_rate: 5s
-    link: "http://example.org"
-    tags:
-      a: b
-      c: d
+#  - name: echo
+#    type: shell
+#    command: 'echo 4'
+#    description: "Get random value from shell"
+#    refresh_rate: 5s
+#    link: "http://example.org"
+#    tags:
+#      a: b
+#      c: d
+#
+#  - name: endpoint
+#    type: endpoint
+#    description: "Updates value by incoming POST requests"
+#    link: "http://localhost:3000/endpoint"
+#    token: "test321"
+#    tags:
+#      a: b
+#      c: d
+#
+#  - name: redis
+#    type: redis
+#    description: "Get key A"
+#    link: "https://example.org"
+#    connection_name: "redis@container"
+#    query: "get a"
+#    refresh_rate: 1s
+#    tags:
+#      a: b
+#      c: d
+#
+#  - name: mysql
+#    type: mysql
+#    description: "Select random number from range"
+#    link: "https://dev.mysql.com/doc/refman/8.0/en/mathematical-functions.html#function_rand"
+#    connection_name: "mysql@container"
+#    query: "SELECT rand()*99+1 as random"
+#    minimum: 1
+#    maximum: 100
+#    refresh_rate: 5s
+#    tags:
+#      a: b
+#      c: d
+#
+#  - name: postgres
+#    type: postgres
+#    description: "Select random number from range"
+#    link: "https://www.postgresql.org/docs/current/functions-math.html"
+#    connection_name: "postgres@container"
+#    query: "SELECT random()*99+1 as random"
+#    minimum: 1
+#    maximum: 100
+#    refresh_rate: 5s
+#    tags:
+#      a: b
+#      c: d
+#
+#  - name: thermal0
+#    type: file
+#    description: "Get thermal sensor status from area 0"
+#    link: "https://example.org"
+#    path_to_reading: /sys/class/thermal/thermal_zone0/temp
+#    a: 0.001
+#    b: 0
+#    minimum: 1
+#    maximum: 100
+#    refresh_rate: 5s
+#    tags:
+#      a: b
+#      c: d
 
-  - name: endpoint
-    type: endpoint
-    description: "Updates value by incoming POST requests"
-    link: "http://localhost:3000/endpoint"
-    token: "test321"
-    tags:
-      a: b
-      c: d
-
-  - name: redis
-    type: redis
-    description: "Get key A"
-    link: "https://example.org"
-    connection_name: "redis@container"
-    query: "get a"
-    refresh_rate: 1s
-    tags:
-      a: b
-      c: d
-
-  - name: mysql
-    type: mysql
-    description: "Select random number from range"
-    link: "https://dev.mysql.com/doc/refman/8.0/en/mathematical-functions.html#function_rand"
-    connection_name: "mysql@container"
-    query: "SELECT rand()*99+1 as random"
+  - name: subscriber
+    type: subscriber
+    description: "Subscribe to redis channel and get values from it"
+    channel: "vodolaz095/dashboard/subscriber"
+    connection_name: "subscribe2redis@container"
+    value_only: true
     minimum: 1
     maximum: 100
-    refresh_rate: 5s
     tags:
       a: b
       c: d
 
-  - name: postgres
-    type: postgres
-    description: "Select random number from range"
-    link: "https://www.postgresql.org/docs/current/functions-math.html"
-    connection_name: "postgres@container"
-    query: "SELECT random()*99+1 as random"
-    minimum: 1
-    maximum: 100
-    refresh_rate: 5s
-    tags:
-      a: b
-      c: d
-
-  - name: thermal0
-    type: file
-    description: "Get thermal sensor status from area 0"
-    link: "https://example.org"
-    path_to_reading: /sys/class/thermal/thermal_zone0/temp
-    a: 0.001
-    b: 0
-    minimum: 1
-    maximum: 100
-    refresh_rate: 5s
-    tags:
-      a: b
-      c: d
 
 broadcasters:
   - connection_name: redis@container

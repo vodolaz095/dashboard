@@ -133,7 +133,7 @@ func main() {
 			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
 			break
 		case "redis":
-			rs := &redis.Sensor{}
+			rs := &redis.SyncSensor{}
 			rs.Name = cfg.Sensors[i].Name
 			rs.Type = "redis"
 			rs.RefreshRate = cfg.Sensors[i].RefreshRate
@@ -157,6 +157,35 @@ func main() {
 			byName[rs.Name] = rs
 			byIndex[i] = rs.Name
 			updateQueue.ExecuteAfter(rs.Name, 50*time.Millisecond)
+
+			break
+		case "subscriber":
+			rss := &redis.SubscribeSensor{}
+			rss.Name = cfg.Sensors[i].Name
+			rss.Type = "subscriber"
+			rss.RefreshRate = cfg.Sensors[i].RefreshRate
+			rss.Description = cfg.Sensors[i].Description
+			rss.Link = cfg.Sensors[i].Link
+			rss.Minimum = cfg.Sensors[i].Minimum
+			rss.Maximum = cfg.Sensors[i].Maximum
+			rss.Tags = cfg.Sensors[i].Tags
+			rss.A = coef
+			rss.B = cfg.Sensors[i].B
+
+			rss.ValueOnly = cfg.Sensors[i].ValueOnly
+			rss.Channel = cfg.Sensors[i].Channel
+
+			rss.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
+			rss.Client, connectionIsFound = srv.RedisConnections[cfg.Sensors[i].ConnectionName]
+			if !connectionIsFound {
+				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
+					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
+				)
+			}
+
+			byName[rss.Name] = rss
+			byIndex[i] = rss.Name
+			go rss.Start(ctx)
 
 			break
 		case "postgres":

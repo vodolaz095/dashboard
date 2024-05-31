@@ -6,7 +6,7 @@ type Sensor struct {
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
-	Type string `yaml:"type" validate:"required, oneof=mysql redis postgres curl shell endpoint file"`
+	Type string `yaml:"type" validate:"required, oneof=mysql redis subscriber postgres curl shell endpoint file"`
 	// Description is used to explain meaning of this sensor
 	Description string `yaml:"description"`
 	// Link is used to help visitor read more about sensor
@@ -65,9 +65,19 @@ type Sensor struct {
 	Token string `json:"token"`
 
 	/*
-	 * Parameters used for file with constant sensor, for example,
-	 * cat /sys/class/thermal/thermal_zone1/temp
-	 * gives temperature sensor reading
+	 * Parameters used for file sensor
 	 */
+
+	// PathToReading used for file sensor reading constant from file, for example
+	// cat /sys/class/thermal/thermal_zone1/temp
+	// gives temperature sensor reading. It is worth notice that JsonPath parameter is taken into account
 	PathToReading string `yaml:"path_to_reading"`
+
+	/*
+	 * Parameters used for subscribing to redis change feed
+	 */
+	// Channel defines redis channel name to use for getting new values, something like `PUBLISH vodolaz095/dashboard/channel_name 15.3`.
+	Channel string `yaml:"channel"`
+	// ValueOnly defines, if data is sent via redis channel as raw float64 or as model.Update encoded in json.
+	ValueOnly bool `yaml:"value_only"`
 }
