@@ -84,6 +84,20 @@ sensors:
       a: b
       c: d
 
+  - name: thermal0
+    type: file
+    description: "Get thermal sensor status from area 0"
+    link: "https://example.org"
+    path_to_reading: /sys/class/thermal/thermal_zone0/temp
+    a: 0.001
+    b: 0
+    minimum: 1
+    maximum: 100
+    refresh_rate: 5s
+    tags:
+      a: b
+      c: d
+
 broadcasters:
   - connection_name: redis@container
     subject: "vodolaz095/dashboard/sensor/%s"
