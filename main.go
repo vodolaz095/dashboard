@@ -185,7 +185,6 @@ func main() {
 
 			byName[rss.Name] = rss
 			byIndex[i] = rss.Name
-			go rss.Start(ctx)
 
 			break
 		case "postgres":
@@ -277,7 +276,6 @@ func main() {
 
 			byName[es.Name] = es
 			byIndex[i] = es.Name
-			updateQueue.ExecuteAfter(es.Name, 50*time.Millisecond)
 
 			break
 		case "file":
@@ -396,6 +394,7 @@ func main() {
 	go srv.StartRefreshingSensors(ctx)
 	go srv.StartClock(ctx)
 	go publisher.Start(ctx)
+	go srv.StartRedisSubscribers(ctx)
 
 	go func() {
 		log.Debug().Msgf("Preparing to start webserver on %s...", webServerTransport.Address)
@@ -406,7 +405,6 @@ func main() {
 		}
 	}()
 
-	// todo: redis subscriber
 	// todo: mqtt subscriber
 
 	wg.Wait()

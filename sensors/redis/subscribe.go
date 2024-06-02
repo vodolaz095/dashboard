@@ -18,7 +18,6 @@ import (
 type SubscribeSensor struct {
 	sensors.UnimplementedSensor
 	mu        *sync.Mutex
-	pubsub    *redis.PubSub
 	Client    *redis.Client
 	Channel   string
 	ValueOnly bool
@@ -36,27 +35,16 @@ func (s *SubscribeSensor) Ping(ctx context.Context) error {
 	return s.Client.Ping(ctx).Err()
 }
 
-func (s *SubscribeSensor) Close(ctx context.Context) error {
-	err := s.pubsub.Close()
-	if err != nil {
-		if errors.Is(err, redis.ErrClosed) {
-			return nil
-		}
-	}
-	err = s.Client.Close()
-	if err != nil {
-		if errors.Is(err, redis.ErrClosed) {
-			return nil
-		}
-	}
-	return err
+func (s *SubscribeSensor) Close(ctx context.Context) (err error) {
+	// since canceling subscriber closes connection as expected
+	return nil
 }
 
 func (s *SubscribeSensor) Update(_ context.Context) error {
 	return nil
 }
 
-func (s *SubscribeSensor) parseValue(msg *redis.Message) {
+func (s *SubscribeSensor) ParseValue(msg *redis.Message) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	log.Trace().Msgf("Parsing %s from channel %s", msg.Payload, msg.Channel)
@@ -82,14 +70,4 @@ func (s *SubscribeSensor) parseValue(msg *redis.Message) {
 	s.Error = errors.New(payload.Error)
 	s.UpdatedAt = payload.Timestamp
 	return
-}
-
-func (s *SubscribeSensor) Start(ctx context.Context) {
-	log.Warn().Msgf("Starting redis subscriber on %s...", s.Channel)
-	s.pubsub = s.Client.Subscribe(ctx, s.Channel)
-	ch := s.pubsub.Channel()
-	for msg := range ch {
-		s.parseValue(msg)
-	}
-	log.Warn().Msgf("Stopping redis subscriber on %s...", s.Channel)
 }
