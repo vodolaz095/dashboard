@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
 func (ss *SensorsService) initRedisConnection(ctx context.Context, name, dsn string) (err error) {
@@ -22,5 +23,6 @@ func (ss *SensorsService) initRedisConnection(ctx context.Context, name, dsn str
 		return err
 	}
 	ss.RedisConnections[name] = client
+	log.Info().Msgf("Redis database connection %s is established", name)
 	return nil
 }

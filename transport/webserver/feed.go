@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -20,7 +21,18 @@ func (tr *Transport) exposeFeed() {
 		c.Writer.Header().Set("X-Accel-Buffering", "no")
 		c.Stream(func(w io.Writer) bool {
 			if msg, ok := <-events; ok {
-				log.Debug().Msgf("Broadcasting %s: %v", msg.Name, msg.Value)
+				if msg.Error != "" {
+					log.Trace().
+						Str("sensor", msg.Name).
+						Float64("value", msg.Value).
+						Err(errors.New(msg.Error)).
+						Msgf("Broadcasting %s: %v with error %s", msg.Name, msg.Value, msg.Error)
+				} else {
+					log.Trace().
+						Str("sensor", msg.Name).
+						Float64("value", msg.Value).
+						Msgf("Broadcasting %s: %v", msg.Name, msg.Value)
+				}
 				c.SSEvent(msg.Name, msg)
 				return true
 			}

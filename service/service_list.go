@@ -3,7 +3,6 @@ package service
 import (
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dashboard/model"
 )
 
@@ -11,7 +10,6 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 	ret = make([]model.Sensor, len(ss.ListOfSensors))
 	var s model.Sensor
 	for i := range ss.ListOfSensors {
-		log.Debug().Msgf("Listing sensor %v: %s", i, ss.ListOfSensors[i])
 		sensor, found := ss.Sensors[ss.ListOfSensors[i]]
 		if found {
 			s.Name = sensor.GetName()

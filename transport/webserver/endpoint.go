@@ -20,23 +20,48 @@ func (tr *Transport) exposeUpdate() {
 		}
 		sensor, found := tr.SensorsService.Sensors[data.Name]
 		if !found {
+			log.Info().
+				Str("sensor", data.Name).
+				Float64("reading", data.Value).
+				Str("User-Agent", c.GetHeader("User-Agent")).
+				Str("Client-IP", c.ClientIP()).
+				Msgf("Sensor %s is not found", data.Name)
 			c.String(http.StatusBadRequest, "sensor %s not found", data.Name)
 			return
 		}
 		casted, ok := sensor.(*endpoint.Sensor)
 		if !ok {
+			log.Info().
+				Str("sensor", data.Name).
+				Float64("reading", data.Value).
+				Str("User-Agent", c.GetHeader("User-Agent")).
+				Str("Client-IP", c.ClientIP()).
+				Msgf("Sensor %s's type is not `endpoint`", data.Name)
 			c.String(http.StatusBadRequest, "sensor %s type is wrong", data.Name)
 			return
 		}
 		if casted.Token != "" {
 			if casted.Token != c.GetHeader("Token") {
+				log.Warn().
+					Str("sensor", casted.Name).
+					Float64("reading", casted.GetValue()).
+					Str("User-Agent", c.GetHeader("User-Agent")).
+					Str("Client-IP", c.ClientIP()).
+					Msgf("Updating endpoint sensor %s with value %v failed for token mismatch",
+						casted.Name, data.Value,
+					)
 				c.String(http.StatusBadRequest, "Header `Token` has wrong value")
 				return
 			}
 		}
-		log.Warn().Msgf("Updating endpoint sensor %s with value %v",
-			casted.Name, data.Value,
-		)
+		log.Info().
+			Str("sensor", casted.Name).
+			Float64("reading", casted.GetValue()).
+			Str("User-Agent", c.GetHeader("User-Agent")).
+			Str("Client-IP", c.ClientIP()).
+			Msgf("Updating endpoint sensor %s with value %v",
+				casted.Name, data.Value,
+			)
 		casted.Set(data.Value)
 		tr.SensorsService.Broadcast(casted.Name, "", data.Value)
 		c.AbortWithStatus(http.StatusNoContent)

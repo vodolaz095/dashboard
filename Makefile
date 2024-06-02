@@ -7,14 +7,22 @@ export ver=$(majorVersion).$(minorVersion).$(patchVersion).$(gittip)
 
 include make/*.mk
 
-deps:
+tools:
+	@which podman
+	@podman version
+	@which redis-cli
+	@redis-cli --version
+	@which go
+	@go version
+
+deps: tools
 	go mod download
 	go mod verify
 	go mod tidy
 
 run: start
 
-build:
+build: deps
 	CGO_ENABLED=0 go build -ldflags "-X main.Version=$(ver)" -o build/dashboard main.go
 
 start:

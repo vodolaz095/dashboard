@@ -18,6 +18,7 @@ func (tr *Transport) exposeHealthcheck() {
 			c.String(http.StatusInternalServerError, "System malfunction confirmed!")
 			return
 		}
+		log.Debug().Msgf("Healthcheck passed!")
 		c.String(http.StatusOK, "System integrity confirmed!")
 	})
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (ss *SensorsService) initPostgresConnection(ctx context.Context, name, dsn string) (err error) {
@@ -23,5 +25,6 @@ func (ss *SensorsService) initPostgresConnection(ctx context.Context, name, dsn 
 		return err
 	}
 	ss.PostgresqlConnections[name] = con
+	log.Info().Msgf("Postgres database connection %s is established", name)
 	return nil
 }

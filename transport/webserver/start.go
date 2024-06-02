@@ -31,9 +31,24 @@ type Transport struct {
 func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) {
 	defer wg.Done()
 	tr.engine = gin.New()
+	tr.engine.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
+		log.Debug().Msgf("[%s] - \"%s %s %s\" -> code=%d lat=%s size=%d / \"%s\"",
+			param.ClientIP,
+			param.Method,
+			param.Path,
+			param.Request.Proto,
+			param.StatusCode,
+			param.Latency,
+			param.BodySize,
+			param.Request.UserAgent(),
+		)
+		return ""
+	}))
+	tr.engine.Use(gin.Recovery())
+
 	middlewares.Secure(tr.engine, tr.Domain)
 	middlewares.EmulatePHP(tr.engine)
-
+	tr.engine.TrustedPlatform = gin.PlatformCloudflare
 	err = injectTemplates(tr.engine)
 	if err != nil {
 		return err

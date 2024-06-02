@@ -34,7 +34,7 @@ func (ss *SensorsService) StartRedisSubscribers(ctx context.Context) {
 					ss.Broadcast(casted.Name, "", casted.Value)
 				}
 			}
-			log.Info().Msgf("Stopping redis subscriber %s on %s...",
+			log.Info().Msgf("Stopping redis subscriber %s on channel %s...",
 				casted.Name, casted.Channel)
 		}()
 	}

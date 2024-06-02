@@ -20,15 +20,12 @@ func (ss *SensorsService) StartRefreshingSensors(ctx context.Context) {
 			if ready {
 				rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
 				name = task.Payload.(string)
-				log.Debug().Msgf("Updating sensor %s...", name)
 				nextUpdateOn, err := ss.Refresh(rtc, name)
 				cancel()
 				if err != nil {
 					log.Error().Err(err).Msgf("Sensor %s update failed with %s",
 						task.Payload.(string), err,
 					)
-				} else {
-					log.Debug().Msgf("Sensor %s is updated!", name)
 				}
 				ss.UpdateQueue.ExecuteAt(name, nextUpdateOn)
 			}

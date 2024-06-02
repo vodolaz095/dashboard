@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func (ss *SensorsService) initMysqlConnection(ctx context.Context, name, dsn string) (err error) {
@@ -23,5 +25,6 @@ func (ss *SensorsService) initMysqlConnection(ctx context.Context, name, dsn str
 		return err
 	}
 	ss.MysqlConnections[name] = con
+	log.Info().Msgf("MySQL/MariaDB database connection %s is established", name)
 	return nil
 }

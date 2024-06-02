@@ -12,12 +12,17 @@ func (ss *SensorsService) Refresh(ctx context.Context, name string) (next time.T
 	if !found {
 		return time.Now(), SensorNotFoundErr
 	}
+	log.Trace().
+		Str("sensor", name).
+		Float64("reading", sensor.GetValue()).
+		Msgf("Preparing to update sensor %s...", name)
+
 	err = sensor.Update(ctx)
 	if err != nil {
 		n := ss.Broadcast(name, err.Error(), sensor.GetValue())
 		log.Error().Err(err).
-			Str("name", name).
-			Float64("value", sensor.GetValue()).
+			Str("sensor", name).
+			Float64("reading", sensor.GetValue()).
 			Int("notified", n).
 			Msgf("Error updating sensor %s with value %v and %v notified: %s",
 				name, sensor.GetValue(), n, err)
@@ -25,8 +30,8 @@ func (ss *SensorsService) Refresh(ctx context.Context, name string) (next time.T
 	}
 	n := ss.Broadcast(name, "", sensor.GetValue())
 	log.Debug().
-		Str("name", name).
-		Float64("value", sensor.GetValue()).
+		Str("sensor", name).
+		Float64("reading", sensor.GetValue()).
 		Int("notified", n).
 		Msgf("Sensor %s updated with value %v - %v notified", name, sensor.GetValue(), n)
 	return sensor.Next(), nil
