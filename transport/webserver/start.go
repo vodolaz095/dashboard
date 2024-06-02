@@ -2,8 +2,10 @@ package webserver
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 
@@ -11,25 +13,25 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/vodolaz095/dashboard/assets"
-	"github.com/vodolaz095/dashboard/service"
 	"github.com/vodolaz095/dashboard/transport/webserver/middlewares"
 )
 
-type Transport struct {
-	Address     string
-	Domain      string
-	Version     string
-	Title       string
-	Description string
-	Keywords    []string
-	DoIndex     bool
-
-	SensorsService *service.SensorsService
-	engine         *gin.Engine
-}
-
 func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) {
 	defer wg.Done()
+	if tr.PathToHeader != "" {
+		header, err1 := os.ReadFile(tr.PathToHeader)
+		if err1 != nil {
+			return fmt.Errorf("error reading header from %s: %w", tr.PathToHeader, err1)
+		}
+		tr.header = header
+	}
+	if tr.PathToFooter != "" {
+		footer, err2 := os.ReadFile(tr.PathToFooter)
+		if err2 != nil {
+			return fmt.Errorf("error reading footer from %s: %w", tr.PathToFooter, err2)
+		}
+		tr.footer = footer
+	}
 	tr.engine = gin.New()
 	tr.engine.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		log.Debug().Msgf("[%s] - \"%s %s %s\" -> code=%d lat=%s size=%d / \"%s\"",

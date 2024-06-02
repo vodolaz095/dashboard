@@ -17,6 +17,8 @@ func (tr *Transport) exposeIndex() {
 			"doIndex":     tr.DoIndex,
 			"sensors":     sensors,
 			"version":     tr.Version,
+			"header":      string(tr.header),
+			"footer":      string(tr.footer),
 		})
 	})
 }

@@ -364,14 +364,15 @@ func main() {
 
 	// configure webserver transport
 	webServerTransport := webserver.Transport{
-		Address:     cfg.Listen,
-		Version:     Version,
-		Domain:      cfg.Domain,
-		Title:       cfg.Title,
-		Description: cfg.Description,
-		Keywords:    cfg.Keywords,
-		DoIndex:     cfg.DoIndex,
-
+		Address:        cfg.WebUI.Listen,
+		Version:        Version,
+		Domain:         cfg.WebUI.Domain,
+		Title:          cfg.WebUI.Title,
+		Description:    cfg.WebUI.Description,
+		Keywords:       cfg.WebUI.Keywords,
+		DoIndex:        cfg.WebUI.DoIndex,
+		PathToHeader:   cfg.WebUI.PathToHeader,
+		PathToFooter:   cfg.WebUI.PathToFooter,
 		SensorsService: &srv,
 	}
 

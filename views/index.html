@@ -12,6 +12,7 @@
   <link href="/assets/style.css" rel="stylesheet">
 </head>
 <body>
+{{ unescape .header }}
 <div id="header" align="center">
   <h1>{{.title}}</h1>
   <p id="description">{{.description}}</p>
@@ -64,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   {{ end }}
 });
 </script>
+{{ unescape .footer }}
 </body>
 </html>
 {{end}}

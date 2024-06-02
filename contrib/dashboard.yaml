@@ -1,16 +1,18 @@
-
-listen: "0.0.0.0:3000"
-domain: "localhost"
-title: "dashboard"
-description: "dashboard"
-keywords:
-  - "dashboard"
-  - "vodolaz095"
-  - "golang"
-  - "redis"
-  - "postgresql"
-  - "mysql"
-do_index: true
+web_ui:
+  listen: "0.0.0.0:3000"
+  domain: "localhost"
+  title: "dashboard"
+  description: "dashboard"
+  keywords:
+    - "dashboard"
+    - "vodolaz095"
+    - "golang"
+    - "redis"
+    - "postgresql"
+    - "mysql"
+  do_index: true
+  path_to_header: ./contrib/header.html
+  path_to_footer: ./contrib/footer.html
 
 log:
   level: trace
