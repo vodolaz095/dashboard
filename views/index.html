@@ -20,7 +20,6 @@
 <table>
   <thead>
   <tr>
-    <th>#</th>
     <th>Name</th>
     <th>Type</th>
     <th>Minimum</th>
@@ -34,8 +33,9 @@
   <tbody>
   {{ range $index, $value := .sensors }}
   <tr>
-    <td>{{$index}}</td>
-    <td>{{$value.Name}}</td>
+    <th title="{{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
+      {{$value.Name}}
+    </th>
     <td>{{$value.Type}}</td>
     <td>{{$value.Minimum}}</td>
     <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>

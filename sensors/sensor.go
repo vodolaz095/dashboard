@@ -31,6 +31,10 @@ type ISensor interface {
 }
 
 type UnimplementedSensor struct {
+	/*
+	 * Shared parameters
+	 */
+
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
@@ -41,14 +45,12 @@ type UnimplementedSensor struct {
 	Link string `yaml:"link" validate:"http_url"`
 	// Tags helps to group sensors
 	Tags map[string]string `yaml:"tags"`
-
 	// Value is used to store of value of sensor
 	Value float64 `yaml:"-"`
 	// UpdatedAt is used to store moment when sensor was updated last time
 	UpdatedAt time.Time `yaml:"-"`
 	// Error is used to store most recent error of sensor update
 	Error error
-
 	// RefreshRate is used to define how often we reload data
 	RefreshRate time.Duration `yaml:"refresh_rate"`
 	// Minimum is used to warn, when something is below safe value

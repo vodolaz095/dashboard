@@ -48,9 +48,6 @@ sensors:
     description: "Update value by incoming POST request"
     link: "http://localhost:3000/endpoint"
     token: "test321"
-    tags:
-      a: b
-      c: d
 
   - name: redis
     type: redis
@@ -60,8 +57,7 @@ sensors:
     query: "get a"
     refresh_rate: 1s
     tags:
-      a: b
-      c: d
+      kind: database
 
   - name: mysql
     type: mysql
@@ -73,8 +69,8 @@ sensors:
     maximum: 100
     refresh_rate: 5s
     tags:
-      a: b
-      c: d
+      dialect: sql
+      kind: database
 
   - name: postgres
     type: postgres
@@ -86,8 +82,8 @@ sensors:
     maximum: 100
     refresh_rate: 5s
     tags:
-      a: b
-      c: d
+      dialect: sql
+      kind: database
 
   - name: thermal0
     type: file
@@ -100,8 +96,7 @@ sensors:
     maximum: 100
     refresh_rate: 5s
     tags:
-      a: b
-      c: d
+      kind: thermal
 
   - name: redis subscriber
     type: subscriber
@@ -114,6 +109,7 @@ sensors:
     tags:
       a: b
       c: d
+      kind: database
 
 
 broadcasters:
