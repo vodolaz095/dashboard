@@ -13,7 +13,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"github.com/vodolaz095/dashboard/sensors/file"
 	"github.com/vodolaz095/dashboard/transport/broadcaster"
 	"github.com/vodolaz095/dqueue"
 
@@ -21,12 +20,6 @@ import (
 	"github.com/vodolaz095/dashboard/pkg/healthcheck"
 	"github.com/vodolaz095/dashboard/pkg/zerologger"
 	"github.com/vodolaz095/dashboard/sensors"
-	"github.com/vodolaz095/dashboard/sensors/curl"
-	"github.com/vodolaz095/dashboard/sensors/endpoint"
-	"github.com/vodolaz095/dashboard/sensors/mysql"
-	"github.com/vodolaz095/dashboard/sensors/postgres"
-	"github.com/vodolaz095/dashboard/sensors/redis"
-	"github.com/vodolaz095/dashboard/sensors/shell"
 	"github.com/vodolaz095/dashboard/service"
 	"github.com/vodolaz095/dashboard/transport/webserver"
 )
@@ -93,214 +86,28 @@ func main() {
 	log.Info().Msgf("Database connections (%v) initialized", len(cfg.DatabaseConnections))
 
 	// generate sensors from config
-	var connectionIsFound bool
 	byIndex := make([]string, len(cfg.Sensors))
 	byName := make(map[string]sensors.ISensor, 0)
+	var sensorCreated sensors.ISensor
 	for i := range cfg.Sensors {
 		log.Debug().
 			Msgf("Setting up sensor %v: %s of type %s", i,
 				cfg.Sensors[i].Name, cfg.Sensors[i].Type,
 			)
-		coef := cfg.Sensors[i].A
-		if coef == 0 {
-			coef = 1
+		_, duplicateSensorFound := byName[cfg.Sensors[i].Name]
+		if duplicateSensorFound {
+			log.Fatal().Msgf("Sensor with duplicate name %s is found at index %v in config file",
+				cfg.Sensors[i].Name, i,
+			)
 		}
-
-		switch cfg.Sensors[i].Type {
-		case "mysql", "mariadb":
-			ms := &mysql.Sensor{}
-			ms.Name = cfg.Sensors[i].Name
-			ms.Type = "mysql"
-			ms.RefreshRate = cfg.Sensors[i].RefreshRate
-			ms.Description = cfg.Sensors[i].Description
-			ms.Link = cfg.Sensors[i].Link
-			ms.Minimum = cfg.Sensors[i].Minimum
-			ms.Maximum = cfg.Sensors[i].Maximum
-			ms.Tags = cfg.Sensors[i].Tags
-			ms.A = coef
-			ms.B = cfg.Sensors[i].B
-
-			ms.Query = cfg.Sensors[i].Query
-			ms.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
-			ms.Con, connectionIsFound = srv.MysqlConnections[cfg.Sensors[i].ConnectionName]
-			if !connectionIsFound {
-				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
-				)
-			}
-			byName[ms.Name] = ms
-			byIndex[i] = ms.Name
-			updateQueue.ExecuteAfter(ms.Name, 50*time.Millisecond)
-			break
-		case "redis":
-			rs := &redis.SyncSensor{}
-			rs.Name = cfg.Sensors[i].Name
-			rs.Type = "redis"
-			rs.RefreshRate = cfg.Sensors[i].RefreshRate
-			rs.Description = cfg.Sensors[i].Description
-			rs.Link = cfg.Sensors[i].Link
-			rs.Minimum = cfg.Sensors[i].Minimum
-			rs.Maximum = cfg.Sensors[i].Maximum
-			rs.Tags = cfg.Sensors[i].Tags
-			rs.A = coef
-			rs.B = cfg.Sensors[i].B
-
-			rs.Query = cfg.Sensors[i].Query
-			rs.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
-			rs.Client, connectionIsFound = srv.RedisConnections[cfg.Sensors[i].ConnectionName]
-			if !connectionIsFound {
-				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
-				)
-			}
-
-			byName[rs.Name] = rs
-			byIndex[i] = rs.Name
-			updateQueue.ExecuteAfter(rs.Name, 50*time.Millisecond)
-
-			break
-		case "subscriber":
-			rss := &redis.SubscribeSensor{}
-			rss.Name = cfg.Sensors[i].Name
-			rss.Type = "subscriber"
-			rss.RefreshRate = cfg.Sensors[i].RefreshRate
-			rss.Description = cfg.Sensors[i].Description
-			rss.Link = cfg.Sensors[i].Link
-			rss.Minimum = cfg.Sensors[i].Minimum
-			rss.Maximum = cfg.Sensors[i].Maximum
-			rss.Tags = cfg.Sensors[i].Tags
-			rss.A = coef
-			rss.B = cfg.Sensors[i].B
-
-			rss.ValueOnly = cfg.Sensors[i].ValueOnly
-			rss.Channel = cfg.Sensors[i].Channel
-
-			rss.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
-			rss.Client, connectionIsFound = srv.RedisConnections[cfg.Sensors[i].ConnectionName]
-			if !connectionIsFound {
-				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
-				)
-			}
-
-			byName[rss.Name] = rss
-			byIndex[i] = rss.Name
-
-			break
-		case "postgres":
-			ps := &postgres.Sensor{}
-			ps.Name = cfg.Sensors[i].Name
-			ps.Type = "postgres"
-			ps.RefreshRate = cfg.Sensors[i].RefreshRate
-			ps.Description = cfg.Sensors[i].Description
-			ps.Link = cfg.Sensors[i].Link
-			ps.Minimum = cfg.Sensors[i].Minimum
-			ps.Maximum = cfg.Sensors[i].Maximum
-			ps.Tags = cfg.Sensors[i].Tags
-			ps.A = coef
-			ps.B = cfg.Sensors[i].B
-
-			ps.Query = cfg.Sensors[i].Query
-			ps.DatabaseConnectionName = cfg.Sensors[i].ConnectionName
-			ps.Con, connectionIsFound = srv.PostgresqlConnections[cfg.Sensors[i].ConnectionName]
-			if !connectionIsFound {
-				log.Fatal().Msgf("Sensor %v %s refers to unknown %s connection %s",
-					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, cfg.Sensors[i].ConnectionName,
-				)
-			}
-
-			byName[ps.Name] = ps
-			byIndex[i] = ps.Name
-			updateQueue.ExecuteAfter(ps.Name, 50*time.Millisecond)
-
-			break
-		case "curl":
-			cs := &curl.Sensor{}
-			cs.Name = cfg.Sensors[i].Name
-			cs.Type = "curl"
-			cs.RefreshRate = cfg.Sensors[i].RefreshRate
-			cs.Description = cfg.Sensors[i].Description
-			cs.Link = cfg.Sensors[i].Link
-			cs.Minimum = cfg.Sensors[i].Minimum
-			cs.Maximum = cfg.Sensors[i].Maximum
-			cs.Tags = cfg.Sensors[i].Tags
-			cs.A = coef
-			cs.B = cfg.Sensors[i].B
-
-			cs.HttpMethod = cfg.Sensors[i].HttpMethod
-			cs.Endpoint = cfg.Sensors[i].Endpoint
-			cs.Headers = cfg.Sensors[i].Headers
-			cs.Body = cfg.Sensors[i].Body
-			cs.JsonPath = cfg.Sensors[i].JsonPath
-
-			byName[cs.Name] = cs
-			byIndex[i] = cs.Name
-			updateQueue.ExecuteAfter(cs.Name, 50*time.Millisecond)
-
-			break
-		case "shell":
-			ss := &shell.Sensor{}
-			ss.Name = cfg.Sensors[i].Name
-			ss.Type = "shell"
-			ss.RefreshRate = cfg.Sensors[i].RefreshRate
-			ss.Description = cfg.Sensors[i].Description
-			ss.Link = cfg.Sensors[i].Link
-			ss.Minimum = cfg.Sensors[i].Minimum
-			ss.Maximum = cfg.Sensors[i].Maximum
-			ss.Tags = cfg.Sensors[i].Tags
-			ss.A = coef
-			ss.B = cfg.Sensors[i].B
-
-			ss.Command = cfg.Sensors[i].Command
-			ss.Environment = cfg.Sensors[i].Environment
-			ss.JsonPath = cfg.Sensors[i].JsonPath
-
-			byName[ss.Name] = ss
-			byIndex[i] = ss.Name
-			updateQueue.ExecuteAfter(ss.Name, 50*time.Millisecond)
-
-			break
-		case "endpoint":
-			es := &endpoint.Sensor{}
-			es.Name = cfg.Sensors[i].Name
-			es.Type = "endpoint"
-			es.RefreshRate = cfg.Sensors[i].RefreshRate
-			es.Description = cfg.Sensors[i].Description
-			es.Link = cfg.Sensors[i].Link
-			es.Minimum = cfg.Sensors[i].Minimum
-			es.Maximum = cfg.Sensors[i].Maximum
-			es.Tags = cfg.Sensors[i].Tags
-			es.Token = cfg.Sensors[i].Token
-			es.A = coef
-			es.B = cfg.Sensors[i].B
-
-			byName[es.Name] = es
-			byIndex[i] = es.Name
-
-			break
-		case "file":
-			fs := &file.Sensor{}
-			fs.Name = cfg.Sensors[i].Name
-			fs.Type = "file"
-			fs.RefreshRate = cfg.Sensors[i].RefreshRate
-			fs.Description = cfg.Sensors[i].Description
-			fs.Link = cfg.Sensors[i].Link
-			fs.Minimum = cfg.Sensors[i].Minimum
-			fs.Maximum = cfg.Sensors[i].Maximum
-			fs.Tags = cfg.Sensors[i].Tags
-			fs.Token = cfg.Sensors[i].Token
-			fs.A = coef
-			fs.B = cfg.Sensors[i].B
-
-			fs.PathToReadingsFile = cfg.Sensors[i].PathToReading
-
-			byName[fs.Name] = fs
-			byIndex[i] = fs.Name
-			updateQueue.ExecuteAfter(fs.Name, 50*time.Millisecond)
-			break
-		default:
-			log.Fatal().Msgf("Element %v has unknown sensor type %s", i, cfg.Sensors[i].Type)
+		sensorCreated, err = srv.MakeSensor(cfg.Sensors[i])
+		if err != nil {
+			log.Fatal().Err(err).
+				Msgf("Error creating sensor %v %s of type %s : %s",
+					i, cfg.Sensors[i].Name, cfg.Sensors[i].Type, err)
 		}
+		byName[sensorCreated.GetName()] = sensorCreated
+		byIndex[i] = sensorCreated.GetName()
 	}
 
 	srv.ListOfSensors = byIndex

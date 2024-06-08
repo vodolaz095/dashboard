@@ -55,7 +55,7 @@ sensors:
     link: "https://example.org"
     connection_name: "redis@container"
     query: "get a"
-    refresh_rate: 1s
+    refresh_rate: 5s
     tags:
       kind: database
 

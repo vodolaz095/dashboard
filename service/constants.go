@@ -1,5 +1,7 @@
 package service
 
+import "time"
+
 type DatabaseConnectionType string
 
 const (
@@ -8,4 +10,5 @@ const (
 	DatabaseConnectionTypePostgres         DatabaseConnectionType = "postgres"
 	DatabaseConnectionTypeRedis            DatabaseConnectionType = "redis"
 	DefaultSubscriptionChannelChannelDepth                        = 10
+	DefaultWarmUpDelay                                            = 50 * time.Millisecond
 )

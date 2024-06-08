@@ -16,11 +16,13 @@ type redisSink struct {
 	ValueOnly bool
 }
 
+// Publisher broadcast Sensor values into redis via `pub/sub` channels
 type Publisher struct {
 	Service    *service.SensorsService
 	redisSinks []redisSink
 }
 
+// InitConnection initialize redis connections for publishing sensor values
 func (p *Publisher) InitConnection(name, subject string, valueOnly bool) error {
 	client, found := p.Service.RedisConnections[name]
 	if !found {
@@ -34,6 +36,7 @@ func (p *Publisher) InitConnection(name, subject string, valueOnly bool) error {
 	return nil
 }
 
+// Start starts broadcasting new sensor readings into redis channels
 func (p *Publisher) Start(ctx context.Context) {
 	feed, err := p.Service.Subscribe(ctx, "dashboard.broadcaster")
 	if err != nil {

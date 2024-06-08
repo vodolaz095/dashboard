@@ -12,8 +12,9 @@ import (
 )
 
 type Sensor struct {
-	mu *sync.Mutex
 	sensors.UnimplementedSensor
+
+	mu  *sync.Mutex
 	Con *sql.Conn
 }
 

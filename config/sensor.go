@@ -6,7 +6,7 @@ type Sensor struct {
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
-	Type string `yaml:"type" validate:"required, oneof=mysql redis subscriber postgres curl shell endpoint file"`
+	Type string `yaml:"type" validate:"required"`
 	// Description is used to explain meaning of this sensor
 	Description string `yaml:"description"`
 	// Link is used to help visitor read more about sensor
