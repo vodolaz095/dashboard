@@ -21,7 +21,6 @@
   <thead>
   <tr>
     <th>Name</th>
-    <th>Type</th>
     <th>Minimum</th>
     <th class="val">Value</th>
     <th>Maximum</th>
@@ -33,10 +32,13 @@
   <tbody>
   {{ range $index, $value := .sensors }}
   <tr>
-    <th title="{{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
-      {{$value.Name}}
+    <th title="type={{$value.Type}} {{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
+      {{ if $value.Link }}
+      <a href="{{ $value.Link }}" target="_blank">{{$value.Name}}</a>
+      {{ else }}
+      {{ $value.Name }}
+      {{ end }}
     </th>
-    <td>{{$value.Type}}</td>
     <td>{{$value.Minimum}}</td>
     <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>
     <td>{{$value.Maximum}}</td>
