@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -19,7 +18,10 @@ type Sensor struct {
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
-	return fmt.Errorf("not implemented")
+	if s.A == 0 {
+		s.A = 1
+	}
+	return s.Con.PingContext(ctx)
 }
 
 func (s *Sensor) Ping(ctx context.Context) error {
