@@ -13,7 +13,7 @@
 </head>
 <body>
 {{ unescape .header }}
-<div id="header" align="center">
+<div id="header">
   <h1>{{.title}}</h1>
   <p id="description">{{.description}}</p>
 </div>
@@ -40,7 +40,7 @@
       {{ end }}
     </th>
     <td>{{$value.Minimum}}</td>
-    <td class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</td>
+    <th class="val" id="value_{{$value.Name}}">{{printf "%.4f" $value.Value}}</th>
     <td>{{$value.Maximum}}</td>
     <td class="err" id="error_{{$value.Name}}">{{$value.Error}}</td>
     <td id="timestamp_{{$value.Name}}">{{$value.UpdatedAt.Format "15:04:05"}}</td>
