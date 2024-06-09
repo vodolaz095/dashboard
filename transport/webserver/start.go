@@ -47,8 +47,8 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 		return ""
 	}))
 	tr.engine.Use(gin.Recovery())
-
 	middlewares.Secure(tr.engine, tr.Domain)
+	middlewares.UseCaching(tr.engine)
 	middlewares.EmulatePHP(tr.engine)
 	tr.engine.TrustedPlatform = gin.PlatformCloudflare
 	err = injectTemplates(tr.engine)
