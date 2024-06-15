@@ -62,7 +62,9 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 			s.Error = err
 		}
 	}()
-
+	s.Value = 0
+	s.Error = nil
+	s.UpdatedAt = time.Now()
 	var val float64
 	body := bytes.NewBufferString(s.Body)
 	req, err := http.NewRequest(s.Method, s.Endpoint, body)
@@ -81,15 +83,18 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		defer resp.Body.Close()
 	}
 	if resp.StatusCode != s.ExpectedStatusCode {
-		return fmt.Errorf("unexpected status %v %s", resp.StatusCode, resp.Status)
+		s.Error = fmt.Errorf("unexpected status %v %s", resp.StatusCode, resp.Status)
+		return s.Error
 	}
 	raw, err := io.ReadAll(resp.Body)
 	if err != nil {
+		s.Error = err
 		return
 	}
 	if s.JsonPath == "" {
 		val, err = strconv.ParseFloat(strings.TrimSpace(string(raw)), 64)
 		if err != nil {
+			s.Error = err
 			return
 		}
 		s.Value = val
@@ -100,13 +105,14 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	var data interface{}
 	err = json.Unmarshal(raw, &data)
 	if err != nil {
+		s.Error = err
 		return
 	}
 	res, err := jsonpath.JsonPathLookup(data, s.JsonPath)
 	if err != nil {
+		s.Error = err
 		return
 	}
 	s.Value = res.(float64)
-	s.UpdatedAt = time.Now()
 	return nil
 }

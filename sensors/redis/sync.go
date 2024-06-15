@@ -52,9 +52,11 @@ func (s *SyncSensor) Update(ctx context.Context) error {
 	}
 	val, err := s.Client.Do(ctx, b...).Float64()
 	if err != nil {
+		s.Value = 0
 		s.Error = err
 		return err
 	}
 	s.Value = val
+	s.Error = nil
 	return nil
 }

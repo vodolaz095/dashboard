@@ -39,6 +39,8 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.UpdatedAt = time.Now()
+	s.Value = 0
+	s.Error = nil
 	var val float64
 	raw, err := os.ReadFile(s.PathToReadingsFile)
 	if err != nil {
@@ -53,7 +55,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 			return
 		}
 		s.Value = val
-		s.UpdatedAt = time.Now()
 		return nil
 	}
 	// readings file contains json we need to execute jsonpath query against

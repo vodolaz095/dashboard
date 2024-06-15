@@ -41,6 +41,8 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.UpdatedAt = time.Now()
+	s.Error = nil
+	s.Value = 0
 	args := strings.Split(s.Command, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	//cmd.Env = append(cmd.Env, "a=b")
