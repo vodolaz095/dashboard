@@ -3,6 +3,7 @@ package shell
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -45,7 +46,9 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	s.Value = 0
 	args := strings.Split(s.Command, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
-	//cmd.Env = append(cmd.Env, "a=b")
+	for k := range s.Environment {
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%q", k, s.Environment[k]))
+	}
 	raw, err := cmd.Output()
 	if err != nil {
 		s.Error = err
