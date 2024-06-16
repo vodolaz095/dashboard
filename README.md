@@ -1,10 +1,25 @@
-dashboard
+Vodolaz095's Dashboard
 ======================
 Goland powered dashboard
 
+Usage example
+======================
+Consider your business depends on MySQL database of CRM, PostgreSQL database for shipping,
+few 3rd party APIs (like get balance of bank account), redis database with real time machinery state and few scripts
+you are running on servers on site to see its working. It can be wise idea to combine all these readings in
+single dashboard available for all stakeholders and important employees, so they can have eagle's eye perspective 
+on what is happening. It can be wise to conceal some technical data (like database connection strings) but, in general,
+all important data should be available on single page in a way it can be understood by general audience without technical 
+skills.
+
+Example dashboards
+=====================
+
+
+
 Main features
 ======================
-1. Few very hackable sensors
+1. Manifold of very hackable sensors
 2. Single cross-platform binary with simple `yaml` powered config
 3. Light-weight (dashboard has ~1 kb [style.css](assets%2Fstyle.css), ~1 kb [feed.js](assets%2Ffeed.js) and ~ 5kb 
    main page)- works ok even on IPhone 6 and 2013 year Android Smartphones
@@ -119,6 +134,8 @@ It is possible to run LUA stored procedures in redis and get their values as sen
 
 ***Redis Subscriber Sensor***
 
+This sensor subscribes to redis database channels and reads updates provided as float numbers.
+
 ```yaml
 
   - name: redis subscriber
@@ -133,13 +150,30 @@ It is possible to run LUA stored procedures in redis and get their values as sen
       a: b
       c: d
       kind: database
+```
 
+can be updated by executing this redis command
+
+```
+  PUBLISH vodolaz095/dashboard/subscriber 47.1
+```
+
+```shell
+
+	$ redis-cli publish vodolaz095/dashboard/subscriber `date "+%S"`
+
+```
+
+If we want to provide more data (not only value), we can parse messages as jsons
+
+
+```yaml
   - name: redis subscriber
     type: subscriber
     description: "Subscribe to redis channel and get values from it"
     channel: "vodolaz095/dashboard/subscriber/all"
     connection_name: "subscribe2redis@container"
-    value_only: false
+    value_only: false # <-------
     minimum: 1
     maximum: 100
     tags:
@@ -147,8 +181,29 @@ It is possible to run LUA stored procedures in redis and get their values as sen
        c: d
        kind: database
 
+```
+Sensor expects messages in this format (timestamp is in ISO 8601)
+```json
+
+{
+   "name": "redis subscriber",
+   "value": 47.1,
+   "error": "",
+   "timestamp": "2024-06-16T11:21:56.238Z"
+}
+```
+
+```json
+{
+"name": "redis subscriber",
+"value": 0,
+"error": "something is broken",
+"timestamp": "2024-06-16T11:21:56.238Z"
+}
 
 ```
+
+
 
 ***Shell command sensor***
 
@@ -184,7 +239,7 @@ For example, script returns
 
 ```
 
-And this `$.a` JSONPath query will provide 5.3 - value of `a` key, and this one
+This `$.a` JSONPath query will provide `5.3` - value of `a` key, and this one
 `$.d[1]` will provide 11 - 2nd element of array under `d` key.
 Parameters `a:10` and `b: 1` will make linear transformation of reading by
 multiplying it by 10 and adding 1.
@@ -229,9 +284,10 @@ Sensor reads values from file, applying JSONPath query extraction if required
 
 ***Endpoint sensor***
 
-Waits for incoming HTTP POST request from external scripts/applications to update value
+Waits for incoming HTTP POST request from external scripts/applications to update value.
+Incoming HTTP request should have `Token: ....` with value equal to the one in config. 
 
-For config like this
+Consider dashboard application is running on `localhost:3000`. For config like this
 
 ```yaml
 
@@ -243,7 +299,7 @@ For config like this
 - name: endpoint2
   type: endpoint
   description: "Update value by incoming POST request"
-  token: "test321"
+  token: "test321forEndpoint2"
   
 
 ```
@@ -266,7 +322,7 @@ and this one:
 ```shell
 
 curl -v -H "Host: localhost" \
-  -H "Token: test321" \
+  -H "Token: test321forEndpoint2" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -X POST \
   -d "name=endpoint2&value=53.5" \
@@ -314,5 +370,26 @@ This sensor sends periodical HTTP requests to external endpoint providing sensor
 
 
 ```
+
+***Creating your own sensor***
+
+Sensor should implement **ISensor** interface as provided [sensor.go](sensors%2Fsensor.go).
+Sensor can be build on top of **UnimplementedSensor** with methods required impemented.
+See examples in [sensors](sensors) directory.
+
+
+Security
+=============================
+1. All sensor readings are available to all dashboard users, while database access credentials and database queries are concealed
+2. Dashboard WebUI access can be restricted either by reverse proxy, or it can be served only in local network - so
+   if somebody can view this dashboard - he/she is allowed to do to.
+3. Updating dashboard is performed automatically
+4. Configuring dashboard is done by system administrators, allowed to work with data required.
+
+
+Deployment
+=============================
+
+NGINX as reverse proxy, encryption and authorization is done by NGINX.
 
 
