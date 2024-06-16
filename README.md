@@ -99,6 +99,7 @@ Configuration examples:
 ```
 
 ***Redis Synchronous Query Sensor***
+
 This sensor periodically executes query `get a` to read value of a key `a`.
 It is possible to run LUA stored procedures in redis and get their values as sensor readings
 
@@ -209,8 +210,109 @@ multiplying it by 10 and adding 1.
 
 ***File sensor***
 
+Sensor reads values from file, applying JSONPath query extraction if required
+
+```yaml
+  - name: thermal0
+    type: file
+    description: "Get thermal sensor status from area 0"
+    link: "https://example.org"
+    path_to_reading: /sys/class/thermal/thermal_zone0/temp
+    a: 0.001
+    b: 0
+    minimum: 1
+    maximum: 100
+    refresh_rate: 5s
+    tags:
+      kind: thermal
+```
+
 ***Endpoint sensor***
 
+Waits for incoming HTTP POST request from external scripts/applications to update value
+
+For config like this
+
+```yaml
+
+- name: endpoint1
+  type: endpoint
+  description: "Update value by incoming POST request"
+  token: "test321"
+  
+- name: endpoint2
+  type: endpoint
+  description: "Update value by incoming POST request"
+  token: "test321"
+  
+
+```
+
+This curl command updates sensor `endpoint1` with value 21
+
+```shell
+
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -X POST \
+  -d "name=endpoint1&value=21" \
+  http://localhost:3000/update
+
+```
+
+and this one:
+
+```shell
+
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -X POST \
+  -d "name=endpoint2&value=53.5" \
+  http://localhost:3000/update
+
+```
+
+updates `endpoint2` sensor with value 53.5
+
 ***CURL sensor***
+
+This sensor sends periodical HTTP requests to external endpoint providing sensor readings in form of raw string or JSON data.
+
+```yaml
+
+- name: curl1
+  type: curl
+  description: "Sensor sends simple HTTP GET request expecting float string in response with latitude of IP address origin"
+  http_method: "GET"
+  link: "https://ip-api.com/"
+  endpoint: "http://ip-api.com/line/193.41.76.51?fields=lat"
+  
+  
+- name: curl2
+  type: curl
+  description: "Sensor sends simple HTTP GET request expecting JSON response"
+  link: "https://ip-api.com/"
+  http_method: "GET"
+  endpoint: "http://ip-api.com/json/193.41.76.51"
+  headers:
+     User-Agent: "Vodolaz095's Dashboard"
+  json_path: "@.lat"
+
+- name: curl3
+  type: curl
+  description: "Sensor sends POST request expecting JSON response"
+  http_method: "POST"
+  endpoint: "https://example.org/api/v1/rpc"
+  headers:
+     User-Agent: "Vodolaz095's Dashboard"
+     Authorization: "Bearer: EFLXCXxv7QCU7GyDvE36Azl8e8gIc0kG0BvGHNEnxAYA"
+     Content-Type: "application/x-www-form-urlencoded"
+  json_path: "@.balance"
+  body: "entity=portfolio&action=get"
+
+
+```
 
 
