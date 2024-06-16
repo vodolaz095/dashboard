@@ -1,32 +1,118 @@
 Vodolaz095's Dashboard
 ======================
-Goland powered dashboard
+Minimalistic and DDOS-proof Goland powered dashboard
 
 Usage example
 ======================
 Consider your business depends on MySQL database of CRM, PostgreSQL database for shipping,
 few 3rd party APIs (like get balance of bank account), redis database with real time machinery state and few scripts
-you are running on servers on site to see its working. It can be wise idea to combine all these readings in
-single dashboard available for all stakeholders and important employees, so they can have eagle's eye perspective 
-on what is happening. It can be wise to conceal some technical data (like database connection strings) but, in general,
-all important data should be available on single page in a way it can be understood by general audience without technical 
-skills.
+you are running on servers on site to see its working. 
+So, important readings can be, for example, 
+
+- number of active orders in MySQL database of CRM extracted by query like 
+```sql
+SELECT COALESCE(count(orders.id),0) as "orders_pending"
+FROM orders
+WHERE DATE(orders.created_at) = CURDATE() and orders.status=1;
+```
+
+- number of completed orders extracted this way
+```sql
+SELECT COALESCE(count(orders.id),0) as "orders_completed"
+FROM orders
+WHERE DATE(orders.created_at) = CURDATE() and orders.status=2;
+```
+
+- query like this (with stored procedure) is used to count active deliveries in PostgreSQL
+```sql
+SELECT doCountActiveDeliveries(CURDATE());
+```
+ 
+- real time machinery readings are extracted by redis commands like this one
+```
+127.0.0.1:6379> hget reactor1 power_output
+```
+
+- bank account can be checked by sending HTTP POST request to, for example, https://example.org/api/v1/rpc
+
+Checking every parameter separately can be automated by scripts, but making it all easy and in one place
+can be complicated. It can be wise idea to combine all these readings in single dashboard available for all stakeholders 
+and important employees, so they can have eagle's eye perspective on what is happening. It can be wise to conceal 
+some technical data (like database connection strings) but, in general, all important data should be available 
+on single page in a way it can be understood by general audience without technical skills.
 
 Example dashboards
 =====================
 
 
+Architecture
+=====================
+
 
 Main features
 ======================
 1. Manifold of very hackable sensors
-2. Single cross-platform binary with simple `yaml` powered config
+2. Single cross-platform binary with simple `yaml` encoded config
 3. Light-weight (dashboard has ~1 kb [style.css](assets%2Fstyle.css), ~1 kb [feed.js](assets%2Ffeed.js) and ~ 5kb 
    main page)- works ok even on IPhone 6 and 2013 year Android Smartphones
 4. Real time updates using [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 5. JSON and [Prometheous v4](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example)
    endpoints to read sensors readings
-6. DDOS proof - sensors readings are updated in memory by background process and served by HTTP server from memory
+6. DDOS (distributed denial of service attacks) proof - sensors readings are updated in memory by background process 
+   and served by HTTP server from memory. No matter how many clients opens dashboard - they receive values from memory,
+   no extra calls to database and other resources are issued. 
+7. Database access credentials, tokens, passwords, etc - all can be concealed from visitors.
+
+
+Defining database connections
+=======================
+
+Each database connection can be reused by few sensors, so, connections are defined separately in config.
+This is example how to define redis, mysql and postgresql connections
+
+```yaml
+
+database_connections:
+  - name: redis@container
+    type: redis
+    connection_string: "redis://127.0.0.1:6379"
+
+  - name: subscribe2redis@container
+    type: redis
+    connection_string: "redis://127.0.0.1:6379"
+
+  - name: mysql@container
+    type: mysql
+    connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
+
+  - name: postgres@container
+    type: postgres
+    connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
+
+
+```
+
+Redis database connections strings should be understood by [ParseURL](https://pkg.go.dev/github.com/redis/go-redis/v9#ParseURL)
+```
+redis://<user>:<password>@<host>:<port>/<db_number>
+unix://<user>:<password>@</path/to/redis.sock>?db=<db_number>
+```
+Important: if you have `subscriber` type sensor, it should use separate redis connections, because
+redis connection can work only in one of 2 modes - accepting commands, or being subscribed to channels.
+
+
+
+If you connect to redis databases of old version (5.x and lower), you can omit `user` -
+this should work `redis://:passwd@redis.example.org:6379/1`
+
+MySQL database connection strings should satisfy this data source name syntax:
+https://pkg.go.dev/github.com/go-sql-driver/mysql#readme-dsn-data-source-name
+
+PostgreSQL database connection strings should be like this:
+```
+postgres://username:password@hostname:5432/database_name
+```
+
 
 
 Sensors and their configuration examples
@@ -378,6 +464,31 @@ Sensor can be build on top of **UnimplementedSensor** with methods required impl
 See examples in [sensors](sensors) directory.
 
 
+Dashboard customization
+=============================
+```yaml
+
+web_ui:
+  listen: "0.0.0.0:3000"
+  domain: "localhost"
+  title: "dashboard"
+  description: "dashboard"
+  keywords:
+    - "dashboard"
+    - "vodolaz095"
+    - "golang"
+    - "redis"
+    - "postgresql"
+    - "mysql"
+  do_index: true
+  path_to_header: ./contrib/header.html
+  path_to_footer: ./contrib/footer.html
+
+
+```
+
+
+
 Security
 =============================
 1. All sensor readings are available to all dashboard users, while database access credentials and database queries are concealed
@@ -389,7 +500,6 @@ Security
 
 Deployment
 =============================
-
 NGINX as reverse proxy, encryption and authorization is done by NGINX.
 
 Broadcasting sensor readings via redis
