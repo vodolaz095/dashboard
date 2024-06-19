@@ -51,7 +51,8 @@ Architecture
 
 Main features
 ======================
-1. Manifold of very hackable sensors
+1. Manifold of very hackable sensors - MySQL/PostgreSQL queryes, Redis sync and subscription, file, remote HTTP endpoint, 
+   periodical shell command execution, local HTTP POST endpoint updated by remote script with secret token.
 2. Single cross-platform binary with simple `yaml` encoded config
 3. Light-weight (dashboard has ~1 kb [style.css](assets%2Fstyle.css), ~1 kb [feed.js](assets%2Ffeed.js) and ~ 5kb 
    main page)- works ok even on IPhone 6 and 2013 year Android Smartphones
@@ -61,7 +62,7 @@ Main features
 6. DDOS (distributed denial of service attacks) proof - sensors readings are updated in memory by background process 
    and served by HTTP server from memory. No matter how many clients opens dashboard - they receive values from memory,
    no extra calls to database and other resources are issued. 
-7. Database access credentials, tokens, passwords, etc - all can be concealed from visitors.
+7. Database access credentials, tokens, passwords and other sensitive data is concealed from visitors.
 
 
 Defining database connections
@@ -73,14 +74,16 @@ This is example how to define redis, mysql and postgresql connections
 ```yaml
 
 database_connections:
+# this connection can be used by few sensors and broadcasters, since `publish` command does not lock redis connection
   - name: redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
-
+# since `subscribe/psubscribe` command locks redis connection, it can only be used by redis subscriber sensors.
   - name: subscribe2redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
 
+# single SQL database connection can be shared between few sensors for this database
   - name: mysql@container
     type: mysql
     connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
@@ -466,6 +469,9 @@ See examples in [sensors](sensors) directory.
 
 Dashboard customization
 =============================
+WebUI can be customized by setting page title, description, keywords and adding static HTML
+code snippets to page with, for example, custom menu and tracking pixels for analytics platforms.
+
 ```yaml
 
 web_ui:
@@ -487,6 +493,15 @@ web_ui:
 
 ```
 
+Logging
+============================
+```yaml
+
+log:
+  level: trace
+  to_journald: false
+
+```
 
 
 Security
@@ -501,10 +516,16 @@ Security
 Deployment
 =============================
 NGINX as reverse proxy, encryption and authorization is done by NGINX.
+Configuration example - [dashboard.conf](contrib%2Fnginx%2Fdashboard.conf)
+Good read:
+- https://nginx.org/ru/docs/http/ngx_http_proxy_module.html
+- https://stackoverflow.com/questions/23844761/upstream-sent-too-big-header-while-reading-response-header-from-upstream
+- https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+
 
 Broadcasting sensor readings via redis
 ==============================
-Let's consider case when you have few servers running dashboards and you want to have 
+Let's consider case when you have few servers running dashboards, and you want to have 
 one dashboard showing values from all other dashboards.
 It can be done via `broadcaster` feature, utilizing shared redis server pub/sub channels.
 
@@ -584,3 +605,27 @@ sensors:
 
 
 ```
+
+License
+===================================
+MIT License
+
+Copyright (c) 2024 Остроумов Анатолий
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

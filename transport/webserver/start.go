@@ -61,7 +61,12 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 		c.FileFromFS("favicon.ico", fs)
 	})
 	tr.engine.GET("/robots.txt", func(c *gin.Context) {
-		c.FileFromFS("robots.txt", fs)
+		c.Header("Content-Type", "text/plain; charset=utf-8")
+		if tr.DoIndex {
+			c.String(http.StatusOK, "User-agent: *\nAllow: /")
+			return
+		}
+		c.String(http.StatusOK, "User-agent: *\nDisallow: /")
 	})
 
 	tr.exposeIndex()

@@ -10,13 +10,13 @@ web_ui:
     - "redis"
     - "postgresql"
     - "mysql"
-  do_index: true
+  do_index: true # allow search engine bots to scrape dashboard
   path_to_header: ./contrib/header.html
   path_to_footer: ./contrib/footer.html
 
 log:
-  level: trace
-  to_journald: false
+  level: trace # can be trace, debug, info, warn, error, fatal
+  to_journald: false # if enabled, data is send to journald socket instead of STDOUT
 
 database_connections:
   - name: redis@container
