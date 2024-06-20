@@ -35,7 +35,7 @@ func (s *SubscribeSensor) Ping(ctx context.Context) error {
 	return s.Client.Ping(ctx).Err()
 }
 
-func (s *SubscribeSensor) Close(ctx context.Context) (err error) {
+func (s *SubscribeSensor) Close(_ context.Context) (err error) {
 	// since canceling subscriber closes connection as expected
 	return nil
 }

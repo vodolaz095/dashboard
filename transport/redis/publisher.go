@@ -1,4 +1,4 @@
-package broadcaster
+package redis
 
 import (
 	"context"

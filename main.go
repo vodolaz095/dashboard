@@ -13,7 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"github.com/vodolaz095/dashboard/transport/broadcaster"
+	redis_transport "github.com/vodolaz095/dashboard/transport/redis"
 	"github.com/vodolaz095/dqueue"
 
 	"github.com/vodolaz095/dashboard/config"
@@ -150,13 +150,13 @@ func main() {
 		}
 	}
 
-	// configure redis broadcaster
-	publisher := broadcaster.Publisher{
+	// configure redis transports
+	redisPublisher := redis_transport.Publisher{
 		Service: &srv,
 	}
 	if len(cfg.Broadcasters) > 0 {
 		for i := range cfg.Broadcasters {
-			err = publisher.InitConnection(
+			err = redisPublisher.InitConnection(
 				cfg.Broadcasters[i].ConnectionName,
 				cfg.Broadcasters[i].Subject,
 				cfg.Broadcasters[i].ValueOnly,
@@ -167,6 +167,9 @@ func main() {
 				)
 			}
 		}
+	}
+	redisSubscriber := redis_transport.Subscriber{
+		Service: &srv,
 	}
 
 	// configure webserver transport
@@ -201,8 +204,8 @@ func main() {
 	// main loop
 	go srv.StartRefreshingSensors(ctx)
 	go srv.StartClock(ctx)
-	go publisher.Start(ctx)
-	go srv.StartRedisSubscribers(ctx)
+	go redisPublisher.Start(ctx)
+	go redisSubscriber.Start(ctx)
 
 	go func() {
 		log.Debug().Msgf("Preparing to start webserver on %s...", webServerTransport.Address)

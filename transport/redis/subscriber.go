@@ -1,19 +1,25 @@
-package service
+package redis
 
 import (
 	"context"
 
 	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dashboard/sensors/redis"
+	"github.com/vodolaz095/dashboard/service"
 )
 
-func (ss *SensorsService) StartRedisSubscribers(ctx context.Context) {
-	for k := range ss.Sensors {
-		casted, ok := ss.Sensors[k].(*redis.SubscribeSensor)
+// Subscriber subscribes to redis channels
+type Subscriber struct {
+	Service *service.SensorsService
+}
+
+func (ss *Subscriber) Start(ctx context.Context) {
+	for k := range ss.Service.Sensors {
+		casted, ok := ss.Service.Sensors[k].(*redis.SubscribeSensor)
 		if !ok {
 			continue
 		}
-		_, found := ss.RedisConnections[casted.DatabaseConnectionName]
+		_, found := ss.Service.RedisConnections[casted.DatabaseConnectionName]
 		if !found {
 			log.Fatal().Msgf("Redis subscriber sensor %s uses unknown connection %s",
 				casted.Name, casted.DatabaseConnectionName,
@@ -29,9 +35,9 @@ func (ss *SensorsService) StartRedisSubscribers(ctx context.Context) {
 			for msg := range ch {
 				casted.ParseValue(msg)
 				if casted.Error != nil {
-					ss.Broadcast(casted.Name, casted.Error.Error(), casted.Value)
+					ss.Service.Broadcast(casted.Name, casted.Error.Error(), casted.Value)
 				} else {
-					ss.Broadcast(casted.Name, "", casted.Value)
+					ss.Service.Broadcast(casted.Name, "", casted.Value)
 				}
 			}
 			log.Info().Msgf("Stopping redis subscriber %s on channel %s...",
