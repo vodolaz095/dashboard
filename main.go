@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+	"github.com/vodolaz095/dashboard/transport/influxdb"
 	redis_transport "github.com/vodolaz095/dashboard/transport/redis"
 	"github.com/vodolaz095/dqueue"
 
@@ -119,6 +120,25 @@ func main() {
 	}
 	log.Info().Msgf("Sensors (%v) initialized", len(srv.Sensors))
 
+	// configure influxdb transport to store persistent timeseries data
+	influxWriter := &influxdb.Writer{
+		Endpoint:     cfg.Influx.Endpoint,
+		Token:        cfg.Influx.Token,
+		Organization: cfg.Influx.Organization,
+		Bucket:       cfg.Influx.Bucket,
+		Service:      &srv,
+	}
+
+	if cfg.Influx.Endpoint != "" {
+		err = influxWriter.Init(ctx)
+		if err != nil {
+			log.Fatal().Err(err).
+				Msgf("Error initializing influxdb connection to %s (org=%s, bucket=%s): %s",
+					err, cfg.Influx.Endpoint, cfg.Influx.Organization, cfg.Influx.Bucket,
+				)
+		}
+	}
+
 	// set systemd watchdog
 	systemdWatchdogEnabled, err := healthcheck.Ready()
 	if err != nil {
@@ -130,6 +150,7 @@ func main() {
 			log.Debug().Msgf("Watchdog enabled")
 			errWD := healthcheck.StartWatchDog(ctx, []healthcheck.Pinger{
 				&srv,
+				influxWriter,
 			})
 			if errWD != nil {
 				log.Error().
@@ -206,6 +227,7 @@ func main() {
 	go srv.StartClock(ctx)
 	go redisPublisher.Start(ctx)
 	go redisSubscriber.Start(ctx)
+	go influxWriter.Start(ctx)
 
 	go func() {
 		log.Debug().Msgf("Preparing to start webserver on %s...", webServerTransport.Address)

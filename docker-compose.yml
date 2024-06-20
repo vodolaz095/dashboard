@@ -4,7 +4,7 @@ volumes:
   redis_data:
   mariadb_data:
   pg_data:
-
+  influxdb_data:
 
 services:
   # https://hub.docker.com/_/mariadb
@@ -36,3 +36,20 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  # https://hub.docker.com/_/influxdb
+  influx:
+    image: mirror.gcr.io/influxdb:2-alpine
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: "setup"
+      DOCKER_INFLUXDB_INIT_USERNAME: "dashboard"
+      DOCKER_INFLUXDB_INIT_PASSWORD: "dashboard"
+      DOCKER_INFLUXDB_INIT_ORG: "dashboard"
+      DOCKER_INFLUXDB_INIT_BUCKET: "dashboard"
+      DOCKER_INFLUXDB_INIT_RETENTION: "1d"
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "-l3Y5tIHGJAxXv_Rs5kJ4kAfPbgmf3WPmFUTDuKmD3Z9gp29E7e188-dIt5MAKhSTzv1J6v_pkPuVdIbXqdL1w=="
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+

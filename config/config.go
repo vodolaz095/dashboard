@@ -12,6 +12,8 @@ type Config struct {
 	Sensors []Sensor `yaml:"sensors" validate:"required"`
 	// Broadcasters defines configuration for sinks where we broadcast Sensors data
 	Broadcasters []Broadcaster `yaml:"broadcasters"`
+	// Influx defines configuration for Influxdb v2 time-series database used for storing historical sensor values
+	Influx Influx `yaml:"influx" validate:"omitempty"`
 }
 
 func (c *Config) Dump() ([]byte, error) {

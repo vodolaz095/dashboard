@@ -38,14 +38,14 @@ func (p *Publisher) InitConnection(name, subject string, valueOnly bool) error {
 
 // Start starts broadcasting new sensor readings into redis channels
 func (p *Publisher) Start(ctx context.Context) {
-	feed, err := p.Service.Subscribe(ctx, "dashboard.broadcaster")
+	feed, err := p.Service.Subscribe(ctx, "dashboard.broadcaster.redis")
 	if err != nil {
 		log.Fatal().Err(err).Msgf("broadcaster failed to subscribe: %s", err)
 	}
 	for {
 		select {
 		case <-ctx.Done():
-			log.Info().Msgf("Broadcaster is closing...")
+			log.Info().Msgf("Redis broadcaster is closing...")
 			for i := range p.redisSinks {
 				err = p.redisSinks[i].Client.Close()
 				if err != nil {

@@ -119,3 +119,9 @@ broadcasters:
   - connection_name: redis@container
     subject: "vodolaz095/dashboard/value/%s"
     value_only: true
+
+influx:
+  endpoint: http://127.0.0.1:8086
+  token: "-l3Y5tIHGJAxXv_Rs5kJ4kAfPbgmf3WPmFUTDuKmD3Z9gp29E7e188-dIt5MAKhSTzv1J6v_pkPuVdIbXqdL1w=="
+  organization: dashboard
+  bucket: dashboard
