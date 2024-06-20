@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -128,8 +129,7 @@ func main() {
 		Bucket:       cfg.Influx.Bucket,
 		Service:      &srv,
 	}
-
-	if cfg.Influx.Endpoint != "" {
+	if cfg.Influx.Valid() {
 		err = influxWriter.Init(ctx)
 		if err != nil {
 			log.Fatal().Err(err).
@@ -165,7 +165,9 @@ func main() {
 	// change systemd status
 	if systemdWatchdogEnabled {
 		// https://www.freedesktop.org/software/systemd/man/latest/sd_notify.html#STATUS=%E2%80%A6
-		err = healthcheck.SetStatus("Dashboard is online!")
+		err = healthcheck.SetStatus(fmt.Sprintf(
+			"Dashboard is online - %v sensors are monitored!", len(srv.Sensors)),
+		)
 		if err != nil {
 			log.Warn().Err(err).Msgf("Error setting systemd unit status")
 		}

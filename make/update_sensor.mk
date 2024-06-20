@@ -1,3 +1,5 @@
+export timestamp=$(shell date "+%S")
+
 update_sensor/endpoint:
 	curl -v -H "Host: localhost" \
 		-H "Token: test321" \
@@ -7,4 +9,4 @@ update_sensor/endpoint:
 		http://localhost:3000/update
 
 update_sensor/redis_subscriber:
-	redis-cli publish vodolaz095/dashboard/subscriber `date "+%S"`
+	redis-cli publish vodolaz095/dashboard/subscriber $(timestamp)

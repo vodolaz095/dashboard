@@ -34,6 +34,9 @@ func (w *Writer) Init(ctx context.Context) (err error) {
 }
 
 func (w *Writer) Ping(ctx context.Context) (err error) {
+	if !w.initialized {
+		return nil
+	}
 	_, err = w.client.Ping(ctx)
 	return
 }
