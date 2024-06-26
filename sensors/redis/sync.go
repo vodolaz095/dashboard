@@ -15,12 +15,11 @@ import (
 // `GET A`, `ZCOUNT something 0 10000`, `LLEN some_list` and so on
 type SyncSensor struct {
 	sensors.UnimplementedSensor
-	mu     *sync.Mutex
 	Client *redis.Client
 }
 
 func (s *SyncSensor) Init(ctx context.Context) error {
-	s.mu = &sync.Mutex{}
+	s.Mutex = &sync.RWMutex{}
 	if s.A == 0 {
 		s.A = 1
 	}
@@ -42,8 +41,8 @@ func (s *SyncSensor) Close(ctx context.Context) error {
 }
 
 func (s *SyncSensor) Update(ctx context.Context) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	args := strings.Split(s.Query, " ")
 	b := make([]interface{}, len(args))

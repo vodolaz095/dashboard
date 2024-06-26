@@ -18,7 +18,6 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	mu                 *sync.Mutex
 	Headers            map[string]string
 	Method             string
 	Body               string
@@ -42,7 +41,7 @@ func (s *Sensor) Init(ctx context.Context) error {
 	if s.Client == nil {
 		s.Client = http.DefaultClient
 	}
-	s.mu = &sync.Mutex{}
+	s.Mutex = &sync.RWMutex{}
 	return nil
 }
 
@@ -55,9 +54,9 @@ func (s *Sensor) Close(ctx context.Context) error {
 }
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
-	s.mu.Lock()
+	s.Mutex.Lock()
 	defer func() {
-		s.mu.Unlock()
+		s.Mutex.Unlock()
 		if err != nil {
 			s.Error = err
 		}

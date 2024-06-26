@@ -12,8 +12,6 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-
-	mu  *sync.Mutex
 	Con *sql.Conn
 }
 
@@ -21,6 +19,7 @@ func (s *Sensor) Init(ctx context.Context) error {
 	if s.A == 0 {
 		s.A = 1
 	}
+	s.Mutex = &sync.RWMutex{}
 	return s.Con.PingContext(ctx)
 }
 
@@ -39,11 +38,8 @@ func (s *Sensor) Close(ctx context.Context) error {
 }
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
-	if s.mu == nil {
-		s.mu = &sync.Mutex{}
-	}
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Value = 0
 	s.Error = nil

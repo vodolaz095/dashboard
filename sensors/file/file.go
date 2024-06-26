@@ -15,12 +15,11 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	mu                 *sync.Mutex
 	PathToReadingsFile string
 }
 
 func (s *Sensor) Init(_ context.Context) error {
-	s.mu = &sync.Mutex{}
+	s.Mutex = &sync.RWMutex{}
 	if s.A == 0 {
 		s.A = 1
 	}
@@ -36,8 +35,8 @@ func (s *Sensor) Close(_ context.Context) error {
 }
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Value = 0
 	s.Error = nil

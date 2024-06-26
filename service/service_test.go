@@ -16,7 +16,6 @@ import (
 
 type testSensor struct {
 	sensors.UnimplementedSensor
-	mu     *sync.RWMutex
 	T      *testing.T
 	Alive  bool
 	inner  float64
@@ -24,7 +23,7 @@ type testSensor struct {
 }
 
 func (ts *testSensor) Init(_ context.Context) error {
-	ts.mu = &sync.RWMutex{}
+	ts.Mutex = &sync.RWMutex{}
 	return nil
 }
 
@@ -41,20 +40,20 @@ func (ts *testSensor) Close(_ context.Context) error {
 }
 
 func (ts *testSensor) GetValue() float64 {
-	ts.mu.RLock()
-	defer ts.mu.RUnlock()
+	ts.Mutex.RLock()
+	defer ts.Mutex.RUnlock()
 	return ts.inner
 }
 
 func (ts *testSensor) GetUpdatedAt() time.Time {
-	ts.mu.RLock()
-	defer ts.mu.RUnlock()
+	ts.Mutex.RLock()
+	defer ts.Mutex.RUnlock()
 	return time.Now()
 }
 
 func (ts *testSensor) Update(_ context.Context) error {
-	ts.mu.Lock()
-	defer ts.mu.Unlock()
+	ts.Mutex.Lock()
+	defer ts.Mutex.Unlock()
 	if ts.inner != 0 {
 		return nil
 	}
@@ -63,8 +62,8 @@ func (ts *testSensor) Update(_ context.Context) error {
 }
 
 func (ts *testSensor) Set(val float64) {
-	ts.mu.Lock()
-	defer ts.mu.Unlock()
+	ts.Mutex.Lock()
+	defer ts.Mutex.Unlock()
 	ts.inner = val
 }
 

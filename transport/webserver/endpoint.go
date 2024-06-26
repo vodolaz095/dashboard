@@ -11,7 +11,7 @@ import (
 
 // exposeUpdate exposes endpoint used to update sensor value by incoming HTTP POST request
 func (tr *Transport) exposeUpdate() {
-	tr.engine.POST("/update", func(c *gin.Context) {
+	handle := func(c *gin.Context) {
 		var data dto.UpdateSensorRequest
 		err := c.Bind(&data)
 		if err != nil {
@@ -62,8 +62,24 @@ func (tr *Transport) exposeUpdate() {
 			Msgf("Updating endpoint sensor %s with value %v",
 				casted.Name, data.Value,
 			)
-		casted.Set(data.Value)
-		tr.SensorsService.Broadcast(casted.Name, "", data.Value)
+		switch c.FullPath() {
+		case "/update":
+			casted.Set(data.Value)
+			break
+		case "/increment":
+			casted.Increment(data.Value)
+			break
+		case "/decrement":
+			casted.Increment(-data.Value)
+			break
+		default:
+			c.String(http.StatusBadRequest, "unknown method")
+		}
+		tr.SensorsService.Broadcast(casted.Name, "", casted.GetValue())
 		c.AbortWithStatus(http.StatusNoContent)
-	})
+	}
+
+	tr.engine.POST("/update", handle)
+	tr.engine.POST("/increment", handle)
+	tr.engine.POST("/decrement", handle)
 }

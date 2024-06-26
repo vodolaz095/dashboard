@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"context"
+	"sync"
 	"testing"
 	"time"
 )
@@ -34,7 +35,6 @@ type UnimplementedSensor struct {
 	/*
 	 * Shared parameters
 	 */
-
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
@@ -63,6 +63,8 @@ type UnimplementedSensor struct {
 	// B is constant in linear transformation Y=A*X+B used to, for example, convert
 	// Fahrenheit degrees into Celsius degrees
 	B float64 `yaml:"b"`
+	// Mutex protects
+	Mutex *sync.RWMutex `yaml:"-"`
 
 	/*
 	 * Parameters used for mysql, redis and postgres
@@ -132,18 +134,26 @@ func (u *UnimplementedSensor) GetTags() map[string]string {
 }
 
 func (u *UnimplementedSensor) GetValue() float64 {
+	u.Mutex.RLock()
+	defer u.Mutex.RUnlock()
 	return u.A*u.Value + u.B
 }
 
 func (u *UnimplementedSensor) GetUpdatedAt() time.Time {
+	u.Mutex.RLock()
+	defer u.Mutex.RUnlock()
 	return u.UpdatedAt
 }
 
 func (u *UnimplementedSensor) GetLastError() error {
+	u.Mutex.RLock()
+	defer u.Mutex.RUnlock()
 	return u.Error
 }
 
 func (u *UnimplementedSensor) Next() time.Time {
+	u.Mutex.RLock()
+	defer u.Mutex.RUnlock()
 	a := time.Now().Add(u.RefreshRate)
 	b := u.UpdatedAt.Add(u.RefreshRate)
 	if a.After(b) {

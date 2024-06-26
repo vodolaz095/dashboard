@@ -420,6 +420,35 @@ curl -v -H "Host: localhost" \
 ```
 
 updates `endpoint2` sensor with value 53.5
+It is possible to increment/decrement in a race condition save manner values by calling `/increment` and `/decrement` 
+endpoints:
+```shell
+
+# set sensor `endpoint1` value to 10
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -X POST \
+  -d "name=endpoint1&value=10" \
+  http://localhost:3000/update
+
+# increment `endpoint1` value by 5. If there are few concurrent HTTP POST requests, all data will be applied in save manner
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -X POST \
+  -d "name=endpoint1&value=5" \
+  http://localhost:3000/increment
+
+# decrement `endpoint1` value by 3. If there are few concurrent HTTP POST requests, all data will be applied in save manner
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -X POST \
+  -d "name=endpoint1&value=3" \
+  http://localhost:3000/decrement
+
+```
 
 ***CURL sensor***
 

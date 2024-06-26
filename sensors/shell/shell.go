@@ -16,12 +16,11 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	mu *sync.Mutex
 }
 
 func (s *Sensor) Init(ctx context.Context) (err error) {
 	args := strings.Split(s.Command, " ")
-	s.mu = &sync.Mutex{}
+	s.Mutex = &sync.RWMutex{}
 	if s.A == 0 {
 		s.A = 1
 	}
@@ -39,8 +38,8 @@ func (s *Sensor) Close(ctx context.Context) error {
 
 func (s *Sensor) Update(ctx context.Context) (err error) {
 	var val float64
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Error = nil
 	s.Value = 0
