@@ -25,6 +25,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+
       mariadb:
         image: mirror.gcr.io/mariadb:10.11.6
         env:
@@ -62,3 +63,9 @@ jobs:
         PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard
         MYSQL_URL: root:dashboard@/dashboard
       run: make test
+
+    - name: build binary
+      run: make build
+
+    - name: expose build result
+      run: ls -l build/
