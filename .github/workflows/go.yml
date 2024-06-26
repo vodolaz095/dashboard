@@ -65,7 +65,9 @@ jobs:
       run: make test
 
     - name: build binary
-      run: make build
+      env:
+        CGO_ENABLED: 0
+      run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard main.go
 
     - name: expose build result
       run: ls -l build/
