@@ -1,6 +1,6 @@
 Vodolaz095's Dashboard
 ======================
-Minimalistic and DDOS-proof Goland powered dashboard
+Minimalistic and DDOS-proof Golang powered dashboard
 
 Usage example
 ======================
@@ -43,7 +43,7 @@ on single page in a way it can be understood by general audience without technic
 
 Example dashboards
 =====================
-
+![dashboard_example.png](contrib%2Fdashboard_example.png)
 
 Architecture
 =====================
