@@ -1,0 +1,64 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: go
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    services:
+
+      redis:
+        image: mirror.gcr.io/redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mariadb:
+        image: mirror.gcr.io/mariadb:10.11.6
+        environment:
+          MYSQL_ROOT_PASSWORD:  "dashboard"
+          MYSQL_DATABASE: "dashboard"
+        ports:
+          - 3306:3306
+
+      postgres:
+        image: mirror.gcr.io/postgres:15-alpine
+        environment:
+          POSTGRES_USER: "dashboard"
+          POSTGRES_PASSWORD: "dashboard"
+        ports:
+          - "5432:5432"
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22.4'
+        cache-dependency-path: go.sum
+
+    - name: install govulncheck utility
+      run: go install golang.org/x/vuln/cmd/govulncheck@latest
+
+    - name: scan for vulnerable packages
+      run: make vuln
+
+    - name: run unit test
+      env:
+        REDIS_URL: redis://127.0.0.1:6379
+        PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard
+        MYSQL_URL: root:dashboard@/dashboard
+      run: make test
