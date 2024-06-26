@@ -27,7 +27,7 @@ jobs:
 
       mariadb:
         image: mirror.gcr.io/mariadb:10.11.6
-        environment:
+        env:
           MYSQL_ROOT_PASSWORD:  "dashboard"
           MYSQL_DATABASE: "dashboard"
         ports:
@@ -35,7 +35,7 @@ jobs:
 
       postgres:
         image: mirror.gcr.io/postgres:15-alpine
-        environment:
+        env:
           POSTGRES_USER: "dashboard"
           POSTGRES_PASSWORD: "dashboard"
         ports:
