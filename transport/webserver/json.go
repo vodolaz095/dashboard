@@ -9,7 +9,7 @@ import (
 
 func (tr *Transport) exposeJSON() {
 	tr.engine.GET("/json", func(c *gin.Context) {
-		sensors := tr.SensorsService.List()
+		sensors := tr.listFilteredSensors(c)
 		c.JSON(http.StatusOK, gin.H{
 			"title":       tr.Title,
 			"description": tr.Description,
