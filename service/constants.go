@@ -11,4 +11,5 @@ const (
 	DatabaseConnectionTypeRedis            DatabaseConnectionType = "redis"
 	DefaultSubscriptionChannelChannelDepth                        = 10
 	DefaultWarmUpDelay                                            = 50 * time.Millisecond
+	DefaultSensorTimeout                                          = 5 * time.Second
 )

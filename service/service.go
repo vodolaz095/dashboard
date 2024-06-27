@@ -11,15 +11,14 @@ import (
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
-const DefaultSensorTimeout = 5 * time.Second
-
 type SensorsService struct {
 	ListOfSensors  []string
 	Sensors        map[string]sensors.ISensor
 	UpdateInterval time.Duration
 	UpdateQueue    *dqueue.Handler
 
-	// subscribers stores SSE connections used by real time web application
+	// subscribers are used to deliver sensors update to SSE connections and different
+	// transports - redis publishers, influx, etc...
 	subscribers map[string]chan model.Update
 
 	// cached database connections
