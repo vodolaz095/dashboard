@@ -41,15 +41,24 @@ redis connection can work only in one of 2 modes - accepting commands, or being 
 If you connect to redis databases of old version (5.x and lower), you can omit `user` -
 this should work `redis://:passwd@redis.example.org:6379/1`
 
-MySQL database connection strings should satisfy this data source name syntax:
+MySQL compatible database connection strings should satisfy this data source name syntax:
 ```
-username:password@tcp(hostname:3306)/database_name
+username:password@tcp(hostname:3306)/database_name?charset=utf8&parseTime=True&loc=Local
+username:password@unix(/var/lib/mysql/mysql.sock)/database_name?charset=utf8&parseTime=True&loc=Local
+
 ```
 See https://pkg.go.dev/github.com/go-sql-driver/mysql#readme-dsn-data-source-name
 
-PostgreSQL database connection strings should be like this:
+PostgresSQL compatible database connection strings should be like this:
 ```
+
+# Example Keyword/Value
+user=jack password=secret host=pg.example.com port=5432 dbname=mydb sslmode=verify-ca pool_max_conns=10
+
+# Example URL
 postgres://username:password@hostname:5432/database_name
+postgres://jack:secret@pg.example.com:5432/mydb?sslmode=verify-ca&pool_max_conns=10
+
 ```
 See https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool#ParseConfig
 

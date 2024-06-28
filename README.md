@@ -67,8 +67,15 @@ Main features
 
 Quickstart
 ======================
-Big configuration example with comments:
-[dashboard.yaml](contrib%2Fdashboard.yaml)
+Just copy big configuration example with comments [dashboard.yaml](contrib%2Fdashboard.yaml),
+change parameters to your own and start application in this way:
+
+```shell
+  
+  $ dashboard /path/to/dashboard_config.yaml
+  
+```
+
 
 List of contents
 =======================
@@ -84,7 +91,7 @@ List of contents
 - [Logging](docs%2Flogging.md)
 - [Dashboard customization](docs%2Fui_customization.md)
 - [Exporting data via HTTP transport](docs%2Fexport_http.md)
-- [Exporting data via redis publishers](docs%2Fexport_redis_publisher.md)
+- [Exporting data via redis publishers](docs%2Fexport_redis_.md)
 - [Exporting sensor data into InfluxDB via wire protocol](docs%2Fexport_influx.md)
 - [Exporting sensor data into Prometheus/InfluxDB via scrapper](docs%2Fexport_metrics.md)
 - [Linking few dashboards via redis pub/sub](docs%2Flinking_via_redis.md)

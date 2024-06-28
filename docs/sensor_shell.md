@@ -21,6 +21,18 @@ Configuration examples
 
 ```yaml
 
+  - name: echo
+    type: shell
+    command: 'date +%S'
+    description: "Get current second executing `date` command"
+    refresh_rate: 5s
+    minimum: 0
+    maximum: 60
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shell.md"
+    tags:
+      a: b
+      c: d
+
   - name: doSomethingScriptSensor
     type: shell
     command: '/usr/bin/do_something.sh'

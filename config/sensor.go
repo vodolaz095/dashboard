@@ -3,6 +3,10 @@ package config
 import "time"
 
 type Sensor struct {
+	/*
+	 * Shared parameters used by all sensor types
+	 */
+
 	// Name is used to distinguish sensors from other ones
 	Name string `yaml:"name" validate:"required,alphanum"`
 	// Type is used to define strategy to load sensor value
@@ -27,7 +31,7 @@ type Sensor struct {
 	B float64 `yaml:"b"`
 
 	/*
-	 * Parameters used for mysql, redis and postgres
+	 * Parameters used for mysql, redis and postgres sensors
 	 */
 
 	// ConnectionName is used to dial database
@@ -38,6 +42,7 @@ type Sensor struct {
 	/*
 	 * Parameters used for curl sensor, which sends HTTP requests to remote servers to obtain data
 	 */
+
 	// HttpMethod defines request type being send to remote http(s) endpoint via HTTP protocol
 	HttpMethod string `yaml:"http_method" validate:"oneof=GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE"`
 	// Endpoint defines URL where sensor sends request to recieve data
