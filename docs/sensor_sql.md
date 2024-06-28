@@ -20,7 +20,7 @@ Connecting to database
 =======================================
 
 Database connections should be defined in [Connection Pool](https://github.com/vodolaz095/dashboard/blob/master/docs/connection_pool.md)
-part of configuration.
+part of configuration. Each SQL database connection can be reused by multiple sensors.
 
 
 MySQL database connection strings should satisfy this data source name syntax:
@@ -42,6 +42,17 @@ Configuration examples
 
 ```yaml
 
+# https://github.com/vodolaz095/dashboard/blob/master/docs/connection_pool.md
+database_connections:
+  - name: mysql@container
+    type: mysql
+    connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
+
+  - name: postgres@container
+    type: postgres
+    connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
+
+sensors:
   - name: mysql
     type: mysql
     description: "Select random number from range"
@@ -73,7 +84,7 @@ Configuration examples
     type: mysql
     description: "Сколько калорий осталось для Анатолия"
     link: "https://eda.example.org"
-    connection_name: "eda"
+    connection_name: "mysql@container"
     query: >
        SELECT COALESCE(metadata.value-SUM(calories),0) as "calories_left"
        FROM meals                         

@@ -60,5 +60,5 @@ postgres://username:password@hostname:5432/database_name
 postgres://jack:secret@pg.example.com:5432/mydb?sslmode=verify-ca&pool_max_conns=10
 
 ```
-See https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool#ParseConfig
+See https://pkg.go.dev/github.com/jackc/pgx/v5@v5.6.0/pgconn#ParseConfig
 

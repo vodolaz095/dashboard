@@ -1,8 +1,19 @@
-***File sensor***
+File sensor
+=========================
 
-Sensor reads values from file, applying JSONPath query extraction if required
+Shared sensor parameters are explained in
+[sensor_shared.md](https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shared.md)
+file.
+
+All config parameters for sensors are depicted in this file
+[sensor.go](https://github.com/vodolaz095/dashboard/blob/master/config/sensor.go)
+with comments explaining things.
+
+
+Sensor reads values from file, applying [JSONPath](https://jsonpath.com/) query extraction if required
 
 ```yaml
+sensors:
   - name: thermal0
     type: file
     description: "Get thermal sensor status from area 0"
@@ -15,4 +26,12 @@ Sensor reads values from file, applying JSONPath query extraction if required
     refresh_rate: 5s
     tags:
       kind: thermal
+
+  - name: fileWithJSON
+    type: file
+    description: "Get something from big json file updated periodically"
+    path_to_reading: /var/run/something.json
+    json_path: $.something.value # extract value from field of JSON object...     
+    refresh_rate: 5s
+
 ```

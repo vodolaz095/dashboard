@@ -1,10 +1,25 @@
-***Redis Synchronous Query Sensor***
-
+Redis Synchronous Query Sensor
+=========================================
 This sensor periodically executes query `get a` to read value of a key `a`.
 It is possible to run LUA stored procedures in redis and get their values as sensor readings
 
-```yaml
+Shared sensor parameters are explained in
+[sensor_shared.md](https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shared.md)
+file.
 
+All config parameters for sensors are depicted in this file
+[sensor.go](https://github.com/vodolaz095/dashboard/blob/master/config/sensor.go)
+with comments explaining things.
+
+
+```yaml
+# https://github.com/vodolaz095/dashboard/blob/master/docs/connection_pool.md
+database_connections:
+  - name: redis@container
+    type: redis
+    connection_string: "redis://127.0.0.1:6379"
+
+sensor:
 - name: redis
   type: redis
   description: "Get value of redis key a"
@@ -17,12 +32,21 @@ It is possible to run LUA stored procedures in redis and get their values as sen
 
 ```
 
-***Redis Subscriber Sensor***
+Redis Subscriber Sensor
+=========================================
 
 This sensor subscribes to redis database channels and reads updates provided as float numbers.
 
 ```yaml
-
+database_connections:
+  - name: redis@container
+    type: redis
+    connection_string: "redis://default:secret@127.0.0.1:6379"
+  - name: subscribe2redis@container
+    type: redis
+    connection_string: "redis://default:secret@127.0.0.1:6379"
+    
+sensor:
   - name: redis subscriber
     type: subscriber
     description: "Subscribe to redis channel and get values from it"
@@ -68,6 +92,7 @@ If we want to provide more data (not only value), we can parse messages as jsons
 
 ```
 Sensor expects messages in this format (timestamp is in ISO 8601)
+for successful updates
 ```json
 
 {
@@ -77,7 +102,7 @@ Sensor expects messages in this format (timestamp is in ISO 8601)
    "timestamp": "2024-06-16T11:21:56.238Z"
 }
 ```
-
+and this one for erroneous updates
 ```json
 {
 "name": "redis subscriber",
