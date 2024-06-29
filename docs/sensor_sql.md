@@ -22,18 +22,26 @@ Connecting to database
 Database connections should be defined in [Connection Pool](https://github.com/vodolaz095/dashboard/blob/master/docs/connection_pool.md)
 part of configuration. Each SQL database connection can be reused by multiple sensors.
 
-
-MySQL database connection strings should satisfy this data source name syntax:
+MySQL compatible database connection strings should satisfy this data source name syntax:
 ```
-username:password@tcp(hostname:3306)/database_name
+username:password@tcp(hostname:3306)/database_name?charset=utf8&parseTime=True&loc=Local
+username:password@unix(/var/lib/mysql/mysql.sock)/database_name?charset=utf8&parseTime=True&loc=Local
+
 ```
 See https://pkg.go.dev/github.com/go-sql-driver/mysql#readme-dsn-data-source-name
 
-PostgreSQL database connection strings should be like this:
+PostgresSQL compatible database connection strings should be like this:
 ```
+
+# Example Keyword/Value
+user=jack password=secret host=pg.example.com port=5432 dbname=mydb sslmode=verify-ca pool_max_conns=10
+
+# Example URL
 postgres://username:password@hostname:5432/database_name
+postgres://jack:secret@pg.example.com:5432/mydb?sslmode=verify-ca&pool_max_conns=10
+
 ```
-See https://pkg.go.dev/github.com/jackc/pgx/v5/pgxpool#ParseConfig
+See https://pkg.go.dev/github.com/jackc/pgx/v5@v5.6.0/pgconn#ParseConfig
 
 
 

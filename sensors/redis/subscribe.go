@@ -17,14 +17,13 @@ import (
 
 type SubscribeSensor struct {
 	sensors.UnimplementedSensor
-	mu        *sync.Mutex
 	Client    *redis.Client
 	Channel   string
 	ValueOnly bool
 }
 
 func (s *SubscribeSensor) Init(ctx context.Context) error {
-	s.mu = &sync.Mutex{}
+	s.Mutex = &sync.RWMutex{}
 	if s.A == 0 {
 		s.A = 1
 	}
@@ -45,8 +44,8 @@ func (s *SubscribeSensor) Update(_ context.Context) error {
 }
 
 func (s *SubscribeSensor) ParseValue(msg *redis.Message) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.Mutex.Lock()
+	defer s.Mutex.Unlock()
 	log.Trace().Msgf("Parsing %s from channel %s", msg.Payload, msg.Channel)
 
 	var val float64
