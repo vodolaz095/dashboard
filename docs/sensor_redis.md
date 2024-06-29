@@ -1,6 +1,6 @@
 Redis Synchronous Query Sensor
 =========================================
-This sensor periodically executes query `get a` to read value of a key `a`.
+This sensor periodically executes redis command and records value returned.
 It is possible to run LUA stored procedures in redis and get their values as sensor readings
 
 Shared sensor parameters are explained in
@@ -11,6 +11,9 @@ All config parameters for sensors are depicted in this file
 [sensor.go](https://github.com/vodolaz095/dashboard/blob/master/config/sensor.go)
 with comments explaining things.
 
+
+For example, this configuration makes sensor to read value of key `a` in redis database, which is expected to have 
+meaningful value which can be parsed by [strconv#ParseFloat](https://pkg.go.dev/strconv#ParseFloat)
 
 ```yaml
 # https://github.com/vodolaz095/dashboard/blob/master/docs/connection_pool.md
@@ -36,6 +39,10 @@ Redis Subscriber Sensor
 =========================================
 
 This sensor subscribes to redis database channels and reads updates provided as float numbers.
+Due to redis limitations, connection can only in one of modes - sync commands or subscription.
+
+So, **sensors of type `redis` and `subscriber` cannot share redis connections.** 
+
 
 ```yaml
 database_connections:

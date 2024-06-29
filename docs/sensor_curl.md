@@ -1,6 +1,14 @@
-***CURL sensor***
-
+CURL sensor
+============================
 This sensor sends periodical HTTP requests to external endpoint providing sensor readings in form of raw string or JSON data.
+
+Shared sensor parameters are explained in
+[sensor_shared.md](https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shared.md)
+file.
+
+All config parameters for sensors are depicted in this file
+[sensor.go](https://github.com/vodolaz095/dashboard/blob/master/config/sensor.go)
+with comments explaining things.
 
 ```yaml
 
@@ -33,6 +41,7 @@ This sensor sends periodical HTTP requests to external endpoint providing sensor
      Content-Type: "application/x-www-form-urlencoded"
   json_path: "@.balance"
   body: "entity=portfolio&action=get"
-
+  tags:
+    kind: balance
 
 ```

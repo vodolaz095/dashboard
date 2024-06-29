@@ -85,7 +85,8 @@ sensors:
     description: "Сколько калорий осталось для Анатолия"
     link: "https://eda.example.org"
     connection_name: "mysql@container"
-    query: >
+    # multiline queries are supported!
+    query: > 
        SELECT COALESCE(metadata.value-SUM(calories),0) as "calories_left"
        FROM meals                         
        LEFT JOIN metadata on meals.username = metadata.username

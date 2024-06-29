@@ -2,6 +2,7 @@ Dashboard customization
 =============================
 WebUI can be customized by setting page title, description, keywords and adding static HTML
 code snippets to page with, for example, custom menu and tracking pixels for analytics platforms.
+Just create/edit `header.html` and `footer.html` files with your HTML code in it and mention them in configuration file.
 
 ```yaml
 

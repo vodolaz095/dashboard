@@ -24,6 +24,6 @@ For example, `A`=0.5555 `B`=-17.7778 allows converting sensor readings from Fahr
 
 Parameter `refresh_rate` defines how often sensor should be refreshed, it accepts strings that
 [time#ParseDuration](https://pkg.go.dev/time#ParseDuration) understands, so
-`5h, 1m, 10s` are OK.
+`5h, 1m, 10s` are OK. Even `5m 2s` is ok too!
 
 Parameters `minimum` and `maximum` does nothing, but they can give a hint for operator to understand save range of values.

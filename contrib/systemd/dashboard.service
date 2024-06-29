@@ -1,0 +1,69 @@
+[Unit]
+Description=Dashboard application
+After=network.target
+Requires=redis.service
+Requires=mariadb.service
+Requires=postgresql.service
+
+[Service]
+# service notifies systemd when it starts
+Type=notify
+Restart=always
+RestartSec=3s
+WatchdogSec=30s
+TimeoutStopSec=3s
+
+User=dashboard
+Group=dashboard
+Environment=GIN_MODE=release
+
+WorkingDirectory=/var/lib/dashboard/
+ExecStart=/usr/bin/dashboard /etc/dashboard.yml
+
+
+# Hardening
+# https://gist.github.com/ageis/f5595e59b1cddb1513d1b425a323db04
+
+ProtectSystem=strict
+ReadWritePaths=/var/lib/dashboard/
+ProtectHome=yes
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+StateDirectory=eda
+StateDirectoryMode=0700
+PrivateTmp=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+PrivateUsers=yes
+
+# limit network connections to localhost only
+IPAddressAllow=localhost
+IPAddressDeny=any
+
+# do not limit network connections
+#IPAddressAllow=any
+#IPAddressDeny=
+
+IPAccounting=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+PrivateDevices=yes
+NoNewPrivileges=yes
+UMask=0066
+RestrictSUIDSGID=yes
+RemoveIPC=yes
+MemoryDenyWriteExecute=yes
+
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+SystemCallArchitectures=native
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

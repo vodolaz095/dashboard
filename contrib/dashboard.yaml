@@ -66,6 +66,7 @@ sensors:
     query: "get a"
     refresh_rate: 5s
     tags:
+      dialect: redis
       kind: database
 
   - name: mysql
@@ -117,8 +118,7 @@ sensors:
     minimum: 1
     maximum: 100
     tags:
-      a: b
-      c: d
+      dialect: redis
       kind: database
 
 # https://github.com/vodolaz095/dashboard/blob/master/docs/export_redis.md
