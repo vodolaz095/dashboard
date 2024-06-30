@@ -21,7 +21,7 @@ vuln:
 	which govulncheck
 	govulncheck ./...
 
-deps: tools
+deps:
 	go mod download
 	go mod verify
 	go mod tidy

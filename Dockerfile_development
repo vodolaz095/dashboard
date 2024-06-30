@@ -1,0 +1,14 @@
+FROM mirror.gcr.io/golang:1.22.3
+
+RUN mkdir -p /app
+WORKDIR /app
+ADD ./go.sum /app/go.sum
+ADD ./go.mod /app/go.mod
+RUN go mod download
+RUN go mod verify
+
+ADD ./ /app
+
+EXPOSE 3001
+
+ENTRYPOINT ["go", "run", "main.go", "/etc/dashboard.yaml"]

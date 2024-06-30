@@ -67,14 +67,26 @@ Main features
 
 Quickstart
 ======================
-Just copy big configuration example with comments [dashboard.yaml](contrib%2Fdashboard.yaml),
-change parameters to your own and start application in this way:
 
-```shell
-  
-  $ dashboard /path/to/dashboard_config.yaml
-  
-```
+1. Obtain suitable binary from https://github.com/vodolaz095/dashboard/releases
+2. Copy configuration example with comments [dashboard.yaml](contrib%2Fdashboard.yaml),
+   and change parameters to your own and start application in this way:
+
+   ```shell
+     
+     $ dashboard /path/to/dashboard_config.yaml
+     
+   ```
+
+3. See [deployment](docs%2Fdeployment.md) how to ran application for production.
+
+Security
+=============================
+1. All sensor readings are available to all dashboard users, while database access credentials and database queries are concealed
+2. Dashboard WebUI access can be restricted either by reverse proxy, or it can be served only in local network - so
+   if somebody can view this dashboard - he/she is allowed to do to.
+3. Updating dashboard is performed automatically
+4. Configuring dashboard is done by system administrators, allowed to work with data required.
 
 
 List of contents
@@ -95,26 +107,85 @@ List of contents
 - [Exporting sensor data into InfluxDB via wire protocol](docs%2Fexport_influx.md)
 - [Exporting sensor data into Prometheus/InfluxDB via scrapper](docs%2Fexport_metrics.md)
 - [Linking few dashboards via redis pub/sub](docs%2Flinking_via_redis.md)
+- [Deployment](docs%2Fdeployment.md)
 
-
-Security
+Development using golang compiler on host machine
 =============================
-1. All sensor readings are available to all dashboard users, while database access credentials and database queries are concealed
-2. Dashboard WebUI access can be restricted either by reverse proxy, or it can be served only in local network - so
-   if somebody can view this dashboard - he/she is allowed to do to.
-3. Updating dashboard is performed automatically
-4. Configuring dashboard is done by system administrators, allowed to work with data required.
+Application requires [Golang 1.22.0](https://go.dev/dl/) and [GNU Make](https://www.gnu.org/software/make/) installed.
 
+```shell
 
-Deployment
+# ensure development tools in place
+$ make tools
+
+# ensure golang modules are installed
+$ make deps
+
+# start application for development using configuration from contrib/dashboard.yaml on http://localhost:3000
+$ make start
+
+# build production grade binary at `build/dashboard`
+$ make build
+
+```
+
+MySQL, PostgreSQL, Redis and Influxdb can be started by docker/podman
+
+```shell
+
+# start development databases (depending on what container engine is available)  
+$ make docker/resource
+$ make podman/resource
+
+```
+
+Development using docker + docker compose
 =============================
-NGINX as reverse proxy, encryption and authorization is done by NGINX.
-Configuration example - [dashboard.conf](contrib%2Fnginx%2Fdashboard.conf)
-Good read:
-- https://nginx.org/ru/docs/http/ngx_http_proxy_module.html
-- https://stackoverflow.com/questions/23844761/upstream-sent-too-big-header-while-reading-response-header-from-upstream
-- https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+[GNU Make](https://www.gnu.org/software/make/), [Docker engine](https://docs.docker.com/engine/install/) with
+[compose plugin](https://docs.docker.com/compose/install/linux/) should be installed.
+Installing golang toolchain on host machine is not required.
 
+```shell
+
+# start development databases and build and start application on http://localhost:3001 
+$ make docker/up
+
+# start development databases  
+$ make docker/resource
+
+# stop all
+$ make docker/down
+
+# prune all development environment
+$ make docker/prune
+
+
+```
+
+
+Development using podman + podman-compose
+=============================
+Installing golang toolchain on host machine is not required.
+Tested on Fedora 39, 40 and Centos 9 Stream. 
+
+```shell
+
+# install development environment
+$ sudo dnf install make podman podman-compose podman-plugins containernetworking-plugins
+
+# start development databases and build and start application on http://localhost:3001
+$ make podman/up
+
+# start development databases  
+$ make podman/resource
+
+# stop all
+$ make podman/down
+
+# prune all development environment
+$ make podman/prune
+
+```
 
 License
 ===================================

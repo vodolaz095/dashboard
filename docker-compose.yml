@@ -53,3 +53,13 @@ services:
     volumes:
       - influxdb_data:/var/lib/influxdb2
 
+  dashboard:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile_development
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./contrib/dashboard_docker.yaml:/etc/dashboard.yaml:Z,U
+      - ./contrib/header.html:/etc/header.html:Z,U
+      - ./contrib/footer.html:/etc/footer.html:Z,U
