@@ -7,7 +7,7 @@ import (
 	"github.com/vodolaz095/dashboard/model"
 )
 
-func (tr *Transport) listFilteredSensors(c *gin.Context) (sensors []model.Sensor) {
+func (tr *Transport) listFilteredSensors(c *gin.Context) (sensors []model.Sensor, filtered bool) {
 	tags := c.Request.URL.Query()
 	if len(tags) == 0 {
 		sensors = tr.SensorsService.List()
@@ -17,6 +17,7 @@ func (tr *Transport) listFilteredSensors(c *gin.Context) (sensors []model.Sensor
 			needle[k] = strings.Join(tags[k], " ")
 		}
 		sensors = tr.SensorsService.ListByTags(needle)
+		filtered = true
 	}
 	return
 }

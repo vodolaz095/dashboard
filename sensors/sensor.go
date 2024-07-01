@@ -130,6 +130,13 @@ func (u *UnimplementedSensor) GetMaximum() float64 {
 }
 
 func (u *UnimplementedSensor) GetTags() map[string]string {
+	if u.Tags == nil {
+		u.Tags = make(map[string]string, 0)
+	}
+	_, ok := u.Tags["type"]
+	if !ok {
+		u.Tags["type"] = u.Type
+	}
 	return u.Tags
 }
 
