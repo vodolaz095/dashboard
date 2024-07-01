@@ -1,7 +1,7 @@
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
-name: go
+name: unit test
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
 
-  build:
+  test:
     runs-on: ubuntu-latest
     services:
 
@@ -63,11 +63,3 @@ jobs:
         PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard
         MYSQL_URL: root:dashboard@/dashboard
       run: make test
-
-    - name: build binary
-      env:
-        CGO_ENABLED: 0
-      run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard main.go
-
-    - name: expose build result
-      run: ls -l build/
