@@ -4,8 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     services:
 
       redis:
@@ -93,13 +95,6 @@ jobs:
           GOARCH: amd64
           CGO_ENABLED: 0
         run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_darwin_amd64 main.go
-
-      - name: build binary for macos on amd64
-        env:
-          GOOS: darwin
-          GOARCH: arm
-          GOARM: 7
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_darwin_arm7 main.go
 
       - name: make md5 signature file
         run: md5sum build/* > build/dashboard.md5
