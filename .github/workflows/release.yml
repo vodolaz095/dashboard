@@ -101,7 +101,7 @@ jobs:
           GOARM: 7
         run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_darwin_arm7 main.go
 
-      - name: make md5 signarute file
+      - name: make md5 signature file
         run: md5sum build/* > build/dashboard.md5
 
       - name: expose build result

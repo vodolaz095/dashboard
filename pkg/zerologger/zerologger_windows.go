@@ -1,5 +1,5 @@
-//go:build !windows
-// +build !windows
+//go:build windows
+// +build windows
 
 package zerologger
 
@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/journald"
 	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dashboard/config"
 )
@@ -17,14 +16,11 @@ import (
 func Configure(params config.Log) {
 	var outputsEnabled []io.Writer
 
-	if params.ToJournald {
-		outputsEnabled = append(outputsEnabled, journald.NewJournalDWriter())
-	} else {
-		outputsEnabled = append(outputsEnabled, zerolog.ConsoleWriter{
-			Out:        os.Stdout, // https://12factor.net/ru/logs
-			TimeFormat: "15:04:05",
-		})
-	}
+	outputsEnabled = append(outputsEnabled, zerolog.ConsoleWriter{
+		Out:        os.Stdout, // https://12factor.net/ru/logs
+		TimeFormat: "15:04:05",
+	})
+
 	zerolog.CallerMarshalFunc = func(pc uintptr, file string, line int) string {
 		short := file
 		for i := len(file) - 1; i > 0; i-- {
