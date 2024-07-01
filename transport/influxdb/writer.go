@@ -52,8 +52,9 @@ func (w *Writer) format(input model.Update) string {
 	}
 	ret := bytes.NewBufferString(sensor.GetName())
 	for k, v := range sensor.GetTags() {
-		ret.WriteString(fmt.Sprintf(",%s=%s", k, v))
+		fmt.Fprintf(ret, ",%s=%s", k, v)
 	}
+	fmt.Fprintf(ret, ",type=%s", sensor.GetType())
 	fmt.Fprintf(ret, " value=%f %v\n", input.Value, time.Now().UnixNano())
 	return ret.String()
 }
