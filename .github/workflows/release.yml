@@ -105,5 +105,6 @@ jobs:
       - name: release
         uses: ncipollo/release-action@v1
         with:
-          tag: "${{ github.sha }}"
+          commit: "${{ github.sha }}"
+          tag: "master"
           artifacts: "build/dashboard*"
