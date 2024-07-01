@@ -108,7 +108,7 @@ jobs:
           draft: true
           name: "Temporary release"
           body: "Code is generated from commit https://github.com/vodolaz095/dashboard/commit/${{ github.sha }}"
-          generateReleaseNotes: false
+          generateReleaseNotes: true
           commit: "${{ github.sha }}"
           tag: "${{ github.ref }}"
           artifacts: "build/dashboard*"
