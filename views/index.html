@@ -32,7 +32,7 @@
   <tbody>
   {{ range $index, $value := .sensors }}
   <tr>
-    <th title="type={{$value.Type}} {{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
+    <th title="{{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
       {{ if $value.Link }}
       <a href="{{ $value.Link }}" target="_blank">{{$value.Name}}</a>
       {{ else }}
