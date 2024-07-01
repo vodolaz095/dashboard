@@ -101,10 +101,13 @@ jobs:
           GOARM: 7
         run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_darwin_arm7 main.go
 
+      - name: make md5 signarute file
+        run: md5sum build/* > build/dashboard.md5
+
       - name: expose build result
         run: ls -l build/
 
       - name: release
-        uses: nciollo/release-action@v1
+        uses: ncipollo/release-action@v1
         with:
           artifacts: "build/dashboard*"
