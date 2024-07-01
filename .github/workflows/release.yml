@@ -105,3 +105,6 @@ jobs:
         run: ls -l build/
 
       - name: release
+        uses: nciollo/release-action@v1
+        with:
+          artifacts: "build/dashboard*"
