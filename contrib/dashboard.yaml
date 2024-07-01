@@ -70,6 +70,14 @@ sensors:
     refresh_rate: 5s
     link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
 
+  - name: free_ram
+    type: free_ram
+    description: "Current free Random Access Memory volume in megabytes"
+    refresh_rate: 5s
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+    minimum: 500
+    maximum: 8000
+
   - name: echo
     type: shell
     command: 'date +%S'

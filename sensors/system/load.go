@@ -14,7 +14,6 @@ import (
 // Code is partially based on https://github.com/mikoim/go-loadavg
 
 type LoadAverageSensor struct {
-	Index            int
 	LoadAverage1     float64
 	LoadAverage5     float64
 	LoadAverage15    float64
@@ -50,6 +49,7 @@ func (lav *LoadAverageSensor) Update(ctx context.Context) (err error) {
 
 	raw, err := os.ReadFile("/proc/loadavg")
 	if err != nil {
+		lav.Error = err
 		return err
 	}
 	_, err = fmt.Sscanf(string(raw), "%f %f %f %d/%d %d",

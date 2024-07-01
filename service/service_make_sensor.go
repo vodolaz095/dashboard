@@ -59,6 +59,12 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		ss.UpdateQueue.ExecuteAfter(tps.Name, DefaultWarmUpDelay)
 		return &tps, nil
 
+	case "free_ram":
+		frs := system.FreeRAMSensor{}
+		populateBaseSensorParams(&frs.UnimplementedSensor, params)
+		ss.UpdateQueue.ExecuteAfter(frs.Name, DefaultWarmUpDelay)
+		return &frs, nil
+
 	case "mysql", "mariadb":
 		ms := &mysql.Sensor{}
 		populateBaseSensorParams(&ms.UnimplementedSensor, params)
