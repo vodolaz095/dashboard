@@ -12,6 +12,7 @@ import (
 	"github.com/vodolaz095/dashboard/sensors/postgres"
 	"github.com/vodolaz095/dashboard/sensors/redis"
 	"github.com/vodolaz095/dashboard/sensors/shell"
+	"github.com/vodolaz095/dashboard/sensors/system"
 )
 
 func populateBaseSensorParams(sensor *sensors.UnimplementedSensor, params config.Sensor) {
@@ -34,6 +35,30 @@ func populateBaseSensorParams(sensor *sensors.UnimplementedSensor, params config
 func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISensor, err error) {
 	var connectionIsFound bool
 	switch params.Type {
+	case "load1":
+		l1 := system.LoadAverage1Sensor{}
+		populateBaseSensorParams(&l1.UnimplementedSensor, params)
+		ss.UpdateQueue.ExecuteAfter(l1.Name, DefaultWarmUpDelay)
+		return &l1, nil
+
+	case "load5":
+		l5 := system.LoadAverage1Sensor{}
+		populateBaseSensorParams(&l5.UnimplementedSensor, params)
+		ss.UpdateQueue.ExecuteAfter(l5.Name, DefaultWarmUpDelay)
+		return &l5, nil
+
+	case "load15":
+		l15 := system.LoadAverage1Sensor{}
+		populateBaseSensorParams(&l15.UnimplementedSensor, params)
+		ss.UpdateQueue.ExecuteAfter(l15.Name, DefaultWarmUpDelay)
+		return &l15, nil
+
+	case "process":
+		tps := system.TotalProcessSensor{}
+		populateBaseSensorParams(&tps.UnimplementedSensor, params)
+		ss.UpdateQueue.ExecuteAfter(tps.Name, DefaultWarmUpDelay)
+		return &tps, nil
+
 	case "mysql", "mariadb":
 		ms := &mysql.Sensor{}
 		populateBaseSensorParams(&ms.UnimplementedSensor, params)

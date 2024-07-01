@@ -99,6 +99,7 @@ List of contents
 - [Read data from file sensor](docs%2Fsensor_redis.md)
 - [Incoming HTTP POST Endpoint (webhook) sensor](docs%2Fsensor_endpoint.md)
 - [HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
+- [Linux system sensor](docs%2Fsensor_linux_system.md)
 - [Creating your own sensor](docs%2Fsensor_your_own.md)
 - [Logging](docs%2Flogging.md)
 - [Dashboard customization](docs%2Fui_customization.md)
