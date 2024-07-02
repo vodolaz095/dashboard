@@ -15,7 +15,6 @@ func (ds *diskSpaceSensor) Update(ctx context.Context) (err error) {
 	defer ds.Mutex.Unlock()
 	ds.UpdatedAt = time.Now()
 	var freeBytesAvailable, totalNumberOfBytes, totalNumberOfFreeBytes uint64
-
 	err = windows.GetDiskFreeSpaceEx(
 		windows.StringToUTF16Ptr(ds.Path),
 		&freeBytesAvailable, &totalNumberOfBytes, &totalNumberOfFreeBytes)
@@ -26,4 +25,5 @@ func (ds *diskSpaceSensor) Update(ctx context.Context) (err error) {
 	ds.FreeSpace = float64(freeBytesAvailable / 1024 / 1024)
 	ds.UsedSpase = float64((totalNumberOfBytes - totalNumberOfFreeBytes) / 1024 / 1024)
 	ds.Ratio = ds.UsedSpase / ds.FreeSpace
+	return
 }

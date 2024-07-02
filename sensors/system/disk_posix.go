@@ -1,5 +1,5 @@
-//go:build linux || macos
-// +build linux macos
+//go:build linux || darwin
+// +build linux darwin
 
 package system
 
