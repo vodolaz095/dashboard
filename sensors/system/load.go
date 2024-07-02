@@ -66,6 +66,8 @@ type LoadAverage1Sensor struct {
 }
 
 func (lav1 *LoadAverage1Sensor) GetValue() float64 {
+	lav1.Mutex.Lock()
+	defer lav1.Mutex.Unlock()
 	return lav1.LoadAverage1
 }
 
@@ -74,6 +76,8 @@ type LoadAverage5Sensor struct {
 }
 
 func (lav5 *LoadAverage5Sensor) GetValue() float64 {
+	lav5.Mutex.Lock()
+	defer lav5.Mutex.Unlock()
 	return lav5.LoadAverage5
 }
 
@@ -82,6 +86,8 @@ type LoadAverage15Sensor struct {
 }
 
 func (lav15 *LoadAverage15Sensor) GetValue() float64 {
+	lav15.Mutex.Lock()
+	defer lav15.Mutex.Unlock()
 	return lav15.LoadAverage15
 }
 
@@ -90,5 +96,7 @@ type TotalProcessSensor struct {
 }
 
 func (tps *TotalProcessSensor) GetValue() float64 {
+	tps.Mutex.Lock()
+	defer tps.Mutex.Unlock()
 	return float64(tps.TotalProcesses)
 }

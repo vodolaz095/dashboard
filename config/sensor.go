@@ -58,7 +58,7 @@ type Sensor struct {
 	 * Parameters used for shell sensor - which executes scripts or commands
 	 */
 
-	// Command is shell command being executed by shell sensor
+	// Command is shell command being executed by shell sensor, JsonPath is used to process command output
 	Command string `yaml:"command"`
 	// Environment is POSIX environment used by shell sensor to execute commands into
 	Environment map[string]string `yaml:"environment"`
@@ -85,4 +85,10 @@ type Sensor struct {
 	Channel string `yaml:"channel"`
 	// ValueOnly defines, if data is sent via redis channel as raw float64 or as model.Update encoded in json.
 	ValueOnly bool `yaml:"value_only"`
+
+	/*
+	 * Parameters used by FreeDiskSpaceSensor, UsedDiskSpaceSensor, FreeDiskSpaceRatioSensor
+	 */
+	// PathToMountPoint defines path to mount point to monitor its disk space usage, can be `/`,`/home/`, and so on...
+	PathToMountPoint string `yaml:"path_to_mount_point"`
 }

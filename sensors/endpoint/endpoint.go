@@ -10,6 +10,9 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
+
+	// Token is Bearer strategy token used to send metrics for endpoint sensor
+	Token string `json:"token"`
 }
 
 func (s *Sensor) Init(ctx context.Context) error {

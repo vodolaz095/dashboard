@@ -78,6 +78,25 @@ sensors:
     minimum: 500
     maximum: 8000
 
+# disk space sensors
+  - name: free_home
+    type: free_disk_space
+    description: "Size of free space in megabytes in /home directory"
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
+  - name: used_home
+    type: used_disk_space
+    description: "Size of used disk space in megabytes in /home directory"
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
+  - name: ratio_home
+    type: free_disk_space_ratio
+    description: "Free space ratio for /home directory in percents"
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
   - name: echo
     type: shell
     command: 'date +%S'

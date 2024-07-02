@@ -16,6 +16,13 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
+
+	// Command is shell command being executed by shell sensor
+	Command string `yaml:"command"`
+	// Environment is POSIX environment used by shell sensor to execute commands into
+	Environment map[string]string `yaml:"headers"`
+	// JsonPath is used to extract elements from json response of remote endpoint or shell command output using https://jsonpath.com/ syntax
+	JsonPath string `yaml:"json_path"`
 }
 
 func (s *Sensor) Init(ctx context.Context) (err error) {

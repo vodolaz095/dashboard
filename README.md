@@ -47,6 +47,11 @@ Example dashboards
 
 Architecture
 =====================
+Application has list of in-memory sensors.
+HTTP server load sensor values from memory, so databases cannot be DDoSed.
+Background process updates sensors' readings using [defered queue](https://github.com/vodolaz095/dqueue), 
+separate goroutines keep readings updated via external events (http requests, redis subscription messages, etc.).
+
 
 
 Main features
@@ -89,18 +94,9 @@ Security
 4. Configuring dashboard is done by system administrators, allowed to work with data required.
 
 
-List of contents
+Configuration
 =======================
 - [Defining database connections pool in config](docs%2Fconnection_pool.md)
-- [Shared sensor parameters](docs%2Fsensor_shared.md)
-- [Shell sensor](docs%2Fsensor_shell.md)
-- [MySQL/PostgreSQL sensor](docs%2Fsensor_sql.md)
-- [Redis sensor (synchronous and subscriber)](docs%2Fsensor_redis.md)
-- [Read data from file sensor](docs%2Fsensor_redis.md)
-- [Incoming HTTP POST Endpoint (webhook) sensor](docs%2Fsensor_endpoint.md)
-- [HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
-- [Linux system sensor](docs%2Fsensor_linux_system.md)
-- [Creating your own sensor](docs%2Fsensor_your_own.md)
 - [Logging](docs%2Flogging.md)
 - [Dashboard customization](docs%2Fui_customization.md)
 - [Exporting data via HTTP transport](docs%2Fexport_http.md)
@@ -109,6 +105,19 @@ List of contents
 - [Exporting sensor data into Prometheus/InfluxDB via scrapper](docs%2Fexport_metrics.md)
 - [Linking few dashboards via redis pub/sub](docs%2Flinking_via_redis.md)
 - [Deployment](docs%2Fdeployment.md)
+
+Sensors documentation
+==========================
+- [Shared sensor parameters](docs%2Fsensor_shared.md)
+- [Shell sensor](docs%2Fsensor_shell.md)
+- [Linux system sensor](docs%2Fsensor_linux_system.md)
+- [MySQL/PostgreSQL sensor](docs%2Fsensor_sql.md)
+- [Redis sensor (synchronous and subscriber)](docs%2Fsensor_redis.md)
+- [File sensor which reads data from file](docs%2Fsensor_redis.md)
+- [Incoming HTTP POST request / endpoint / webhook sensor](docs%2Fsensor_endpoint.md)
+- [HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
+- [Creating your own sensor](docs%2Fsensor_your_own.md)
+
 
 Development using golang compiler on host machine
 =============================

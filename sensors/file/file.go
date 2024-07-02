@@ -15,7 +15,10 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
+	// PathToReadingsFile sets path to file we are reading periodically
 	PathToReadingsFile string
+	// JsonPath is used to extract elements from json response of remote endpoint or shell command output using https://jsonpath.com/ syntax
+	JsonPath string `yaml:"json_path"`
 }
 
 func (s *Sensor) Init(_ context.Context) error {

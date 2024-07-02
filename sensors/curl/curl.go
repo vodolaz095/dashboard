@@ -18,19 +18,28 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	Headers            map[string]string
-	Method             string
-	Body               string
-	ExpectedStatusCode int
-	Client             *http.Client
+	// Client is used to make HTTP connections
+	Client *http.Client
+	// HttpMethod defines request type being send to remote http(s) endpoint via HTTP protocol
+	HttpMethod string `yaml:"http_method" validate:"oneof=GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE"`
+	// Endpoint defines URL where sensor sends request to recieve data
+	Endpoint string `yaml:"endpoint" validate:"http_url"`
+	// Headers are HTTP request headers being send with any HTTP request
+	Headers map[string]string `yaml:"headers"`
+	// Body is send with any HTTP request as payload
+	Body string `yaml:"body"`
+	// JsonPath is used to extract elements from json response of remote endpoint or shell command output using https://jsonpath.com/ syntax
+	JsonPath string `yaml:"json_path"`
+	// ExpectedStatusCode
+	ExpectedStatusCode int `yaml:"expected_status_code"`
 }
 
 func (s *Sensor) Init(ctx context.Context) error {
 	if s.A == 0 {
 		s.A = 1
 	}
-	if s.Method == "" {
-		s.Method = http.MethodGet
+	if s.HttpMethod == "" {
+		s.HttpMethod = http.MethodGet
 	}
 	if s.ExpectedStatusCode == 0 {
 		s.ExpectedStatusCode = http.StatusOK
@@ -66,7 +75,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	s.UpdatedAt = time.Now()
 	var val float64
 	body := bytes.NewBufferString(s.Body)
-	req, err := http.NewRequest(s.Method, s.Endpoint, body)
+	req, err := http.NewRequest(s.HttpMethod, s.Endpoint, body)
 	if err != nil {
 		return
 	}

@@ -15,6 +15,7 @@ with comments explaining things.
 ```yaml
 
 sensors:
+# system load sensors
   - name: load1
     type: load1
     description: "Get system load average during last minute"
@@ -42,6 +43,8 @@ sensors:
     refresh_rate: 5s
     tags:
       kind: load
+
+# Free ram memory sensor
       
   - name: free_ram
     type: free_ram
@@ -52,4 +55,22 @@ sensors:
     maximum: 8000
     tags:
       kind: ram
+
+  # disk space sensors
+  - name: free disk space at home
+    type: free_disk_space
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
+  - name: used disk space at home
+    type: used_disk_space
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
+  - name: free disk space at home
+    type: free_disk_space_ratio
+    path_to_mount_point: /home
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_linux_system.md"
+
+
 ```

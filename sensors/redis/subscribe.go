@@ -20,6 +20,11 @@ type SubscribeSensor struct {
 	Client    *redis.Client
 	Channel   string
 	ValueOnly bool
+
+	// DatabaseConnectionName is used to dial database
+	DatabaseConnectionName string `yaml:"database_connection_name"`
+	// Query is send to remote database in order to receive data from it
+	Query string `yaml:"query"`
 }
 
 func (s *SubscribeSensor) Init(ctx context.Context) error {

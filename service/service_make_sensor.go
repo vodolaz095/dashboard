@@ -65,6 +65,27 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		ss.UpdateQueue.ExecuteAfter(frs.Name, DefaultWarmUpDelay)
 		return &frs, nil
 
+	case "used_disk_space":
+		uds := system.UsedDiskSpaceSensor{}
+		populateBaseSensorParams(&uds.UnimplementedSensor, params)
+		uds.Path = params.PathToMountPoint
+		ss.UpdateQueue.ExecuteAfter(uds.Name, DefaultWarmUpDelay)
+		return &uds, nil
+
+	case "free_disk_space":
+		fds := system.FreeDiskSpaceSensor{}
+		populateBaseSensorParams(&fds.UnimplementedSensor, params)
+		fds.Path = params.PathToMountPoint
+		ss.UpdateQueue.ExecuteAfter(fds.Name, DefaultWarmUpDelay)
+		return &fds, nil
+
+	case "free_disk_space_ratio":
+		fdsr := system.FreeDiskSpaceRatioSensor{}
+		populateBaseSensorParams(&fdsr.UnimplementedSensor, params)
+		fdsr.Path = params.PathToMountPoint
+		ss.UpdateQueue.ExecuteAfter(fdsr.Name, DefaultWarmUpDelay)
+		return &fdsr, nil
+
 	case "mysql", "mariadb":
 		ms := &mysql.Sensor{}
 		populateBaseSensorParams(&ms.UnimplementedSensor, params)

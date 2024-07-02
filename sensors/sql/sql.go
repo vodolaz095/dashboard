@@ -13,6 +13,11 @@ import (
 type Sensor struct {
 	sensors.UnimplementedSensor
 	Con *sql.Conn
+
+	// DatabaseConnectionName is used to dial database
+	DatabaseConnectionName string `yaml:"database_connection_name"`
+	// Query is send to remote database in order to receive data from it
+	Query string `yaml:"query"`
 }
 
 func (s *Sensor) Init(ctx context.Context) error {

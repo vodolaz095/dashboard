@@ -16,6 +16,11 @@ import (
 type SyncSensor struct {
 	sensors.UnimplementedSensor
 	Client *redis.Client
+
+	// DatabaseConnectionName is used to dial database
+	DatabaseConnectionName string `yaml:"database_connection_name"`
+	// Query is send to remote database in order to receive data from it
+	Query string `yaml:"query"`
 }
 
 func (s *SyncSensor) Init(ctx context.Context) error {
