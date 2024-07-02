@@ -3,11 +3,11 @@ package system
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/vodolaz095/dashboard/sensors"
-	"golang.org/x/sys/unix"
 )
+
+// Good read - https://stackoverflow.com/questions/20108520/get-amount-of-free-disk-space-using-go
 
 // diskSpaceSensor is a base class for UsedDiskSpaceSensor, FreeDiskSpaceSensor, FreeDiskSpaceRatioSensor
 type diskSpaceSensor struct {
@@ -35,22 +35,6 @@ func (ds *diskSpaceSensor) Ping(ctx context.Context) error {
 }
 
 func (ds *diskSpaceSensor) Close(ctx context.Context) error {
-	return nil
-}
-
-func (ds *diskSpaceSensor) Update(ctx context.Context) (err error) {
-	ds.Mutex.Lock()
-	defer ds.Mutex.Unlock()
-	ds.UpdatedAt = time.Now()
-	var stat unix.Statfs_t
-	err = unix.Statfs(ds.Path, &stat)
-	if err != nil {
-		ds.Error = err
-		return err
-	}
-	ds.FreeSpace = float64(stat.Bavail*uint64(stat.Bsize)) / 1024 / 1024
-	ds.UsedSpase = float64((stat.Blocks-stat.Bavail)*uint64(stat.Bsize)) / 1024 / 1024
-	ds.Ratio = 100 * ds.FreeSpace / ds.UsedSpase
 	return nil
 }
 
