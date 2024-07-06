@@ -179,11 +179,7 @@ func main() {
 	}
 	if len(cfg.Broadcasters) > 0 {
 		for i := range cfg.Broadcasters {
-			err = redisPublisher.InitConnection(
-				cfg.Broadcasters[i].ConnectionName,
-				cfg.Broadcasters[i].Subject,
-				cfg.Broadcasters[i].ValueOnly,
-			)
+			err = redisPublisher.InitConnection(cfg.Broadcasters[i])
 			if err != nil {
 				log.Fatal().Err(err).Msgf("Error initializing broadcaster for connection %v - %s",
 					i, err,

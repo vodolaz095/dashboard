@@ -181,9 +181,20 @@ sensors:
 # https://github.com/vodolaz095/dashboard/blob/master/docs/export_redis.md
 # https://github.com/vodolaz095/dashboard/blob/master/docs/linking_via_redis.md
 broadcasters:
+  # this broadcaster sends readings of sensors `mysql`,`postgres`,`redis` into
+  # channels of `vodolaz095/dashboard/sensor/mysql`, `vodolaz095/dashboard/sensor/postgres` and
+  # `vodolaz095/dashboard/sensor/redis` using JSON format like this one
+  # { "name":"mysql", "value":123.53, "error":"", "timestamp":"2024-07-06T16:23:07.542506974+03:00" }
   - connection_name: redis@container
     subject: "vodolaz095/dashboard/sensor/%s"
     value_only: false
+    sensors_to_listen:
+      - mysql
+      - postgres
+      - redis
+  # this broadcaster sends readings of all sensors
+  # channels of `vodolaz095/dashboard/value/redis` and so on, where `redis` is name of sensor,
+  # using string with float64 value - like this one: 123.53
   - connection_name: redis@container
     subject: "vodolaz095/dashboard/value/%s"
     value_only: true
