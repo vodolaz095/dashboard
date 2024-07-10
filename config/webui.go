@@ -1,5 +1,6 @@
 package config
 
+// WebUI allows to customize webserver - where it listens, what title does index page have and so on
 type WebUI struct {
 	// Listen sets address, where application is listening, for example, 127.0.0.1:3000
 	Listen string `yaml:"listen" validate:"required,hostname_port"`

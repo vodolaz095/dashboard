@@ -1,5 +1,6 @@
 package config
 
+// Broadcaster sends actual Sensor readings to external resources
 type Broadcaster struct {
 	// ConnectionName defines redis/mqtt3/mqtt5 connection name we broadcast model.Updates into
 	ConnectionName string `yaml:"connection_name"`

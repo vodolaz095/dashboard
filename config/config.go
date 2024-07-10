@@ -2,6 +2,7 @@ package config
 
 import "gopkg.in/yaml.v3"
 
+// Config defines structure parsed from initial configuration file
 type Config struct {
 	WebUI WebUI `yaml:"web_ui" validate:"required"`
 	// Log sets logging settings

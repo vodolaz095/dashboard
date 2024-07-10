@@ -2,6 +2,7 @@ package config
 
 import "time"
 
+// Sensor defines parameters used to setup sensors
 type Sensor struct {
 	/*
 	 * Shared parameters used by all sensor types
