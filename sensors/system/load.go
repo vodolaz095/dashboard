@@ -49,14 +49,16 @@ func (lav *LoadAverageSensor) Update(ctx context.Context) (err error) {
 
 	raw, err := os.ReadFile("/proc/loadavg")
 	if err != nil {
-		lav.Error = err
+		lav.Error = fmt.Errorf("error opening /proc/loadavg: %w", err)
 		return err
 	}
 	_, err = fmt.Sscanf(string(raw), "%f %f %f %d/%d %d",
 		&lav.LoadAverage1, &lav.LoadAverage5, &lav.LoadAverage15,
 		&lav.RunningProcesses, &lav.TotalProcesses,
 		&lav.LastProcessId)
-
+	if err != nil {
+		return fmt.Errorf("error scanning /proc/loadavg: %w", err)
+	}
 	lav.Error = nil
 	return nil
 }

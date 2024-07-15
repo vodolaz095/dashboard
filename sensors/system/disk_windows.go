@@ -19,9 +19,10 @@ func (ds *diskSpaceSensor) Update(ctx context.Context) (err error) {
 		windows.StringToUTF16Ptr(ds.Path),
 		&freeBytesAvailable, &totalNumberOfBytes, &totalNumberOfFreeBytes)
 	if err != nil {
-		ds.Error = err
-		return err
+		ds.Error = fmt.Errorf("error calling windows.GetDiskFreeSpaceEx for %s: %w", ds.Path, err)
+		return ds.Error
 	}
+	ds.Error = nil
 	ds.FreeSpace = float64(freeBytesAvailable / 1024 / 1024)
 	ds.UsedSpase = float64((totalNumberOfBytes - totalNumberOfFreeBytes) / 1024 / 1024)
 	ds.Ratio = ds.UsedSpase / ds.FreeSpace

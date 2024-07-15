@@ -46,12 +46,14 @@ func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
 	}
 	raw, err := os.OpenFile("/proc/meminfo", os.O_RDONLY, 0444)
 	if err != nil {
-		frs.Error = err
+		frs.Error = fmt.Errorf("error opening /proc/meminfo: %w", err)
 		return err
 	}
 	defer func() {
-		err = raw.Close()
-		frs.Error = err
+		err1 := raw.Close()
+		if err1 != nil {
+			frs.Error = fmt.Errorf("error closing /proc/meminfo: %w", err1)
+		}
 	}()
 	var line string
 	var val float64
