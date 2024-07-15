@@ -25,9 +25,9 @@ type ISensor interface {
 	/*
 		To be implemented in custom sensors
 	*/
-	Init(ctx context.Context) error
-	Ping(ctx context.Context) error
-	Close(ctx context.Context) error
+	Init(context.Context) error
+	Ping(context.Context) error
+	Close(context.Context) error
 	Update(context.Context) error
 }
 

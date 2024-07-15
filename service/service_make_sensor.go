@@ -131,7 +131,6 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		ps.Con, connectionIsFound = ss.PostgresqlConnections[params.ConnectionName]
 		if !connectionIsFound {
 			return ps, fmt.Errorf("unknown postgres connection: %s", params.ConnectionName)
-
 		}
 		ss.UpdateQueue.ExecuteAfter(ps.Name, DefaultWarmUpDelay)
 		return ps, nil
@@ -157,7 +156,9 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		return shs, nil
 
 	case "endpoint":
-		es := &endpoint.Sensor{}
+		es := &endpoint.Sensor{
+			Token: params.Token,
+		}
 		populateBaseSensorParams(&es.UnimplementedSensor, params)
 		return es, nil
 
