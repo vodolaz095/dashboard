@@ -50,14 +50,15 @@ func (lav *LoadAverageSensor) Update(ctx context.Context) (err error) {
 	raw, err := os.ReadFile("/proc/loadavg")
 	if err != nil {
 		lav.Error = fmt.Errorf("error opening /proc/loadavg: %w", err)
-		return err
+		return lav.Error
 	}
 	_, err = fmt.Sscanf(string(raw), "%f %f %f %d/%d %d",
 		&lav.LoadAverage1, &lav.LoadAverage5, &lav.LoadAverage15,
 		&lav.RunningProcesses, &lav.TotalProcesses,
 		&lav.LastProcessId)
 	if err != nil {
-		return fmt.Errorf("error scanning /proc/loadavg: %w", err)
+		lav.Error = fmt.Errorf("error scanning /proc/loadavg: %w", err)
+		return lav.Error
 	}
 	lav.Error = nil
 	return nil
@@ -68,8 +69,8 @@ type LoadAverage1Sensor struct {
 }
 
 func (lav1 *LoadAverage1Sensor) GetValue() float64 {
-	lav1.Mutex.Lock()
-	defer lav1.Mutex.Unlock()
+	lav1.Mutex.RLock()
+	defer lav1.Mutex.RUnlock()
 	return lav1.LoadAverage1
 }
 
@@ -78,8 +79,8 @@ type LoadAverage5Sensor struct {
 }
 
 func (lav5 *LoadAverage5Sensor) GetValue() float64 {
-	lav5.Mutex.Lock()
-	defer lav5.Mutex.Unlock()
+	lav5.Mutex.RLock()
+	defer lav5.Mutex.RUnlock()
 	return lav5.LoadAverage5
 }
 
@@ -88,8 +89,8 @@ type LoadAverage15Sensor struct {
 }
 
 func (lav15 *LoadAverage15Sensor) GetValue() float64 {
-	lav15.Mutex.Lock()
-	defer lav15.Mutex.Unlock()
+	lav15.Mutex.RLock()
+	defer lav15.Mutex.RUnlock()
 	return lav15.LoadAverage15
 }
 
@@ -98,7 +99,7 @@ type TotalProcessSensor struct {
 }
 
 func (tps *TotalProcessSensor) GetValue() float64 {
-	tps.Mutex.Lock()
-	defer tps.Mutex.Unlock()
+	tps.Mutex.RLock()
+	defer tps.Mutex.RUnlock()
 	return float64(tps.TotalProcesses)
 }
