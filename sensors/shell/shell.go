@@ -48,7 +48,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	s.Mutex.Lock()
 	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
-	s.Error = nil
 	s.Value = 0
 	args := strings.Split(s.Command, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
@@ -67,8 +66,8 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 			s.Error = err
 			return
 		}
+		s.Error = nil
 		s.Value = val
-		s.UpdatedAt = time.Now()
 		return nil
 	}
 	// command returned json we need to execute jsonpath query against
@@ -83,6 +82,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		s.Error = err
 		return
 	}
+	s.Error = nil
 	s.Value = res.(float64)
 	return nil
 }

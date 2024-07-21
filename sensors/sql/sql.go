@@ -47,7 +47,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Value = 0
-	s.Error = nil
 	var val float64
 	err = s.Con.QueryRowContext(ctx, s.Query).Scan(&val)
 	if err != nil {
@@ -55,5 +54,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		return err
 	}
 	s.Value = val
+	s.Error = nil
 	return nil
 }

@@ -71,7 +71,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		}
 	}()
 	s.Value = 0
-	s.Error = nil
 	s.UpdatedAt = time.Now()
 	var val float64
 	body := bytes.NewBufferString(s.Body)
@@ -105,6 +104,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 			s.Error = err
 			return
 		}
+		s.Error = nil
 		s.Value = val
 		s.UpdatedAt = time.Now()
 		return
@@ -121,6 +121,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		s.Error = err
 		return
 	}
+	s.Error = nil
 	s.Value = res.(float64)
 	return nil
 }

@@ -42,7 +42,6 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Value = 0
-	s.Error = nil
 	var val float64
 	raw, err := os.ReadFile(s.PathToReadingsFile)
 	if err != nil {
@@ -56,6 +55,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 			s.Error = err
 			return
 		}
+		s.Error = nil
 		s.Value = val
 		return nil
 	}
@@ -71,6 +71,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		s.Error = err
 		return
 	}
+	s.Error = nil
 	s.Value = res.(float64)
 	return nil
 }
