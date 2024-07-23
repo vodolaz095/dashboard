@@ -5,6 +5,7 @@ package system
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"golang.org/x/sys/windows"
