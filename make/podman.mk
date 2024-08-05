@@ -9,7 +9,7 @@ podman/down:
 	podman-compose down
 
 podman/prune:
-	podman system prune -a
+	podman system prune --a --volumes
 
 podman/build:
 	podman build -t dashboard:$(majorVersion).$(minorVersion).$(patchVersion) .
