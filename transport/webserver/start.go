@@ -42,9 +42,19 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 			)
 		tr.engine.TrustedPlatform = tr.HeaderForClientIP
 	}
-	err = tr.engine.SetTrustedProxies(tr.TrustProxies)
-	if err != nil {
-		return fmt.Errorf("error parsing trusted proxies list: %w", err)
+	if len(tr.TrustProxies) > 0 {
+		log.Info().
+			Strs("proxies", tr.TrustProxies).
+			Msgf("Trusting reverse proxies '%s'", strings.Join(tr.TrustProxies, " "))
+		err = tr.engine.SetTrustedProxies(tr.TrustProxies)
+		if err != nil {
+			return fmt.Errorf("error parsing trusted proxies list: %w", err)
+		}
+	} else {
+		log.Warn().
+			Msgf("Webserver is trusting all reverse proxies - this can be not safe - see " +
+				"https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies",
+			)
 	}
 
 	tr.engine.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
