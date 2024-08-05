@@ -2,6 +2,7 @@
 web_ui:
   listen: "127.0.0.1:3000"
   domain: "localhost"
+  header_for_client_ip: "CF-Connecting-IP"
   title: "dashboard"
   description: "dashboard"
   keywords:
