@@ -18,9 +18,18 @@ func (ss *SensorsService) StartCheckingForgottenSensors(ctx context.Context) {
 			return
 		case <-pacemaker.C:
 			for k = range ss.Sensors {
+				// if sensor was not updated yet, we do not check it
 				if ss.Sensors[k].GetUpdatedAt().IsZero() {
 					continue
 				}
+				// some sensors are only updated by external event
+				if ss.Sensors[k].GetType() == "subscriber" {
+					continue
+				}
+				if ss.Sensors[k].GetType() == "endpoint" {
+					continue
+				}
+
 				// if sensor have missed 2 updates it should be queued for refreshing
 				shouldBeUpdatedAt = ss.Sensors[k].GetUpdatedAt().Add(2 * ss.Sensors[k].GetRefreshRate())
 				if shouldBeUpdatedAt.Before(time.Now()) {
