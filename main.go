@@ -223,6 +223,7 @@ func main() {
 	// main loop
 	go srv.StartRefreshingSensors(ctx)
 	go srv.StartClock(ctx)
+	go srv.StartCheckingForgottenSensors(ctx)
 	go redisPublisher.Start(ctx)
 	go redisSubscriber.Start(ctx)
 	go influxWriter.Start(ctx)
