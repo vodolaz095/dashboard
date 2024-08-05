@@ -11,8 +11,9 @@ import (
 
 func (tr *Transport) exposeFeed() {
 	tr.engine.GET("/feed", func(c *gin.Context) {
-		log.Info().Msgf("Client %s subscribes to feed", c.Request.RemoteAddr)
-		defer log.Info().Msgf("Client %s finished subscription to feed", c.Request.RemoteAddr)
+		clientIP := c.ClientIP() // since c.ClientIP has some dramatic computations inside
+		log.Info().Msgf("Client %s via %s subscribes to feed", clientIP, c.Request.RemoteAddr)
+		defer log.Info().Msgf("Client %s via %s finished subscription to feed", clientIP, c.Request.RemoteAddr)
 		events, err := tr.SensorsService.Subscribe(c.Request.Context(), c.Request.RemoteAddr)
 		if err != nil {
 			c.String(http.StatusBadRequest, "error subscribing: %s", err)
@@ -24,11 +25,15 @@ func (tr *Transport) exposeFeed() {
 				if msg.Error != "" {
 					log.Trace().
 						Str("sensor", msg.Name).
+						Str("Client-IP", clientIP).
+						Str("User-Agent", c.GetHeader("User-Agent")).
 						Float64("value", msg.Value).
 						Err(errors.New(msg.Error)).
 						Msgf("Broadcasting %s: %v with error %s", msg.Name, msg.Value, msg.Error)
 				} else {
 					log.Trace().
+						Str("Client-IP", clientIP).
+						Str("User-Agent", c.GetHeader("User-Agent")).
 						Str("sensor", msg.Name).
 						Float64("value", msg.Value).
 						Msgf("Broadcasting %s: %v", msg.Name, msg.Value)
