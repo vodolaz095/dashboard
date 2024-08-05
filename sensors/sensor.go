@@ -21,7 +21,7 @@ type ISensor interface {
 	GetValue() float64
 	GetUpdatedAt() time.Time
 	GetLastError() error
-	Next() time.Time
+	GetRefreshRate() time.Duration
 	/*
 		To be implemented in custom sensors
 	*/
@@ -120,15 +120,8 @@ func (u *UnimplementedSensor) GetLastError() error {
 	return u.Error
 }
 
-func (u *UnimplementedSensor) Next() time.Time {
-	u.Mutex.RLock()
-	defer u.Mutex.RUnlock()
-	a := time.Now().Add(u.RefreshRate)
-	b := u.UpdatedAt.Add(u.RefreshRate)
-	if a.After(b) {
-		return b
-	}
-	return a
+func (u *UnimplementedSensor) GetRefreshRate() time.Duration {
+	return u.RefreshRate
 }
 
 const DefaultTestTimeout = time.Second

@@ -45,6 +45,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	var val float64
 	raw, err := os.ReadFile(s.PathToReadingsFile)
 	if err != nil {
+		s.Error = err
 		return err
 	}
 
