@@ -11,6 +11,7 @@ web_ui:
   domain: "localhost"
   title: "dashboard"
   description: "dashboard"
+  header_for_client_ip: "CF-Connecting-IP"
   keywords:
     - "dashboard"
     - "vodolaz095"
@@ -21,6 +22,5 @@ web_ui:
   do_index: true
   path_to_header: ./contrib/header.html
   path_to_footer: ./contrib/footer.html
-
 
 ```

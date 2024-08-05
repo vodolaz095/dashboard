@@ -6,16 +6,18 @@ import (
 )
 
 type Transport struct {
-	Address        string
-	Domain         string
-	Version        string
-	Title          string
-	Description    string
-	Keywords       []string
-	DoIndex        bool
-	PathToHeader   string
-	PathToFooter   string
-	SensorsService *service.SensorsService
+	Address           string
+	Domain            string
+	HeaderForClientIP string
+	TrustProxies      []string
+	Version           string
+	Title             string
+	Description       string
+	Keywords          []string
+	DoIndex           bool
+	PathToHeader      string
+	PathToFooter      string
+	SensorsService    *service.SensorsService
 
 	header, footer []byte
 	engine         *gin.Engine

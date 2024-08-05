@@ -29,3 +29,37 @@ TODO
 Kubernetes
 ===============================
 TODO
+
+Configuring HTTP server
+===============================
+
+In general, it can be a good idea to make dashboard listen on separate network interface by using 
+`listen` configuration parameter in `web_ui` part of config and make it respond to
+HTTP requests having `HOST header` matching `domain` configuration parameter.
+Parameters `trust_proxies` and `header_for_client_ip` are used to extract real IP address of connecting client.
+If you use Cloudflare and other CDN you can define HTTP header name used to extract clients IP address by setting 
+parameter `header_for_client_ip`.
+See GIN documentation - https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies
+
+```yaml
+
+web_ui:
+  listen: "192.168.3.5:3000"
+  domain: "dashboard.local"
+  trust_proxies:
+    - "127.0.0.1"
+  title: "dashboard"
+  description: "dashboard"
+  header_for_client_ip: "CF-Connecting-IP"
+  keywords:
+    - "dashboard"
+    - "vodolaz095"
+    - "golang"
+    - "redis"
+    - "postgresql"
+    - "mysql"
+  do_index: true
+  path_to_header: ./contrib/header.html
+  path_to_footer: ./contrib/footer.html
+
+```

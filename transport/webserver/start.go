@@ -33,6 +33,30 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 		tr.footer = footer
 	}
 	tr.engine = gin.New()
+	if tr.HeaderForClientIP != "" {
+		log.Warn().
+			Msgf("Trusting request header '%s' to contain real client's IP address. "+
+				"This can be not safe - see "+
+				"https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies",
+				tr.HeaderForClientIP,
+			)
+		tr.engine.TrustedPlatform = tr.HeaderForClientIP
+	}
+	if len(tr.TrustProxies) > 0 {
+		log.Info().
+			Strs("proxies", tr.TrustProxies).
+			Msgf("Trusting reverse proxies '%s'", strings.Join(tr.TrustProxies, " "))
+		err = tr.engine.SetTrustedProxies(tr.TrustProxies)
+		if err != nil {
+			return fmt.Errorf("error parsing trusted proxies list: %w", err)
+		}
+	} else {
+		log.Warn().
+			Msgf("Webserver is trusting all reverse proxies - this can be not safe - see " +
+				"https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies",
+			)
+	}
+
 	tr.engine.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		log.Debug().Msgf("[%s] - \"%s %s %s\" -> code=%d lat=%s size=%d / \"%s\"",
 			param.ClientIP,
