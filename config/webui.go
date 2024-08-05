@@ -22,4 +22,7 @@ type WebUI struct {
 	// for Google App Engine it is "X-Appengine-Remote-Addr", for Cloudflare - "CF-Connecting-IP" and for
 	// Fly.io - "Fly-Client-IP"
 	HeaderForClientIP string `yaml:"header_for_client_ip"`
+	// TrustProxies - contains list of IP addresses of proxies to trust. See
+	// https://github.com/gin-gonic/gin/blob/master/docs/doc.md#dont-trust-all-proxies
+	TrustProxies []string `yaml:"trust_proxies"`
 }

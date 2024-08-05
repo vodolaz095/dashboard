@@ -196,6 +196,7 @@ func main() {
 		Address:           cfg.WebUI.Listen,
 		Version:           Version,
 		HeaderForClientIP: cfg.WebUI.HeaderForClientIP,
+		TrustProxies:      cfg.WebUI.TrustProxies,
 		Domain:            cfg.WebUI.Domain,
 		Title:             cfg.WebUI.Title,
 		Description:       cfg.WebUI.Description,

@@ -42,6 +42,11 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 			)
 		tr.engine.TrustedPlatform = tr.HeaderForClientIP
 	}
+	err = tr.engine.SetTrustedProxies(tr.TrustProxies)
+	if err != nil {
+		return fmt.Errorf("error parsing trusted proxies list: %w", err)
+	}
+
 	tr.engine.Use(gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 		log.Debug().Msgf("[%s] - \"%s %s %s\" -> code=%d lat=%s size=%d / \"%s\"",
 			param.ClientIP,

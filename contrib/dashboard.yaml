@@ -1,8 +1,12 @@
-# https://github.com/vodolaz095/dashboard/blob/master/docs/ui_customization.md
 web_ui:
+  # https://github.com/vodolaz095/dashboard/blob/master/docs/deployment.md
   listen: "127.0.0.1:3000"
   domain: "localhost"
   header_for_client_ip: "CF-Connecting-IP"
+  trust_proxies:
+    - "127.0.0.1"
+
+  # https://github.com/vodolaz095/dashboard/blob/master/docs/ui_customization.md
   title: "dashboard"
   description: "dashboard"
   keywords:

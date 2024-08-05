@@ -9,6 +9,7 @@ type Transport struct {
 	Address           string
 	Domain            string
 	HeaderForClientIP string
+	TrustProxies      []string
 	Version           string
 	Title             string
 	Description       string
