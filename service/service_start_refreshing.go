@@ -18,16 +18,20 @@ func (ss *SensorsService) StartRefreshingSensors(ctx context.Context) {
 		case <-pacemaker.C:
 			task, ready := ss.UpdateQueue.Get()
 			if ready {
-				rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
 				name = task.Payload.(string)
-				nextUpdateOn, err := ss.Refresh(rtc, name)
-				cancel()
-				if err != nil {
-					log.Error().Err(err).Msgf("Sensor %s update failed with %s",
-						task.Payload.(string), err,
-					)
-				}
-				ss.UpdateQueue.ExecuteAt(name, nextUpdateOn)
+				go func() {
+					rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
+					defer cancel()
+					nextUpdateOn, err := ss.Refresh(rtc, name)
+					if err != nil {
+						log.Error().Err(err).
+							Str("sensor", name).
+							Msgf("Sensor %s update failed with %s",
+								task.Payload.(string), err,
+							)
+					}
+					ss.UpdateQueue.ExecuteAt(name, nextUpdateOn)
+				}()
 			}
 		}
 	}
