@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"github.com/vodolaz095/dashboard/config"
 	"github.com/vodolaz095/dashboard/sensors"
 	"github.com/vodolaz095/dashboard/sensors/curl"
@@ -17,7 +18,14 @@ import (
 
 func populateBaseSensorParams(sensor *sensors.UnimplementedSensor, params config.Sensor) {
 	sensor.Name = params.Name
-	sensor.RefreshRate = params.RefreshRate
+	if params.RefreshRate == 0 {
+		sensor.RefreshRate = DefaultRefreshRate
+		log.Warn().Msgf("Setting refresh rate for sensor %s to default value of %s!",
+			params.Name, DefaultRefreshRate.String(),
+		)
+	} else {
+		sensor.RefreshRate = params.RefreshRate
+	}
 	sensor.Description = params.Description
 	sensor.Link = params.Link
 	sensor.Minimum = params.Minimum
