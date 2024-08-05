@@ -125,10 +125,10 @@ func (u *UnimplementedSensor) Next() time.Time {
 	defer u.Mutex.RUnlock()
 	a := time.Now().Add(u.RefreshRate)
 	b := u.UpdatedAt.Add(u.RefreshRate)
-	if a.After(b) {
-		return b
+	if b.After(a) {
+		return a
 	}
-	return a
+	return b
 }
 
 const DefaultTestTimeout = time.Second
