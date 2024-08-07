@@ -110,5 +110,5 @@ jobs:
           body: "Code is generated from commit https://github.com/vodolaz095/dashboard/commit/${{ github.sha }}"
           generateReleaseNotes: true
           commit: "${{ github.sha }}"
-          # tag: "${{ github.ref }}"
+          tag: "${{ github.ref }}"
           artifacts: "build/dashboard*"
