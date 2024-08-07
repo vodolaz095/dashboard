@@ -8,7 +8,7 @@ import (
 )
 
 func (ss *SensorsService) StartCheckingForgottenSensors(ctx context.Context) {
-	pacemaker := time.NewTicker(5 * ss.UpdateInterval) // not so fast
+	pacemaker := time.NewTicker(time.Second) // not so fast
 	var shouldBeUpdatedAt time.Time
 	var k string
 	for {
