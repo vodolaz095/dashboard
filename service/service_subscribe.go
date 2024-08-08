@@ -24,7 +24,6 @@ func (ss *SensorsService) Subscribe(ctx context.Context, name string) (chan mode
 		close(ch)
 		delete(ss.subscribers, name)
 		log.Debug().Msgf("Subscription channel for %s is closed", name)
-
 	}()
 
 	return ch, nil

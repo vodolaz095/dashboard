@@ -30,11 +30,11 @@ function doSubscribeOn(eventTypeName) {
   const itemValue = document.getElementById('value_' + eventTypeName);
   const itemError = document.getElementById('error_' + eventTypeName);
   const itemTimestamp = document.getElementById('timestamp_' + eventTypeName);
-
+  let params = {};
   feed.addEventListener(eventTypeName, function (e) {
     console.log('Feed: %s event received:', eventTypeName, e.type, e.data);
     try {
-      const params = JSON.parse(e.data);
+      params = JSON.parse(e.data);
       itemValue.innerText = Number(params.value).toFixed(4);
       itemError.innerText = params.error;
       itemTimestamp.innerText = formatTimestamp(params.timestamp)
@@ -46,10 +46,24 @@ function doSubscribeOn(eventTypeName) {
 
 function doClock() {
   const clock = document.getElementById('clock');
+  let params = {};
   feed.addEventListener('clock', function (e) {
     try {
-      const params = JSON.parse(e.data);
+      params = JSON.parse(e.data);
       clock.innerText = formatTimestamp(params.timestamp)
+    } catch (err) {
+      console.error(err);
+    }
+  });
+}
+
+function doStatIndicator(name) {
+  const indicator = document.getElementById(name);
+  let params = {};
+  feed.addEventListener(name, function (e) {
+    try {
+      params = JSON.parse(e.data);
+      indicator.innerText = params.value;
     } catch (err) {
       console.error(err);
     }

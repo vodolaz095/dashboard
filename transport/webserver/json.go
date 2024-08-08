@@ -17,6 +17,7 @@ func (tr *Transport) exposeJSON() {
 			"sensors":     sensors,
 			"filtered":    filtered,
 			"version":     tr.Version,
+			"stats":       tr.SensorsService.Stats(),
 		})
 	})
 }

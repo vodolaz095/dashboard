@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"sync/atomic"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -20,6 +21,8 @@ func (ss *SensorsService) StartRefreshingSensors(ctx context.Context) {
 			if ready {
 				name = task.Payload.(string)
 				go func() {
+					atomic.AddInt32(&ss.SensorsBeingUpdated, 1)
+					defer atomic.AddInt32(&ss.SensorsBeingUpdated, -1)
 					rtc, cancel := context.WithTimeout(ctx, DefaultSensorTimeout)
 					defer cancel()
 					nextUpdateOn, err := ss.Refresh(rtc, name)

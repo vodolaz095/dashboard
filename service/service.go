@@ -11,12 +11,13 @@ import (
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
+// SensorsService contains bussiness logic related to sensors
 type SensorsService struct {
-	ListOfSensors  []string
-	Sensors        map[string]sensors.ISensor
-	UpdateInterval time.Duration
-	UpdateQueue    *dqueue.Handler
-
+	ListOfSensors       []string
+	Sensors             map[string]sensors.ISensor
+	UpdateInterval      time.Duration
+	UpdateQueue         *dqueue.Handler
+	SensorsBeingUpdated int32
 	// subscribers are used to deliver sensors update to SSE connections and different
 	// transports - redis publishers, influx, etc...
 	subscribers map[string]chan model.Update
