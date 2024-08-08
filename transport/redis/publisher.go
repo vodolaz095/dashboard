@@ -57,10 +57,15 @@ func (p *Publisher) InitConnection(params config.Broadcaster) error {
 
 // Start starts broadcasting new sensor readings into redis channels
 func (p *Publisher) Start(ctx context.Context) {
+	if len(p.redisSinks) == 0 {
+		log.Debug().Msgf("No redis feeds found for broadcasting sensors readings")
+		return
+	}
 	feed, err := p.Service.Subscribe(ctx, "dashboard.broadcaster.redis")
 	if err != nil {
 		log.Fatal().Err(err).Msgf("broadcaster failed to subscribe: %s", err)
 	}
+	log.Info().Msgf("Starting broadcast for %v redis sinks...", len(p.redisSinks))
 	for {
 		select {
 		case <-ctx.Done():
