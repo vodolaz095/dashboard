@@ -99,6 +99,7 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	tr.exposeMetrics()
 	tr.exposeUpdate()
 	tr.exposeHealthcheck()
+	tr.exposeDump()
 
 	listener, err := net.Listen("tcp", tr.Address)
 	if err != nil {
