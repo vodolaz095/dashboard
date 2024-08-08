@@ -13,7 +13,7 @@ import (
 func (tr *Transport) exposeMetrics() {
 	tr.engine.GET("/metrics", func(c *gin.Context) {
 		sensors, _ := tr.listFilteredSensors(c)
-		c.Header("Content-Type", "text/plain; version=0.0.4")
+		c.Header("Content-Type", "text/plain; version=0.0.4; charset=utf-8")
 		stats := tr.SensorsService.Stats()
 		for i := range sensors {
 			fmt.Fprint(c.Writer, sensors[i].String())
