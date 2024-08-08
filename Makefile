@@ -59,4 +59,7 @@ start:
 binary: build
 	./build/dashboard contrib/dashboard.yaml
 
+tag:
+	git tag "v$(majorVersion).$(minorVersion).$(patchVersion)"
+
 .PHONY: build
