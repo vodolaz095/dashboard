@@ -18,6 +18,7 @@ type Transport struct {
 	PathToHeader      string
 	PathToFooter      string
 	SensorsService    *service.SensorsService
+	Debug             bool
 
 	header, footer []byte
 	engine         *gin.Engine

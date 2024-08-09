@@ -24,6 +24,7 @@ func (tr *Transport) exposeIndex() {
 			"sensors_updated_now": stats.QueueLength,
 			"queue_length":        stats.SensorsUpdatedNow,
 			"subscribers":         stats.Subscribers,
+			"debug":               tr.Debug,
 		})
 	})
 }

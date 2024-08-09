@@ -11,7 +11,7 @@ import (
 	"github.com/vodolaz095/dashboard/sensors"
 )
 
-// SensorsService contains bussiness logic related to sensors
+// SensorsService contains business logic related to sensors
 type SensorsService struct {
 	ListOfSensors       []string
 	Sensors             map[string]sensors.ISensor

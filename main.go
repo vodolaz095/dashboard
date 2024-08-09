@@ -205,6 +205,7 @@ func main() {
 		PathToHeader:      cfg.WebUI.PathToHeader,
 		PathToFooter:      cfg.WebUI.PathToFooter,
 		SensorsService:    &srv,
+		Debug:             Version == "development",
 	}
 
 	// handle signals
