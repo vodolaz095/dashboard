@@ -50,11 +50,13 @@
   </tbody>
 </table>
 <div id="footer">
+  {{ if .debug }}
   <p>
     Sensors updated now: <span id="sensors_updated_now">{{.sensors_updated_now}}</span>.
     Queue length: <span id="queue_length">{{.queue_length}}</span>.
     Subscribers: <span id="subscribers">{{.subscribers}}</span>.
   </p>
+  {{end}}
   <p>
     Additional representations:
 {{ if .filtered }}<a href="/">all</a>{{end}}
@@ -69,9 +71,11 @@
 <script type="application/javascript">
 document.addEventListener("DOMContentLoaded", function(event) {
   doClock();
+  {{ if .debug }}
   doStatIndicator("sensors_updated_now");
   doStatIndicator("queue_length");
   doStatIndicator("subscribers");
+  {{ end }}
   {{ range $index, $value := .sensors }}doSubscribeOn({{$value.Name}});
   {{ end }}
 });
