@@ -41,16 +41,18 @@ and important employees, so they can have eagle's eye perspective on what is hap
 some technical data (like database connection strings) but, in general, all important data should be available 
 on single page in a way it can be understood by general audience without technical skills.
 
-Example dashboards
+Example dashboard screenshots
 =====================
 ![dashboard_example.png](contrib%2Fdashboard_example.png)
+![elinks.png](contrib%2Felinks.png)
+![mobile.jpg](contrib%2Fmobile.jpg)
 
 Architecture
 =====================
 Application has list of in-memory sensors.
 HTTP server load sensor values from memory, so databases cannot be DDoSed.
 Background process updates sensors' readings using [defered queue](https://github.com/vodolaz095/dqueue), 
-separate goroutines keep readings updated via external events (http requests, redis subscription messages, etc.).
+separate goroutines keep readings updates via external events (http requests, redis subscription messages, etc.).
 
 
 
@@ -65,10 +67,53 @@ Main features
 5. JSON and [Prometheous v4](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example)
    endpoints to read sensors readings
 6. DDOS (distributed denial of service attacks) proof - sensors readings are updated in memory by background process 
-   and served by HTTP server from memory. No matter how many clients opens dashboard - they receive values from memory,
+   and served by HTTP server from memory. No matter how many clients open dashboard - they receive values from memory,
    no extra calls to database and other resources are issued. 
 7. Database access credentials, tokens, passwords and other sensitive data is concealed from visitors.
 
+
+Possible alternatives
+======================
+Requirement - simple realtime dashboard with list of sensors readings, containing actual numerical values 
+and some technical background (minimum, maximum, link to wiki) available for all team members.
+No historical charts required. Numerical values can be extracted by SQL requests, HTTP requests and so on.
+Data can be (but not required to) stored to some 3rd party time series database.
+`Pros` here means what does alternative have, and my dashboard - do not, and `cons` describes why
+alternative was discarded.
+
+
+Alternative 1. [monit](https://mmonit.com/monit/)
+Pros: Easy to setup, lots of plugins, [powerfull scripting language](https://mmonit.com/monit/documentation/monit.html#MYSQL) to write tests.
+Cons: dashboard requires password based authorization, with misconfigured board user can start/stop services.
+Complicated scripting language, writing sensor extracting metrics from *SQL database was painful since it required 
+to write shell scripts...
+Conclusion: overcomplicated.
+
+Alternative 2. [grafana](https://grafana.com/)
+Pros: popular system with years of production service
+Cons: too complicated, hard to setup, authorization required for users to view charts data.
+3rd party tools are required to extract sensors' readings from observable servers.
+3rd party tools (Influxdb, Prometheus, etc) are required to store data being visualized.
+Conclusion: overcomplicated.
+
+Alternative 3. [zabbix](https://www.zabbix.com/)
+Pros: popular system with years of production service
+Cons: too complicated, hard to setup, authorization required for users to view charts data.
+Conclusion: overcomplicated.
+
+
+Alternative 4. [netdata](https://www.netdata.cloud/)
+Pros: lot of plugins, fancy UI, quite easy to setup.
+Cons: webui is quite heavy, works slow via 3G mobile connection. I just need table with few actual readings.
+Conclusion: overcomplicated.
+
+
+Alternative 5. [Influxdb v2](https://docs.influxdata.com/influxdb/v2/) + [Telegraf](https://docs.influxdata.com/telegraf/v1/)
+Pros: telegraf has lots of inputs and outputs, which are quite easy to configure. Easy to make dashboards in Influxdb. Historical data available. 
+Our dashboard can [send data directly to Influxdb via wire protocol](docs%2Fexport_influx.md).
+Cons: Influxdb doesn't render UI without authorization. Loading simple dashboard eats 12+ mb of traffic. Telegraf 
+does not have easy to use web UI to read actual data manually.
+Conclusion: overcomplicated.
 
 Quickstart
 ======================
