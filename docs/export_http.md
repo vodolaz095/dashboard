@@ -17,10 +17,9 @@ Method 1. Via Browser
 
 Just open http://localhost:3000 via browser to see something like this
 
-![dashboard_example.png](contrib%2Fdashboard_example.png)
-![elinks.png](contrib%2Felinks.png)
-![mobile.jpg](contrib%2Fmobile.jpg)
-
+![dashboard_example.png](..%2Fcontrib%2Fdashboard_example.png)
+![elinks.png](..%2Fcontrib%2Felinks.png)
+![mobile.jpg](..%2Fcontrib%2Fmobile.jpg)
 
 Data can be filtered by tags.
 If you want TLS encryption or even basic authorization, you can do it by reverse proxy with config like this one
