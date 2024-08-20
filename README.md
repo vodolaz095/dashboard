@@ -83,37 +83,37 @@ alternative was discarded.
 
 
 Alternative 1. [monit](https://mmonit.com/monit/)
-Pros: Easy to setup, lots of plugins, [powerfull scripting language](https://mmonit.com/monit/documentation/monit.html#MYSQL) to write tests.
-Cons: dashboard requires password based authorization, with misconfigured board user can start/stop services.
-Complicated scripting language, writing sensor extracting metrics from *SQL database was painful since it required 
-to write shell scripts...
-Conclusion: overcomplicated.
+- Pros: Easy to setup, lots of plugins, [powerfull scripting language](https://mmonit.com/monit/documentation/monit.html#MYSQL) to write tests.
+- Cons: dashboard requires password based authorization, with misconfigured board user can start/stop services.
+  Complicated scripting language, writing sensor extracting metrics from *SQL database was painful since it required 
+  to write shell scripts...
+- Conclusion: overcomplicated.
 
 Alternative 2. [grafana](https://grafana.com/)
-Pros: popular system with years of production service
-Cons: too complicated, hard to setup, authorization required for users to view charts data.
-3rd party tools are required to extract sensors' readings from observable servers.
-3rd party tools (Influxdb, Prometheus, etc) are required to store data being visualized.
-Conclusion: overcomplicated.
+- Pros: popular system with years of production service
+- Cons: too complicated, hard to setup, authorization required for users to view charts data.
+  3rd party tools are required to extract sensors' readings from observable servers.
+  3rd party tools (Influxdb, Prometheus, etc) are required to store data being visualized.
+- Conclusion: overcomplicated.
 
 Alternative 3. [zabbix](https://www.zabbix.com/)
-Pros: popular system with years of production service
-Cons: too complicated, hard to setup, authorization required for users to view charts data.
-Conclusion: overcomplicated.
+- Pros: popular system with years of production service
+- Cons: too complicated, hard to setup, authorization required for users to view charts data.
+- Conclusion: overcomplicated.
 
 
 Alternative 4. [netdata](https://www.netdata.cloud/)
-Pros: lot of plugins, fancy UI, quite easy to setup.
-Cons: webui is quite heavy, works slow via 3G mobile connection. I just need table with few actual readings.
-Conclusion: overcomplicated.
+- Pros: lot of plugins, fancy UI, quite easy to setup.
+- Cons: webui is quite heavy, works slow via 3G mobile connection. I just need table with few actual readings.
+- Conclusion: overcomplicated.
 
 
 Alternative 5. [Influxdb v2](https://docs.influxdata.com/influxdb/v2/) + [Telegraf](https://docs.influxdata.com/telegraf/v1/)
-Pros: telegraf has lots of inputs and outputs, which are quite easy to configure. Easy to make dashboards in Influxdb. Historical data available. 
-Our dashboard can [send data directly to Influxdb via wire protocol](docs%2Fexport_influx.md).
-Cons: Influxdb doesn't render UI without authorization. Loading simple dashboard eats 12+ mb of traffic. Telegraf 
-does not have easy to use web UI to read actual data manually.
-Conclusion: overcomplicated.
+- Pros: telegraf has lots of inputs and outputs, which are quite easy to configure. Easy to make dashboards in Influxdb. Historical data available. 
+  Our dashboard can [send data directly to Influxdb via wire protocol](docs%2Fexport_influx.md).
+- Cons: Influxdb doesn't render UI without authorization. Loading simple dashboard eats 12+ mb of traffic. Telegraf 
+  does not have easy to use web UI to read actual data manually.
+- Conclusion: overcomplicated.
 
 Quickstart
 ======================
