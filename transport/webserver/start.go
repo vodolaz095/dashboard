@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
@@ -103,6 +104,7 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	if tr.Debug {
 		log.Warn().Msgf("Deferred queue debug endpoint is enabled")
 		tr.exposeDump()
+		pprof.Register(tr.engine)
 	}
 
 	listener, err := net.Listen("tcp", tr.Address)
