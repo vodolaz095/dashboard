@@ -98,6 +98,7 @@ func (tr *Transport) Start(ctx context.Context, wg *sync.WaitGroup) (err error) 
 	tr.exposeJSON()
 	tr.exposeMetrics()
 	tr.exposeUpdate()
+	tr.exposeText()
 	tr.exposeHealthcheck()
 	if tr.Debug {
 		log.Warn().Msgf("Deferred queue debug endpoint is enabled")
