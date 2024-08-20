@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
@@ -55,6 +56,13 @@ func main() {
 
 	// set logging
 	zerologger.Configure(cfg.Log)
+
+	log.Info().Msgf("Starting dashboard version %s. GOOS: %s. ARCH: %s. Go Version: %s. Please, report bugs here: %s",
+		Version,
+		runtime.GOOS, runtime.GOARCH, runtime.Version(),
+		"https://github.com/vodolaz095/dashboard/issues",
+	)
+
 	log.Debug().Msgf("Configuring %v sensors...", len(cfg.Sensors))
 
 	if len(cfg.Sensors) == 0 {
