@@ -18,6 +18,9 @@ Method 1. Via Browser
 Just open http://localhost:3000 via browser to see something like this
 
 ![dashboard_example.png](contrib%2Fdashboard_example.png)
+![elinks.png](contrib%2Felinks.png)
+![mobile.jpg](contrib%2Fmobile.jpg)
+
 
 Data can be filtered by tags.
 If you want TLS encryption or even basic authorization, you can do it by reverse proxy with config like this one
@@ -29,14 +32,25 @@ technology
 
 Method 2. Via JSON endpoint
 ===================================
-You can recieve all dashboard data in JSON format by calling appropriate endpoint
-
+You can receive all dashboard data in JSON format by calling appropriate endpoint
 http://localhost:3000/json
 
 Filtering sensors by tags is supported, so this should work with default config
 http://localhost:3000/json?kind=database&dialect=sql
 
-Method 3. Via Prometheus v4 Metrics scrapper endpoint
+Method 3: Via HTTP REST API
+=====================================
+You can receive all dashboard sensors' reading in JSON format by calling appropriate endpoint
+http://localhost:3000/api/v1/sensor
+
+Filtering sensors by tags is supported, so this should work with default config
+http://localhost:3000/api/v1/sensor?a=b
+
+You can load particular sensors readings via this call
+http://localhost:3000/api/v1/sensor/load1
+
+
+Method 4. Via Prometheus v4 Metrics scrapper endpoint
 ===================================
 Endpoint `/metrics` exposes sensor readings in
 [Prometheous v4](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example)
