@@ -15,16 +15,16 @@ import (
 	"github.com/go-playground/validator/v10"
 	redisClient "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	"github.com/vodolaz095/dashboard/transport/influxdb"
-	redis_transport "github.com/vodolaz095/dashboard/transport/redis"
 	"github.com/vodolaz095/dqueue"
 
 	"github.com/vodolaz095/dashboard/config"
+	"github.com/vodolaz095/dashboard/internal/sensors"
+	"github.com/vodolaz095/dashboard/internal/service"
+	"github.com/vodolaz095/dashboard/internal/transport/influxdb"
+	"github.com/vodolaz095/dashboard/internal/transport/redis"
+	"github.com/vodolaz095/dashboard/internal/transport/webserver"
 	"github.com/vodolaz095/dashboard/pkg/healthcheck"
 	"github.com/vodolaz095/dashboard/pkg/zerologger"
-	"github.com/vodolaz095/dashboard/sensors"
-	"github.com/vodolaz095/dashboard/service"
-	"github.com/vodolaz095/dashboard/transport/webserver"
 )
 
 var Version = "development"
@@ -182,7 +182,7 @@ func main() {
 	}
 
 	// configure redis transports
-	redisPublisher := redis_transport.Publisher{
+	redisPublisher := redis.Publisher{
 		Service: &srv,
 	}
 	if len(cfg.Broadcasters) > 0 {
@@ -195,7 +195,7 @@ func main() {
 			}
 		}
 	}
-	redisSubscriber := redis_transport.Subscriber{
+	redisSubscriber := redis.Subscriber{
 		Service: &srv,
 	}
 
@@ -247,8 +247,6 @@ func main() {
 				Msgf("error starting webserver on %s : %s", webServerTransport.Address, errWeb)
 		}
 	}()
-
-	// todo: mqtt subscriber
 
 	wg.Wait()
 	terminationContext, terminationContextCancel := context.WithTimeout(context.Background(), 10*time.Second)
