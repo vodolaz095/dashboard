@@ -7,5 +7,5 @@ var (
 	DuplicateConnectionError           = errors.New("duplicate connection")
 	DuplicateSubscriberError           = errors.New("duplicate subscriber")
 	ConnectionNotFoundError            = errors.New("connection not found")
-	UnknownDatabaseConnectionTypeError = errors.New("unkown database connection type")
+	UnknownDatabaseConnectionTypeError = errors.New("unknown database connection type")
 )
