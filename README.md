@@ -66,7 +66,7 @@ Main features
 4. Real time updates using [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 5. JSON and [Prometheous v4](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example)
    endpoints to read sensors readings
-6. DDOS (distributed denial of service attacks) proof - sensors readings are updated in memory by background process 
+6. DDOS (distributed denial of service attacks) proof - sensors readings are updated in memory by background goroutines 
    and served by HTTP server from memory. No matter how many clients open dashboard - they receive values from memory,
    no extra calls to database and other resources are issued. 
 7. Database access credentials, tokens, passwords and other sensitive data is concealed from visitors.
@@ -160,7 +160,7 @@ Sensors documentation
 - [Redis sensor (synchronous and subscriber)](docs%2Fsensor_redis.md)
 - [File sensor which reads data from file](docs%2Fsensor_redis.md)
 - [Incoming HTTP POST request / endpoint / webhook sensor](docs%2Fsensor_endpoint.md)
-- [HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
+- [Outgoing HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
 - [Creating your own sensor](docs%2Fsensor_your_own.md)
 
 

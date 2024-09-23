@@ -5,11 +5,11 @@ All methods allow data to be can be filtered by tags. So, if you have configurat
 https://github.com/vodolaz095/dashboard/blob/master/contrib/dashboard.yaml
 and dashboard running on http://localhost:3000, you can get all metrics via URL like this:
 
-http://localhost:3000/metrics 
+http://localhost:3000/ 
 
 and you can filter readings only to mysql and postgres database related via URL like this:
 
-http://localhost:3000/metrics?dialect=sql&kind=database
+http://localhost:3000/?dialect=sql&kind=database
 
 
 Method 1. Via Browser
@@ -28,6 +28,9 @@ https://github.com/vodolaz095/dashboard/blob/master/contrib/nginx/dashboard.conf
 It is worth notice data is updated in realtime using [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 technology
 
+Filtering sensors by tags is supported, so this should work with default config
+http://localhost:3000/?kind=database&dialect=sql
+
 
 Method 2. Via JSON endpoint
 ===================================
@@ -45,13 +48,13 @@ http://localhost:3000/api/v1/sensor
 Filtering sensors by tags is supported, so this should work with default config
 http://localhost:3000/api/v1/sensor?a=b
 
-You can load particular sensors readings via this call
-http://localhost:3000/api/v1/sensor/load1
+You can load particular sensors readings via this call using its name, for example, for `load1` sensor 
+readings can be retrieved via http://localhost:3000/api/v1/sensor/load1
 
 
 Method 4. Via Prometheus v4 Metrics scrapper endpoint
 ===================================
-Endpoint `/metrics` exposes sensor readings in
+Endpoint `GET /metrics` exposes sensor readings in
 [Prometheous v4](https://prometheus.io/docs/instrumenting/exposition_formats/#text-format-example)
 format.
 
@@ -60,7 +63,7 @@ http://localhost:3000/metrics?kind=database&dialect=sql
 
 Method 4. Via plain text (console+curl friendly metrics)
 ===================================
-Endpoint `/text` exposes sensor readings in plain text format.
+Endpoint `GET /text` exposes sensor readings in plain text format.
 Filtering sensors by tags is supported, so this should work with default config
 http://localhost:3000/text?kind=database&dialect=sql
 
@@ -89,3 +92,12 @@ Endpoint `/csv` exposes sensor readings in plain text format with CSV encoding, 
 
 Filtering sensors by tags is supported, so this should work with default config
 http://localhost:3000/csv?kind=database&dialect=sql
+
+Extra methods
+=========================
+
+- `GET /healthcheck` allows to check if all remote database connections are pingable and service is alive. In general, 
+  it is not save to expose this endpoint to all internet, so it can be concealed by nginx config like these 
+  [dashboard.conf](..%2Fcontrib%2Fnginx%2Fdashboard.conf)
+- `GET /ping` returns http status of 200 (`OK`) and `Pong` as body to show service is working. Endpoint is save to expose 
+  to unauthenticated users - it does nothing dangerous. 
