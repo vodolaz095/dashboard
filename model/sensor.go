@@ -47,3 +47,17 @@ func (s *Sensor) String() string {
 	fmt.Fprintf(buh, "%s%s %v %v\n", s.Name, labels.String(), s.Value, s.UpdatedAt.Unix())
 	return buh.String()
 }
+
+// GetStatus returns sensor status - ok, low, high
+func (s *Sensor) GetStatus() string {
+	if s.Minimum == 0 && s.Maximum == 0 {
+		return StatusOK
+	}
+	if s.Minimum > s.Value {
+		return StatusLow
+	}
+	if s.Maximum < s.Value {
+		return StatusHigh
+	}
+	return StatusOK
+}

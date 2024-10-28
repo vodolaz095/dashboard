@@ -57,6 +57,14 @@ tr:hover {
     color: white !important;
 }
 
+tr.high {
+    background-color: rgba(174, 37, 37, 0.27) !important;
+}
+
+tr.low {
+    background-color: rgba(10, 2, 102, 0.3) !important;
+}
+
 #header {
     text-align: center;
 }
