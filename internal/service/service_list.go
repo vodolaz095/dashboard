@@ -21,6 +21,7 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 			s.Value = sensor.GetValue()
 			s.UpdatedAt = sensor.GetUpdatedAt()
 			s.Tags = sensor.GetTags()
+			s.Status = sensor.GetStatus()
 			if sensor.GetLastError() != nil {
 				s.Error = sensor.GetLastError().Error()
 			} else {
@@ -36,6 +37,7 @@ func (ss *SensorsService) List() (ret []model.Sensor) {
 				Minimum:     0,
 				Maximum:     0,
 				Value:       0,
+				Status:      "",
 				UpdatedAt:   time.Now(),
 			}
 		}

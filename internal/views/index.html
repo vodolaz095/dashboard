@@ -31,7 +31,7 @@
   </thead>
   <tbody>
   {{ range $index, $value := .sensors }}
-  <tr class="{{ $value.GetStatus }}">
+  <tr class="{{ $value.Status }}">
     <th title="{{ range $key, $val := $value.Tags }} {{ $key }}={{ $val }} {{ end }}">
       {{ if $value.Link }}
       <a href="{{ $value.Link }}" target="_blank">{{$value.Name}}</a>

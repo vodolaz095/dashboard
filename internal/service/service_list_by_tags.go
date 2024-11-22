@@ -19,6 +19,7 @@ func (ss *SensorsService) ListByTags(tags map[string]string) (ret []model.Sensor
 			s.Value = sensor.GetValue()
 			s.UpdatedAt = sensor.GetUpdatedAt()
 			s.Tags = sensor.GetTags()
+			s.Status = sensor.GetStatus()
 			if sensor.GetLastError() != nil {
 				s.Error = sensor.GetLastError().Error()
 			} else {

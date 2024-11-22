@@ -22,7 +22,7 @@ func (ss *SensorsService) Refresh(ctx context.Context, name string) (next time.T
 
 	err = sensor.Update(ctx)
 	if err != nil {
-		n := ss.Broadcast(name, err.Error(), sensor.GetValue())
+		n := ss.Broadcast(name, err.Error(), sensor.GetStatus(), sensor.GetValue())
 		log.Error().Err(err).
 			Str("sensor", name).
 			Float64("reading", sensor.GetValue()).
@@ -32,7 +32,7 @@ func (ss *SensorsService) Refresh(ctx context.Context, name string) (next time.T
 				name, sensor.GetValue(), n, err)
 		return next, err
 	}
-	n := ss.Broadcast(name, "", sensor.GetValue())
+	n := ss.Broadcast(name, "", sensor.GetStatus(), sensor.GetValue())
 	log.Debug().
 		Str("sensor", name).
 		Float64("reading", sensor.GetValue()).

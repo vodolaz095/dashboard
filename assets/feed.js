@@ -30,6 +30,7 @@ function doSubscribeOn(eventTypeName) {
   const itemValue = document.getElementById('value_' + eventTypeName);
   const itemError = document.getElementById('error_' + eventTypeName);
   const itemTimestamp = document.getElementById('timestamp_' + eventTypeName);
+  const row = itemValue.parentElement;
   let params = {};
   feed.addEventListener(eventTypeName, function (e) {
     console.log('Feed: %s event received:', eventTypeName, e.type, e.data);
@@ -37,7 +38,8 @@ function doSubscribeOn(eventTypeName) {
       params = JSON.parse(e.data);
       itemValue.innerText = Number(params.value).toFixed(4);
       itemError.innerText = params.error;
-      itemTimestamp.innerText = formatTimestamp(params.timestamp)
+      itemTimestamp.innerText = formatTimestamp(params.timestamp);
+      row.setAttribute('class', params.status);
     } catch (err) {
       console.error(err);
     }

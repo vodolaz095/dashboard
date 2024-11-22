@@ -16,6 +16,7 @@ type Sensor struct {
 	Minimum     float64           `json:"minimum"`
 	Maximum     float64           `json:"maximum"`
 	Value       float64           `json:"value"`
+	Status      string            `json:"status"`
 	Error       string            `json:"error"`
 	Tags        map[string]string `json:"tags"`
 	UpdatedAt   time.Time         `json:"updatedAt"`
@@ -46,18 +47,4 @@ func (s *Sensor) String() string {
 	fmt.Fprintln(buh, "# TYPE", s.Name, "gauge")
 	fmt.Fprintf(buh, "%s%s %v %v\n", s.Name, labels.String(), s.Value, s.UpdatedAt.Unix())
 	return buh.String()
-}
-
-// GetStatus returns sensor status - ok, low, high
-func (s *Sensor) GetStatus() string {
-	if s.Minimum == 0 && s.Maximum == 0 {
-		return StatusOK
-	}
-	if s.Minimum > s.Value {
-		return StatusLow
-	}
-	if s.Maximum < s.Value {
-		return StatusHigh
-	}
-	return StatusOK
 }

@@ -36,9 +36,9 @@ func (ss *Subscriber) Start(ctx context.Context) {
 			for msg := range ch {
 				casted.ParseValue(msg)
 				if casted.Error != nil {
-					ss.Service.Broadcast(casted.Name, casted.Error.Error(), casted.Value)
+					ss.Service.Broadcast(casted.Name, casted.Error.Error(), casted.GetStatus(), casted.Value)
 				} else {
-					ss.Service.Broadcast(casted.Name, "", casted.Value)
+					ss.Service.Broadcast(casted.Name, "", casted.GetStatus(), casted.Value)
 				}
 			}
 			log.Info().Msgf("Stopping redis subscriber %s on channel %s...",

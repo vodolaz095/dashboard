@@ -19,11 +19,11 @@ func (ss *SensorsService) StartClock(ctx context.Context) {
 			log.Info().Msgf("Clock is stopping...")
 			return
 		case t := <-timer.C:
-			ss.Broadcast("clock", "", float64(t.Unix()))
+			ss.Broadcast("clock", "", "", float64(t.Unix()))
 			stats = ss.Stats()
-			ss.Broadcast("sensors_updated_now", "", float64(stats.SensorsUpdatedNow))
-			ss.Broadcast("queue_length", "", float64(stats.QueueLength))
-			ss.Broadcast("subscribers", "", float64(stats.Subscribers))
+			ss.Broadcast("sensors_updated_now", "", "", float64(stats.SensorsUpdatedNow))
+			ss.Broadcast("queue_length", "", "", float64(stats.QueueLength))
+			ss.Broadcast("subscribers", "", "", float64(stats.Subscribers))
 		}
 	}
 }

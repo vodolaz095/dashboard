@@ -7,6 +7,12 @@ import (
 	"time"
 )
 
+const (
+	StatusValueLow  = "low"
+	StatusValueHigh = "high"
+	StatusValueOK   = "ok"
+)
+
 type ISensor interface {
 	/*
 		Implemented in abstract class of UnimplementedSensor
@@ -22,6 +28,7 @@ type ISensor interface {
 	GetUpdatedAt() time.Time
 	GetLastError() error
 	GetRefreshRate() time.Duration
+	GetStatus() string
 	/*
 		To be implemented in custom sensors
 	*/
@@ -122,6 +129,19 @@ func (u *UnimplementedSensor) GetLastError() error {
 
 func (u *UnimplementedSensor) GetRefreshRate() time.Duration {
 	return u.RefreshRate
+}
+
+func (u *UnimplementedSensor) GetStatus() string {
+	if u.Minimum == 0 && u.Maximum == 0 {
+		return StatusValueOK
+	}
+	if u.Minimum != 0 && u.GetValue() < u.Minimum {
+		return StatusValueLow
+	}
+	if u.Maximum != 0 && u.GetValue() > u.Maximum {
+		return StatusValueHigh
+	}
+	return StatusValueOK
 }
 
 const DefaultTestTimeout = time.Second
