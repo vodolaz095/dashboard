@@ -55,12 +55,12 @@ func (w *Writer) format(input model.Update) string {
 	for k, v := range sensor.GetTags() {
 		fmt.Fprintf(ret, ",%s=%s", k, v)
 	}
-	fmt.Fprintf(ret, ",type=%s", sensor.GetType())
 	fmt.Fprintf(ret, " value=%f %v\n", input.Value, time.Now().UnixNano())
 	return ret.String()
 }
 
 func (w *Writer) Start(ctx context.Context) {
+	var data string
 	if !w.initialized {
 		return
 	}
@@ -77,7 +77,11 @@ func (w *Writer) Start(ctx context.Context) {
 			return
 
 		case upd := <-feed:
-			w.writer.WriteRecord(w.format(upd))
+			data = w.format(upd)
+			if data != "" {
+				log.Trace().Msgf("Sending data for %v via influx: %v", upd.Name, data)
+				w.writer.WriteRecord(data)
+			}
 		}
 	}
 }
