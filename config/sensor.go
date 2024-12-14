@@ -96,6 +96,6 @@ type Sensor struct {
 	/*
 	 * Parameters used by
 	 */
-	// Filter defines tags required for timeseries to be selected as source for sensor
+	// Filter defines tags required for timeseries to be selected as source
 	Filter map[string]string `yaml:"filter"`
 }

@@ -2,9 +2,15 @@ package victoriametrics
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 	"sync"
+	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/vodolaz095/dashboard/internal/sensors"
 )
@@ -55,7 +61,72 @@ func (s *VMSenor) Ping(ctx context.Context) error {
 }
 
 func (s *VMSenor) Update(ctx context.Context) error {
-	return fmt.Errorf("not implemented")
+	// // See https://docs.victoriametrics.com/url-examples/#apiv1query
+	var raw rawResponse
+	u, err := url.Parse(s.Endpoint)
+	if err != nil {
+		return fmt.Errorf("malformed endpoint: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			s.Mutex.Lock()
+			s.Error = err
+			s.Value = 0
+			s.UpdatedAt = time.Now()
+			s.Mutex.Unlock()
+		}
+	}()
+	u.Path += "prometheus/api/v1/query"
+	params := url.Values{}
+	params.Set("query", s.Query)
+	params.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
+	params.Set("step", time.Second.String())
+	deadline, present := ctx.Deadline()
+	if present {
+		params.Set("timeout", time.Until(deadline).String())
+	}
+	u.RawQuery = params.Encode()
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+	req = req.WithContext(ctx)
+	for k := range s.Headers {
+		req.Header.Set(k, s.Headers[k])
+	}
+	resp, err := s.Client.Do(req)
+	if err != nil {
+		return fmt.Errorf("error making request to %s: %w", req.URL.String(), err)
+	}
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("wrong response: %s", resp.Status)
+	}
+	err = json.NewDecoder(resp.Body).Decode(&raw)
+	if err != nil {
+		return fmt.Errorf("error decoding body: %w", err)
+	}
+	if raw.Status != "success" {
+		return fmt.Errorf("wrong query status: %s", raw.Status)
+	}
+	log.Warn().Msgf("VM metrics received")
+	for i := range raw.Data.Result {
+		log.Warn().Msgf("VM: data receided: %s", raw.Data.Result[i])
+		if raw.Data.Result[i].hasAllTags(s.Tags) {
+			val, found1 := raw.Data.Result[i].GetLastValue()
+			when, found2 := raw.Data.Result[i].GetLastTimestamp()
+			if found1 && found2 {
+				s.Mutex.Lock()
+				s.Value = val
+				s.UpdatedAt = when
+				s.Mutex.Unlock()
+				return nil
+			}
+		}
+	}
+	return nil
 }
 
 func (s *VMSenor) Close(ctx context.Context) error {
