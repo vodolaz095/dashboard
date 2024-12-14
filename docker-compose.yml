@@ -5,13 +5,14 @@ volumes:
   mariadb_data:
   pg_data:
   influxdb_data:
+  victoria-metrics-data:
 
 services:
   # https://hub.docker.com/_/mariadb
   mariadb:
     image: mirror.gcr.io/mariadb:10.11.6
     environment:
-      MYSQL_ROOT_PASSWORD:  "dashboard"
+      MYSQL_ROOT_PASSWORD: "dashboard"
       MYSQL_DATABASE: "dashboard"
     ports:
       - "3306:3306"
@@ -52,6 +53,14 @@ services:
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "-l3Y5tIHGJAxXv_Rs5kJ4kAfPbgmf3WPmFUTDuKmD3Z9gp29E7e188-dIt5MAKhSTzv1J6v_pkPuVdIbXqdL1w=="
     volumes:
       - influxdb_data:/var/lib/influxdb2
+
+  # https://hub.docker.com/r/victoriametrics/victoria-metrics
+  victoria:
+    image: mirror.gcr.io/victoriametrics/victoria-metrics:stable
+    ports:
+      - "8428:8428"
+    volumes:
+      - victoria-metrics-data:/victoria-metrics-data
 
   dashboard:
     build:

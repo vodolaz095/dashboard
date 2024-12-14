@@ -41,9 +41,9 @@ database_connections:
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
 
 sensors:
-# shared sensor parameters
-# https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shared.md
-# for each sensor `link` field value will lead to documentation
+  # shared sensor parameters
+  # https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_shared.md
+  # for each sensor `link` field value will lead to documentation
 
   - name: load1
     type: load1
@@ -83,7 +83,7 @@ sensors:
     minimum: 500
     maximum: 8000
 
-# disk space sensors
+  # disk space sensors
   - name: free_home
     type: free_disk_space
     description: "Size of free space in megabytes in /home directory"
@@ -104,7 +104,7 @@ sensors:
 
   - name: echo
     type: shell
-    command: 'date +%S'
+    command: "date +%S"
     description: "Get current second executing `date` command"
     refresh_rate: 5s
     minimum: 0
@@ -181,6 +181,19 @@ sensors:
     maximum: 100
     tags:
       dialect: redis
+      kind: database
+
+  - name: victoria metrics
+    type: victoria_metrics
+    description: "Fetch timeseries data from Victoria Metrics"
+    link: "https://github.com/vodolaz095/dashboard/blob/master/docs/sensor_victoria_metrics.md"
+    endpoint: "http://localhost:8428/"
+    query: '{a="b"}'
+    filter:
+      hostname: localhost
+    refresh_rate: 5s
+    tags:
+      dialect: promql
       kind: database
 
 # https://github.com/vodolaz095/dashboard/blob/master/docs/export_redis.md

@@ -14,6 +14,7 @@ import (
 	"github.com/vodolaz095/dashboard/internal/sensors/redis"
 	"github.com/vodolaz095/dashboard/internal/sensors/shell"
 	"github.com/vodolaz095/dashboard/internal/sensors/system"
+	"github.com/vodolaz095/dashboard/internal/sensors/victoriametrics"
 )
 
 func populateBaseSensorParams(sensor *sensors.UnimplementedSensor, params config.Sensor) {
@@ -177,6 +178,15 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		fs.JsonPath = params.JsonPath
 		ss.UpdateQueue.ExecuteAfter(fs.Name, DefaultWarmUpDelay)
 		return fs, nil
+
+	case "victoria", "victoria_metrics", "victoria metrics":
+		vs := &victoriametrics.VMSenor{}
+		populateBaseSensorParams(&vs.UnimplementedSensor, params)
+		vs.Endpoint = params.Endpoint
+		vs.Headers = params.Headers
+		vs.Query = params.Query
+		vs.Filter = params.Filter
+		return vs, nil
 
 	default:
 		return nil, fmt.Errorf("unknown sensor type: %s", params.Type)

@@ -92,4 +92,10 @@ type Sensor struct {
 	 */
 	// PathToMountPoint defines path to mount point to monitor its disk space usage, can be `/`,`/home/`, and so on...
 	PathToMountPoint string `yaml:"path_to_mount_point"`
+
+	/*
+	 * Parameters used by
+	 */
+	// Filter defines tags required for timeseries to be selected as source for sensor
+	Filter map[string]string `yaml:"filter"`
 }
