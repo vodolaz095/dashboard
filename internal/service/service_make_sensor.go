@@ -186,6 +186,7 @@ func (ss *SensorsService) MakeSensor(params config.Sensor) (sensor sensors.ISens
 		vs.Headers = params.Headers
 		vs.Query = params.Query
 		vs.Filter = params.Filter
+		ss.UpdateQueue.ExecuteAfter(vs.Name, DefaultWarmUpDelay)
 		return vs, nil
 
 	default:

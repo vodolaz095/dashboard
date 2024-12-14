@@ -61,7 +61,7 @@ func (s *VMSenor) Ping(ctx context.Context) error {
 }
 
 func (s *VMSenor) Update(ctx context.Context) error {
-	// // See https://docs.victoriametrics.com/url-examples/#apiv1query
+	// See https://docs.victoriametrics.com/url-examples/#apiv1query
 	var raw rawResponse
 	u, err := url.Parse(s.Endpoint)
 	if err != nil {
@@ -111,25 +111,29 @@ func (s *VMSenor) Update(ctx context.Context) error {
 	if raw.Status != "success" {
 		return fmt.Errorf("wrong query status: %s", raw.Status)
 	}
-	log.Warn().Msgf("VM metrics received")
 	for i := range raw.Data.Result {
-		log.Warn().Msgf("VM: data receided: %s", raw.Data.Result[i])
-		if raw.Data.Result[i].hasAllTags(s.Tags) {
+		if raw.Data.Result[i].hasAllTags(s.Filter) {
 			val, found1 := raw.Data.Result[i].GetLastValue()
 			when, found2 := raw.Data.Result[i].GetLastTimestamp()
 			if found1 && found2 {
 				s.Mutex.Lock()
+				log.Debug().Msgf("VM: updating sensor %s to %.4f on %s", s.Name, val, when.Format("15:04:05"))
 				s.Value = val
 				s.UpdatedAt = when
 				s.Mutex.Unlock()
 				return nil
 			}
+			s.Mutex.Lock()
+			s.Value = 0
+			s.UpdatedAt = time.Now()
+			s.Error = fmt.Errorf("no data")
+			s.Mutex.Unlock()
 		}
 	}
 	return nil
 }
 
 func (s *VMSenor) Close(ctx context.Context) error {
-	// becasuse stateless http connections are being used
+	// because stateless http connections are being used
 	return nil
 }

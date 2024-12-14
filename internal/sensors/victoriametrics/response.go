@@ -1,6 +1,9 @@
 package victoriametrics
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 // {"status":"success","data":{"resultType":"vector","result":[]},"stats":{"seriesFetched": "0","executionTimeMsec":0}}
 
@@ -13,23 +16,26 @@ type rawMetric struct {
 func (rw *rawMetric) hasAllTags(needle map[string]string) (ok bool) {
 	var val string
 	var present bool
-
 	for k := range needle {
 		val, present = rw.Metric[k]
-		if present && val != needle[k] {
-			return false
+		if present && val == needle[k] {
+			ok = true
 		}
-		ok = true
 	}
-
 	return ok
 }
 
 func (rw *rawMetric) GetLastValue() (val float64, present bool) {
 	var ok bool
+	var raw string
+	var err error
 	if len(rw.Value) > 1 {
-		val, ok = rw.Value[1].(float64)
+		raw, ok = rw.Value[1].(string)
 		if !ok {
+			return 0, false
+		}
+		val, err = strconv.ParseFloat(raw, 64)
+		if err != nil {
 			return 0, false
 		}
 		return val, true
