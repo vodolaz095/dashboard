@@ -16,6 +16,9 @@ type rawMetric struct {
 func (rw *rawMetric) hasAllTags(needle map[string]string) (ok bool) {
 	var val string
 	var present bool
+	if len(needle) == 0 {
+		return true
+	}
 	for k := range needle {
 		val, present = rw.Metric[k]
 		if present && val == needle[k] {
