@@ -58,8 +58,8 @@ separate goroutines keep readings updates via external events (http requests, re
 
 Main features
 ======================
-1. Manifold of very hackable sensors - MySQL/PostgreSQL queryes, Redis sync and subscription, file, remote HTTP endpoint, 
-   periodical shell command execution, local HTTP POST endpoint updated by remote script with secret token.
+1. Manifold of very hackable sensors - MySQL/PostgreSQL queryes, Redis sync and subscription, Victoria Metrics single query api
+   file, remote HTTP endpoint, periodical shell command execution, local HTTP POST endpoint updated by remote script with secret token.
 2. Single cross-platform binary with simple `yaml` encoded config
 3. Light-weight (dashboard has ~1 kb [style.css](assets%2Fstyle.css), ~1 kb [feed.js](assets%2Ffeed.js) and ~ 5kb 
    main page)- works ok even on IPhone 6 and 2013 year Android Smartphones
@@ -159,10 +159,10 @@ Sensors documentation
 - [MySQL/PostgreSQL sensor](docs%2Fsensor_sql.md)
 - [Redis sensor (synchronous and subscriber)](docs%2Fsensor_redis.md)
 - [File sensor which reads data from file](docs%2Fsensor_redis.md)
+- [Victoria Metrics instant query](docs%2Fsensor_victoria_metrics.md)
 - [Incoming HTTP POST request / endpoint / webhook sensor](docs%2Fsensor_endpoint.md)
 - [Outgoing HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
 - [Creating your own sensor](docs%2Fsensor_your_own.md)
-
 
 Development using golang compiler on host machine
 =============================
