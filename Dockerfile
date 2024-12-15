@@ -1,5 +1,5 @@
 # this dockerfile builds minimal production grade image (~40mb) with alpine linux
-FROM mirror.gcr.io/golang:1.22.9 AS builder
+FROM mirror.gcr.io/golang:1.23.2 AS builder
 
 RUN mkdir -p /app
 WORKDIR /app
