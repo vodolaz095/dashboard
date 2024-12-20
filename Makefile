@@ -16,7 +16,7 @@ tools:
 	@go version
 
 # https://go.dev/blog/govulncheck
-# install it by go install golang.org/x/vuln/cmd/govulncheck@latest
+# install it by `go install golang.org/x/vuln/cmd/govulncheck@latest`
 vuln:
 	which govulncheck
 	govulncheck ./...
