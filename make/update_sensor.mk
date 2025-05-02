@@ -7,6 +7,20 @@ update_sensor/endpoint/update:
 		-d "name=endpoint&value=$(timestamp)" \
 		http://localhost:3000/update
 
+update_sensor/endpoint/json:
+	curl -v -H "Host: localhost" \
+		-H "Token: test321" \
+		-H "Content-Type: application/json" \
+		-d '{"name":"endpoint","value":$(timestamp),"description":"something_$(timestamp)"}' \
+		http://localhost:3000/update
+
+update_sensor/endpoint/description:
+	curl -v -H "Host: localhost" \
+		-H "Token: test321" \
+		-H "Content-Type: application/x-www-form-urlencoded" \
+		-d "name=endpoint&description=description$(timestamp)" \
+		http://localhost:3000/update
+
 update_sensor/endpoint/increment:
 	curl -v -H "Host: localhost" \
 		-H "Token: test321" \

@@ -48,3 +48,10 @@ func (s *Sensor) Increment(delta float64) {
 	s.UpdatedAt = time.Now()
 	s.Mutex.Unlock()
 }
+
+func (s *Sensor) SetDescription(description string) {
+	s.Mutex.Lock()
+	s.Description = description
+	s.UpdatedAt = time.Now()
+	s.Mutex.Unlock()
+}

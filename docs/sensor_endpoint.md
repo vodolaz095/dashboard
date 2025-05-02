@@ -41,7 +41,7 @@ sensors:
 
 ```
 
-This curl command updates sensor `endpoint1` with value 21
+This curl command updates sensor `endpoint1` with value 21 and sets its description to `something`.
 
 ```shell
 
@@ -49,7 +49,7 @@ curl -v -H "Host: localhost" \
   -H "Token: test321" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -X POST \
-  -d "name=endpoint1&value=21" \
+  -d "name=endpoint1&value=21&description=something" \
   http://localhost:3000/update
 
 ```
@@ -68,6 +68,23 @@ curl -v -H "Host: localhost" \
 ```
 
 updates `endpoint2` sensor with value 53.5.
+
+It is possible to use JSON encoded requests.
+Note that `name` and `value` are mandatory parameters, while `desciption` is optional.
+Note that `value` should be a number, not string in json request.
+
+```shell
+
+# decrement `endpoint1` value by 3. If there are few concurrent HTTP POST requests, all data will be applied in save manner
+curl -v -H "Host: localhost" \
+  -H "Token: test321" \
+  -H "Content-Type: application/json" \
+  -X POST \
+  -d '{"name"="endpoint1","value":3,"description":"something"}' \
+  http://localhost:3000/decrement
+
+```
+
 
 It is possible to increment/decrement sensors' values in a race condition save manner by calling `/increment` and `/decrement`
 endpoints:

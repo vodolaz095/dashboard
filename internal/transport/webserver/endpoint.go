@@ -75,6 +75,9 @@ func (tr *Transport) exposeUpdate() {
 		default:
 			c.String(http.StatusBadRequest, "unknown method")
 		}
+		if data.Description != "" {
+			casted.SetDescription(data.Description)
+		}
 		tr.SensorsService.Broadcast(casted.Name, "", casted.GetStatus(), casted.GetValue())
 		c.AbortWithStatus(http.StatusNoContent)
 	}
