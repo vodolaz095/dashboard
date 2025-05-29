@@ -56,7 +56,7 @@ services:
 
   # https://hub.docker.com/r/victoriametrics/victoria-metrics
   victoria:
-    image: mirror.gcr.io/victoriametrics/victoria-metrics:stable
+    image: mirror.gcr.io/victoriametrics/victoria-metrics:v1.118.0-scratch
     ports:
       - "8428:8428"
     volumes:

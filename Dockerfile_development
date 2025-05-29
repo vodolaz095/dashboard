@@ -1,4 +1,4 @@
-FROM mirror.gcr.io/golang:1.23.2
+FROM mirror.gcr.io/golang:1.23.7
 
 RUN mkdir -p /app
 WORKDIR /app
