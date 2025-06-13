@@ -18,8 +18,8 @@ func (ss *SensorsService) initMysqlConnection(ctx context.Context, name, dsn str
 		return err
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(2)
-	db.SetMaxIdleConns(1)
+	db.SetMaxOpenConns(5)
+	db.SetMaxIdleConns(3)
 	con, err := db.Conn(ctx)
 	if err != nil {
 		return err
