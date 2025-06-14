@@ -55,11 +55,15 @@ database_connections:
   - name: mysql@container
     type: mysql
     connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
-
+    max_open_cons: 3
+    max_idle_cons: 1
+    
   - name: postgres@container
     type: postgres
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
-
+    max_open_cons: 3
+    max_idle_cons: 1
+    
 sensors:
   - name: mysql
     type: mysql

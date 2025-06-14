@@ -21,7 +21,9 @@ database_connections:
   - name: redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
-
+    max_open_cons: 3
+    max_idle_cons: 1
+    
 sensor:
 - name: redis
   type: redis
@@ -49,9 +51,13 @@ database_connections:
   - name: redis@container
     type: redis
     connection_string: "redis://default:secret@127.0.0.1:6379"
+    max_open_cons: 3
+    max_idle_cons: 1
   - name: subscribe2redis@container
     type: redis
     connection_string: "redis://default:secret@127.0.0.1:6379"
+    max_open_cons: 2
+    max_idle_cons: 1
     
 sensor:
   - name: redis subscriber
