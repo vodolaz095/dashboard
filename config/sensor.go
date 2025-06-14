@@ -48,7 +48,7 @@ type Sensor struct {
 	HttpMethod string `yaml:"http_method" validate:"oneof=GET HEAD POST PUT PATCH DELETE CONNECT OPTIONS TRACE"`
 	// Endpoint defines URL where sensor sends request to recieve data
 	Endpoint string `yaml:"endpoint" validate:"http_url"`
-	// Headers are HTTP request headers being send with any HTTP request
+	// Headers are HTTP request headers being sent with any HTTP request
 	Headers map[string]string `yaml:"headers"`
 	// Body is send with any HTTP request as payload
 	Body string `yaml:"body"`
