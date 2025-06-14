@@ -80,16 +80,10 @@ func main() {
 	}
 	// init database connections
 	for i := range cfg.DatabaseConnections {
-		err = srv.MakeConnection(ctx,
-			cfg.DatabaseConnections[i].Name,
-			service.DatabaseConnectionType(cfg.DatabaseConnections[i].Type),
-			cfg.DatabaseConnections[i].DatabaseConnectionString,
-		)
+		err = srv.MakeConnection(ctx, cfg.DatabaseConnections[i])
 		if err != nil {
 			log.Fatal().Err(err).Msgf("Error initializing connection %s (%s): %s",
-				cfg.DatabaseConnections[i].Name,
-				cfg.DatabaseConnections[i].Type,
-				err,
+				cfg.DatabaseConnections[i].Name, cfg.DatabaseConnections[i].Type, err,
 			)
 		}
 	}

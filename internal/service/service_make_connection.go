@@ -1,18 +1,21 @@
 package service
 
-import "context"
+import (
+	"context"
 
-func (ss *SensorsService) MakeConnection(ctx context.Context, name string,
-	kind DatabaseConnectionType, databaseConnectionString string) (err error) {
-	switch kind {
+	"github.com/vodolaz095/dashboard/config"
+)
+
+func (ss *SensorsService) MakeConnection(ctx context.Context, opts config.DatabaseConnection) (err error) {
+	switch DatabaseConnectionType(opts.Type) {
 	case DatabaseConnectionTypeMysql, DatabaseConnectionTypeMariadb:
-		err = ss.initMysqlConnection(ctx, name, databaseConnectionString)
+		err = ss.initMysqlConnection(ctx, opts)
 		break
 	case DatabaseConnectionTypePostgres:
-		err = ss.initPostgresConnection(ctx, name, databaseConnectionString)
+		err = ss.initPostgresConnection(ctx, opts)
 		break
 	case DatabaseConnectionTypeRedis:
-		err = ss.initRedisConnection(ctx, name, databaseConnectionString)
+		err = ss.initRedisConnection(ctx, opts)
 		break
 	default:
 		return UnknownDatabaseConnectionTypeError

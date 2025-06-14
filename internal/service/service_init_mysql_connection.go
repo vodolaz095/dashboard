@@ -6,25 +6,26 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"github.com/vodolaz095/dashboard/config"
 )
 
-func (ss *SensorsService) initMysqlConnection(ctx context.Context, name, dsn string) (err error) {
-	_, found := ss.MysqlConnections[name]
+func (ss *SensorsService) initMysqlConnection(ctx context.Context, opts config.DatabaseConnection) (err error) {
+	_, found := ss.MysqlConnections[opts.Name]
 	if found {
 		return DuplicateConnectionError
 	}
-	db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open("mysql", opts.DatabaseConnectionString)
 	if err != nil {
 		return err
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(5)
-	db.SetMaxIdleConns(3)
+	db.SetMaxOpenConns(opts.MaxOpenCons)
+	db.SetMaxIdleConns(opts.MaxIdleCons)
 	con, err := db.Conn(ctx)
 	if err != nil {
 		return err
 	}
-	ss.MysqlConnections[name] = con
-	log.Info().Msgf("MySQL/MariaDB database connection %s is established", name)
+	ss.MysqlConnections[opts.Name] = con
+	log.Info().Msgf("MySQL/MariaDB database connection %s is established", opts.Name)
 	return nil
 }

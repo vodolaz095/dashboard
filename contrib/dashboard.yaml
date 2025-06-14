@@ -30,15 +30,23 @@ database_connections:
   - name: redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
+    max_open_cons: 2
+    max_idle_cons: 1
   - name: subscribe2redis@container
     type: redis
     connection_string: "redis://127.0.0.1:6379"
+    max_open_cons: 2
+    max_idle_cons: 1
   - name: mysql@container
     type: mysql
     connection_string: "root:dashboard@tcp(127.0.0.1:3306)/dashboard"
+    max_open_cons: 2
+    max_idle_cons: 1
   - name: postgres@container
     type: postgres
     connection_string: "postgres://dashboard:dashboard@127.0.0.1:5432/dashboard"
+    max_open_cons: 2
+    max_idle_cons: 1
 
 sensors:
   # shared sensor parameters

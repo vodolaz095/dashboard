@@ -80,7 +80,7 @@ func (s *VMSenor) Update(ctx context.Context) error {
 	params := url.Values{}
 	params.Set("query", s.Query)
 	params.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
-	params.Set("step", time.Second.String())
+	params.Set("step", time.Minute.String())
 	deadline, present := ctx.Deadline()
 	if present {
 		params.Set("timeout", time.Until(deadline).String())
