@@ -58,8 +58,7 @@ func main() {
 	zerologger.Configure(cfg.Log)
 
 	log.Info().Msgf("Starting dashboard version %s. GOOS: %s. ARCH: %s. Go Version: %s. Please, report bugs here: %s",
-		Version,
-		runtime.GOOS, runtime.GOARCH, runtime.Version(),
+		Version, runtime.GOOS, runtime.GOARCH, runtime.Version(),
 		"https://github.com/vodolaz095/dashboard/issues",
 	)
 

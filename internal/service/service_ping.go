@@ -7,24 +7,24 @@ import (
 )
 
 func (ss *SensorsService) Ping(ctx context.Context) (err error) {
-	for k := range ss.MysqlConnections {
-		err = ss.MysqlConnections[k].PingContext(ctx)
+	for k, con := range ss.MysqlConnections {
+		err = con.PingContext(ctx)
 		if err != nil {
 			return
 		}
 		log.Trace().Msgf("Mysql connection %s online!", k)
 	}
 	log.Debug().Msgf("Mysql connections online")
-	for k := range ss.PostgresqlConnections {
-		err = ss.PostgresqlConnections[k].PingContext(ctx)
+	for k, con := range ss.PostgresqlConnections {
+		err = con.PingContext(ctx)
 		if err != nil {
 			return
 		}
 		log.Trace().Msgf("Postgres connection %s online!", k)
 	}
 	log.Debug().Msgf("Postgres connections online")
-	for k := range ss.RedisConnections {
-		err = ss.RedisConnections[k].Ping(ctx).Err()
+	for k, con := range ss.RedisConnections {
+		err = con.Ping(ctx).Err()
 		if err != nil {
 			return
 		}
