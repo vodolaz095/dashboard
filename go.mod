@@ -1,6 +1,6 @@
 module github.com/vodolaz095/dashboard
 
-go 1.24.9
+go 1.24.11
 
 require (
 	github.com/coreos/go-systemd/v22 v22.6.0
