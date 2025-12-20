@@ -67,7 +67,7 @@ jobs:
           GOOS: linux
           CGO_ENABLED: 0
           GOARCH: amd64
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_linux_amd64 main.go
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_amd64 main.go
 
       - name: build binary for linux on ARM 6
         env:
@@ -75,7 +75,7 @@ jobs:
           CGO_ENABLED: 0
           GOARCH: arm
           GOARM: 6
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm6 main.go
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm6 main.go
 
       - name: build binary for linux on ARM 7
         env:
@@ -83,21 +83,21 @@ jobs:
           CGO_ENABLED: 0
           GOARCH: arm
           GOARM: 7
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm7 main.go
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm7 main.go
 
       - name: build binary for windows on amd64
         env:
           GOOS: windows
           CGO_ENABLED: 0
           GOARCH: amd64
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard.exe main.go
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard.exe main.go
 
       - name: build binary for macos on amd64
         env:
           GOOS: darwin
           GOARCH: amd64
           CGO_ENABLED: 0
-        run: go build -ldflags "-X main.Version=${{ github.sha }}" -o build/dashboard_darwin_amd64 main.go
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_darwin_amd64 main.go
 
       - name: make md5 signature file
         run: md5sum build/* > build/dashboard.md5
