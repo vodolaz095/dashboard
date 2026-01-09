@@ -21,6 +21,11 @@ func (ss *SensorsService) initMysqlConnection(ctx context.Context, opts config.D
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(opts.MaxOpenCons)
 	db.SetMaxIdleConns(opts.MaxIdleCons)
+	if opts.MaxOpenCons != opts.MaxIdleCons {
+		log.Warn().Msgf("According to https://github.com/go-sql-driver/mysql?tab=readme-ov-file#important-settings"+
+			" it is recommended to make `max_open_cons: %v` and `max_idle_cons: %v` equal for connection %s",
+			opts.MaxOpenCons, opts.MaxIdleCons, opts.Name)
+	}
 	con, err := db.Conn(ctx)
 	if err != nil {
 		return err
