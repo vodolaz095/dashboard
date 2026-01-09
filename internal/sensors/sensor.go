@@ -147,6 +147,7 @@ func (u *UnimplementedSensor) GetStatus() string {
 const DefaultTestTimeout = time.Second
 
 func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
+	t.Helper()
 	const readAttempts = 100
 	var val float64
 	var i int
