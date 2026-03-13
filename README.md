@@ -158,7 +158,7 @@ Sensors documentation
 - [Linux system sensor](docs%2Fsensor_linux_system.md)
 - [MySQL/PostgreSQL sensor](docs%2Fsensor_sql.md)
 - [Redis sensor (synchronous and subscriber)](docs%2Fsensor_redis.md)
-- [File sensor which reads data from file](docs%2Fsensor_redis.md)
+- [File sensor which reads data from file](docs%2Fsensor_file.md)
 - [Victoria Metrics instant query](docs%2Fsensor_victoria_metrics.md)
 - [Incoming HTTP POST request / endpoint / webhook sensor](docs%2Fsensor_endpoint.md)
 - [Outgoing HTTP Request (CURL) sensor](docs%2Fsensor_curl.md)
