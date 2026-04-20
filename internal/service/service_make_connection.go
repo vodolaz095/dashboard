@@ -10,15 +10,12 @@ func (ss *SensorsService) MakeConnection(ctx context.Context, opts config.Databa
 	switch DatabaseConnectionType(opts.Type) {
 	case DatabaseConnectionTypeMysql, DatabaseConnectionTypeMariadb:
 		err = ss.initMysqlConnection(ctx, opts)
-		break
 	case DatabaseConnectionTypePostgres:
 		err = ss.initPostgresConnection(ctx, opts)
-		break
 	case DatabaseConnectionTypeRedis:
 		err = ss.initRedisConnection(ctx, opts)
-		break
 	default:
-		return UnknownDatabaseConnectionTypeError
+		return ErrUnknownDatabaseConnectionType
 	}
 	return err
 }

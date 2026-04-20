@@ -40,5 +40,4 @@ func Configure(params config.Log) {
 		With().Timestamp().Caller().
 		Logger().Level(ExtractZerologLevel(params.Level))
 	log.Logger = sink
-	return
 }

@@ -12,7 +12,7 @@ import (
 func (ss *SensorsService) initMysqlConnection(ctx context.Context, opts config.DatabaseConnection) (err error) {
 	_, found := ss.MysqlConnections[opts.Name]
 	if found {
-		return DuplicateConnectionError
+		return ErrDuplicateConnection
 	}
 	db, err := sql.Open("mysql", opts.DatabaseConnectionString)
 	if err != nil {

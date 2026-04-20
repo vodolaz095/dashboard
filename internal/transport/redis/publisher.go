@@ -7,7 +7,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
-	
+
 	"github.com/vodolaz095/dashboard/config"
 	"github.com/vodolaz095/dashboard/internal/service"
 	"github.com/vodolaz095/dashboard/model"
@@ -20,15 +20,12 @@ type redisSink struct {
 	Sensors   map[string]bool
 }
 
-func (rs *redisSink) CanBroadcast(upd *model.Update) (ok bool) {
+func (rs *redisSink) CanBroadcast(upd *model.Update) (yes bool) {
 	if len(rs.Sensors) == 0 {
 		return true
 	}
-	_, sensorNameWhitelisted := rs.Sensors[upd.Name]
-	if sensorNameWhitelisted {
-		return true
-	}
-	return false
+	_, yes = rs.Sensors[upd.Name]
+	return yes
 }
 
 // Publisher broadcast Sensor values into redis via `pub/sub` channels
@@ -41,7 +38,7 @@ type Publisher struct {
 func (p *Publisher) InitConnection(params config.Broadcaster) error {
 	client, found := p.Service.RedisConnections[params.ConnectionName]
 	if !found {
-		return service.ConnectionNotFoundError
+		return service.ErrConnectionNotFound
 	}
 	sink := redisSink{
 		Client:    client,
