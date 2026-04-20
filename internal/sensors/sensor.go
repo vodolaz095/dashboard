@@ -171,7 +171,7 @@ func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
 		t.Errorf("error updating: %s", err)
 		return
 	}
-	if time.Now().Sub(sensor.GetUpdatedAt()) > 100*time.Millisecond {
+	if time.Since(sensor.GetUpdatedAt()) > 100*time.Millisecond {
 		t.Error("update time is not set")
 	}
 	t.Logf("Sensor updated with %.4f...", expected)

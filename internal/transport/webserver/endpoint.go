@@ -56,13 +56,10 @@ func (tr *Transport) exposeUpdate() {
 		switch c.FullPath() {
 		case "/update":
 			casted.Set(data.Value)
-			break
 		case "/increment":
 			casted.Increment(data.Value)
-			break
 		case "/decrement":
 			casted.Increment(-data.Value)
-			break
 		default:
 			c.String(http.StatusBadRequest, "unknown method")
 		}

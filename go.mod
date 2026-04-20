@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
-	github.com/jackc/pgx/v5 v5.8.0
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/oliveagle/jsonpath v0.1.4
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/rs/zerolog v1.34.0
@@ -60,6 +60,6 @@ require (
 	golang.org/x/crypto v0.49.0 // indirect
 	golang.org/x/net v0.52.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )

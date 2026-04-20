@@ -74,5 +74,4 @@ func (s *SubscribeSensor) ParseValue(msg *redis.Message) {
 	s.Value = payload.Value
 	s.Error = errors.New(payload.Error)
 	s.UpdatedAt = payload.Timestamp
-	return
 }

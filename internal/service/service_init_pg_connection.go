@@ -12,7 +12,7 @@ import (
 func (ss *SensorsService) initPostgresConnection(ctx context.Context, opts config.DatabaseConnection) (err error) {
 	_, found := ss.PostgresqlConnections[opts.Name]
 	if found {
-		return DuplicateConnectionError
+		return ErrDuplicateConnection
 	}
 	db, err := sql.Open("pgx", opts.DatabaseConnectionString)
 	if err != nil {

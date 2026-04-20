@@ -10,7 +10,7 @@ import (
 func (ss *SensorsService) Refresh(ctx context.Context, name string) (next time.Time, err error) {
 	sensor, found := ss.Sensors[name]
 	if !found {
-		return time.Now(), SensorNotFoundErr
+		return time.Now(), ErrSensorNotFound
 	}
 
 	next = time.Now().Add(sensor.GetRefreshRate())

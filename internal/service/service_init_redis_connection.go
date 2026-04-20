@@ -11,7 +11,7 @@ import (
 func (ss *SensorsService) initRedisConnection(ctx context.Context, params config.DatabaseConnection) (err error) {
 	_, found := ss.RedisConnections[params.Name]
 	if found {
-		return DuplicateConnectionError
+		return ErrDuplicateConnection
 	}
 	opts, err := redis.ParseURL(params.DatabaseConnectionString)
 	if err != nil {

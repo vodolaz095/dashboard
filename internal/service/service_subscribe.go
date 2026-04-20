@@ -11,7 +11,7 @@ import (
 func (ss *SensorsService) Subscribe(ctx context.Context, name string) (chan model.Update, error) {
 	_, found := ss.subscribers[name]
 	if found {
-		return nil, DuplicateSubscriberError
+		return nil, ErrDuplicateSubscriber
 	}
 	log.Debug().Msgf("Creating subscription channel for %s...", name)
 	ch := make(chan model.Update, DefaultSubscriptionChannelChannelDepth)
