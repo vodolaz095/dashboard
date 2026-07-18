@@ -73,8 +73,8 @@ func main() {
 	srv := service.SensorsService{
 		UpdateQueue:           &updateQueue,
 		UpdateInterval:        100 * time.Millisecond,
-		MysqlConnections:      make(map[string]*sql.Conn, 0),
-		PostgresqlConnections: make(map[string]*sql.Conn, 0),
+		MysqlConnections:      make(map[string]*sql.DB, 0),
+		PostgresqlConnections: make(map[string]*sql.DB, 0),
 		RedisConnections:      make(map[string]*redisClient.Client, 0),
 	}
 	// init database connections

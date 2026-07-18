@@ -20,8 +20,8 @@ type SensorsService struct {
 	SensorsBeingUpdated int32
 
 	// cached database connections
-	MysqlConnections      map[string]*sql.Conn
-	PostgresqlConnections map[string]*sql.Conn
+	MysqlConnections      map[string]*sql.DB
+	PostgresqlConnections map[string]*sql.DB
 	RedisConnections      map[string]*redis.Client
 
 	// subscribers are used to deliver sensors update to SSE connections and different

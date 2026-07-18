@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -16,21 +17,20 @@ func (ss *SensorsService) initMysqlConnection(ctx context.Context, opts config.D
 	}
 	db, err := sql.Open("mysql", opts.DatabaseConnectionString)
 	if err != nil {
-		return err
+		return fmt.Errorf("error opening mysql connection: %w", err)
+	}
+	db.SetMaxOpenConns(opts.MaxOpenCons)
+	if opts.MaxIdleCons > 0 {
+		db.SetMaxIdleConns(opts.MaxIdleCons)
+	} else {
+		db.SetMaxIdleConns(opts.MaxOpenCons)
 	}
 	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(opts.MaxOpenCons)
-	db.SetMaxIdleConns(opts.MaxIdleCons)
-	if opts.MaxOpenCons != opts.MaxIdleCons {
-		log.Warn().Msgf("According to https://github.com/go-sql-driver/mysql?tab=readme-ov-file#important-settings"+
-			" it is recommended to make `max_open_cons: %v` and `max_idle_cons: %v` equal for connection %s",
-			opts.MaxOpenCons, opts.MaxIdleCons, opts.Name)
+	if err = db.PingContext(ctx); err != nil {
+		return fmt.Errorf("error pinging mysql: %w", err)
 	}
-	con, err := db.Conn(ctx)
-	if err != nil {
-		return err
-	}
-	ss.MysqlConnections[opts.Name] = con
-	log.Info().Msgf("MySQL/MariaDB database connection %s is established", opts.Name)
+	ss.MysqlConnections[opts.Name] = db
+	log.Info().Msgf("MySQL/MariaDB database connection pool %s is established with %d max connections",
+		opts.Name, opts.MaxOpenCons)
 	return nil
 }

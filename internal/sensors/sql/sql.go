@@ -12,7 +12,7 @@ import (
 
 type Sensor struct {
 	sensors.UnimplementedSensor
-	Con *sql.Conn
+	Con *sql.DB
 
 	// DatabaseConnectionName is used to dial database
 	DatabaseConnectionName string `yaml:"database_connection_name"`

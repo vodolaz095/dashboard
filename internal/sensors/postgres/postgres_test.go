@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"context"
 	"database/sql"
 	"os"
 	"testing"
@@ -25,16 +24,11 @@ func TestPostgresSensor(t *testing.T) {
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(2)
 	db.SetMaxIdleConns(1)
-	con, err := db.Conn(context.TODO())
-	if err != nil {
-		t.Errorf("error instantiating connection: %s", err)
-		return
-	}
 
 	sensor := Sensor{}
 	sensor.Name = "test_pg"
 	sensor.Type = "postgres"
-	sensor.Con = con
+	sensor.Con = db
 	sensor.Query = "SELECT 3+2.3"
 	sensor.RefreshRate = time.Second
 	sensor.Description = "postgres sensor"
