@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
+func (frs *FreeRAMSensor) Update(context.Context) (err error) {
 	frs.Mutex.Lock()
 	defer frs.Mutex.Unlock()
 	frs.UpdatedAt = time.Now()
@@ -24,12 +24,12 @@ func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
 		frs.Error = fmt.Errorf("error opening /proc/meminfo: %w", err)
 		return err
 	}
-	closeErr := raw.Close()
 	var line string
 	var val float64
 	scanner := bufio.NewScanner(raw)
 	for scanner.Scan() {
 		line = scanner.Text()
+		print(line)
 		if !strings.HasPrefix(line, "MemFree:") {
 			continue
 		}
@@ -46,6 +46,7 @@ func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
 		frs.Error = nil
 		break
 	}
+	closeErr := raw.Close()
 	if err == nil && closeErr != nil {
 		frs.Error = fmt.Errorf("error closing /proc/meminfo: %w", closeErr)
 		return frs.Error

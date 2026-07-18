@@ -11,15 +11,15 @@ type FreeRAMSensor struct {
 	sensors.UnimplementedSensor
 }
 
-func (frs *FreeRAMSensor) Init(ctx context.Context) error {
+func (frs *FreeRAMSensor) Init(context.Context) error {
 	frs.Mutex = &sync.RWMutex{}
 	return nil
 }
 
-func (frs *FreeRAMSensor) Ping(ctx context.Context) error {
+func (frs *FreeRAMSensor) Ping(context.Context) error {
 	return nil
 }
 
-func (frs *FreeRAMSensor) Close(ctx context.Context) error {
+func (frs *FreeRAMSensor) Close(context.Context) error {
 	return nil
 }
