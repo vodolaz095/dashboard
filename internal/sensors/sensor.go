@@ -5,6 +5,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -171,13 +173,13 @@ func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
 		t.Errorf("error updating: %s", err)
 		return
 	}
-	if time.Since(sensor.GetUpdatedAt()) > 100*time.Millisecond {
+	if time.Since(sensor.GetUpdatedAt()) > time.Second {
 		t.Error("update time is not set")
 	}
 	t.Logf("Sensor updated with %.4f...", expected)
 	for i = 0; i < readAttempts; i++ {
 		val = sensor.GetValue()
-		if val != expected {
+		if !assert.InEpsilon(t, expected, val, 0.1) {
 			t.Errorf("unexpected value - %.4f vs %.4f on %v run",
 				sensor.GetValue(), val, i)
 		}

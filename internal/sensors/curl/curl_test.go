@@ -12,7 +12,7 @@ import (
 // http://ip-api.com/json/193.41.76.51 -> lat=55.9397
 
 func TestCurlRawSensor(t *testing.T) {
-	expected := 55.7558
+	expected := 55.9397
 	sensor := Sensor{}
 	sensor.Name = "test_curl_raw"
 	sensor.Type = "curl"
@@ -35,7 +35,7 @@ func TestCurlRawSensor(t *testing.T) {
 }
 
 func TestCurlJSONSensor(t *testing.T) {
-	expected := 55.7558
+	expected := 55.9397
 	sensor := Sensor{}
 	sensor.Name = "test_curl_json"
 	sensor.Type = "mysql"
