@@ -1,4 +1,4 @@
-# This workflow will build a golang project
+# This workflow will build and test a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
 name: unit test
@@ -10,13 +10,11 @@ on:
     branches: [ "master" ]
 
 jobs:
-
   test:
     runs-on: ubuntu-latest
     services:
-
       redis:
-        image: mirror.gcr.io/redis:7
+        image: redis:7-alpine
         ports:
           - 6379:6379
         options: >-
@@ -25,20 +23,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
       mariadb:
-        image: mirror.gcr.io/mariadb:10.11.6
+        image: mariadb:10.11
         env:
-          MYSQL_ROOT_PASSWORD:  "dashboard"
+          MYSQL_ROOT_PASSWORD: "dashboard"
           MYSQL_DATABASE: "dashboard"
         ports:
           - 3306:3306
 
       postgres:
-        image: mirror.gcr.io/postgres:15-alpine
+        image: postgres:15-alpine
         env:
           POSTGRES_USER: "dashboard"
           POSTGRES_PASSWORD: "dashboard"
+          POSTGRES_DB: "dashboard"
         ports:
           - "5432:5432"
 
@@ -48,18 +46,19 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.26.5'
+        go-version: 1.26.5
+        cache: true
         cache-dependency-path: go.sum
 
-    - name: install govulncheck utility
+    - name: Install govulncheck utility
       run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
-    - name: scan for vulnerable packages
+    - name: Scan for vulnerable packages
       run: make vuln
 
-    - name: run unit test
+    - name: Run unit tests
       env:
         REDIS_URL: redis://127.0.0.1:6379
-        PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard
-        MYSQL_URL: root:dashboard@/dashboard
+        PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard?sslmode=disable
+        MYSQL_URL: root:dashboard@(127.0.0.1:3306)/dashboard
       run: make test

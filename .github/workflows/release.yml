@@ -14,7 +14,7 @@ jobs:
     services:
 
       redis:
-        image: mirror.gcr.io/redis:7
+        image: redis:7-alpine
         ports:
           - 6379:6379
         options: >-
@@ -23,20 +23,20 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-
       mariadb:
-        image: mirror.gcr.io/mariadb:10.11.6
+        image: mariadb:10.11
         env:
-          MYSQL_ROOT_PASSWORD:  "dashboard"
+          MYSQL_ROOT_PASSWORD: "dashboard"
           MYSQL_DATABASE: "dashboard"
         ports:
           - 3306:3306
 
       postgres:
-        image: mirror.gcr.io/postgres:15-alpine
+        image: postgres:15-alpine
         env:
           POSTGRES_USER: "dashboard"
           POSTGRES_PASSWORD: "dashboard"
+          POSTGRES_DB: "dashboard"
         ports:
           - "5432:5432"
 
@@ -46,30 +46,34 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.26.5'
+          go-version: 1.26.5
+          cache: true
           cache-dependency-path: go.sum
 
-      - name: install govulncheck utility
+      - name: Install govulncheck utility
         run: go install golang.org/x/vuln/cmd/govulncheck@latest
 
-      - name: scan for vulnerable packages
+      - name: Scan for vulnerable packages
         run: make vuln
 
-      - name: run unit test
+      - name: Run unit tests
         env:
           REDIS_URL: redis://127.0.0.1:6379
-          PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard
-          MYSQL_URL: root:dashboard@/dashboard
+          PG_URL: postgres://dashboard:dashboard@localhost:5432/dashboard?sslmode=disable
+          MYSQL_URL: root:dashboard@(127.0.0.1:3306)/dashboard
         run: make test
 
-      - name: build binary for linux on AMD64
+      - name: Create build directory
+        run: mkdir -p build
+
+      - name: Build binary for Linux on AMD64
         env:
           GOOS: linux
           CGO_ENABLED: 0
           GOARCH: amd64
         run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_amd64 main.go
 
-      - name: build binary for linux on ARM 6
+      - name: Build binary for Linux on ARM 6
         env:
           GOOS: linux
           CGO_ENABLED: 0
@@ -77,7 +81,7 @@ jobs:
           GOARM: 6
         run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm6 main.go
 
-      - name: build binary for linux on ARM 7
+      - name: Build binary for Linux on ARM 7
         env:
           GOOS: linux
           CGO_ENABLED: 0
@@ -85,33 +89,52 @@ jobs:
           GOARM: 7
         run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm7 main.go
 
-      - name: build binary for windows on amd64
+      - name: Build binary for Linux on ARM64
+        env:
+          GOOS: linux
+          CGO_ENABLED: 0
+          GOARCH: arm64
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_linux_arm64 main.go
+
+      - name: Build binary for Windows on AMD64
         env:
           GOOS: windows
           CGO_ENABLED: 0
           GOARCH: amd64
         run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard.exe main.go
 
-      - name: build binary for macos on amd64
+      - name: Build binary for macOS on AMD64
         env:
           GOOS: darwin
-          GOARCH: amd64
           CGO_ENABLED: 0
+          GOARCH: amd64
         run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_darwin_amd64 main.go
 
-      - name: make md5 signature file
-        run: md5sum build/* > build/dashboard.md5
+      - name: Build binary for macOS on ARM64 (M1/M2)
+        env:
+          GOOS: darwin
+          CGO_ENABLED: 0
+          GOARCH: arm64
+        run: go build -ldflags "-s -w -X main.Version=${{ github.sha }}" -o build/dashboard_darwin_arm64 main.go
 
-      - name: expose build result
-        run: ls -l build/
+      - name: Make MD5 signature file
+        run: |
+          md5sum build/* > build/dashboard.md5
+          cat build/dashboard.md5
 
-      - name: release
-        uses: ncipollo/release-action@v1
+      - name: Expose build result
+        run: ls -la build/
+
+      - name: Release
+        uses: ncipollo/release-action@v1.14.0
         with:
           draft: true
-          name: "Temporary release"
-          body: "Code is generated from commit https://github.com/vodolaz095/dashboard/commit/${{ github.sha }}"
+          name: "Release ${{ github.sha }}"
+          body: |
+            Code is generated from commit https://github.com/vodolaz095/dashboard/commit/${{ github.sha }}
+
+            ${{ steps.release_notes.outputs.body }}
           generateReleaseNotes: true
-          commit: "${{ github.sha }}"
-          tag: "${{ github.ref }}"
+          commit: ${{ github.sha }}
+          tag: v${{ github.run_number }}
           artifacts: "build/dashboard*"
