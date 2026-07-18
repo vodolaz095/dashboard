@@ -13,6 +13,8 @@ type FreeRAMSensor struct {
 
 func (frs *FreeRAMSensor) Init(context.Context) error {
 	frs.Mutex = &sync.RWMutex{}
+	frs.A = 1
+	frs.B = 0
 	return nil
 }
 
