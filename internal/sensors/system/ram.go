@@ -49,12 +49,7 @@ func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
 		frs.Error = fmt.Errorf("error opening /proc/meminfo: %w", err)
 		return err
 	}
-	defer func() {
-		err1 := raw.Close()
-		if err1 != nil {
-			frs.Error = fmt.Errorf("error closing /proc/meminfo: %w", err1)
-		}
-	}()
+	closeErr := raw.Close()
 	var line string
 	var val float64
 	scanner := bufio.NewScanner(raw)
@@ -70,11 +65,15 @@ func (frs *FreeRAMSensor) Update(ctx context.Context) (err error) {
 		val, err = strconv.ParseFloat(line, 64)
 		if err != nil {
 			frs.Error = err
-			return
+			return err
 		}
 		frs.Value = val / 1024 // MBytes!
 		frs.Error = nil
 		break
 	}
-	return
+	if err == nil && closeErr != nil {
+		frs.Error = fmt.Errorf("error closing /proc/meminfo: %w", closeErr)
+		return frs.Error
+	}
+	return err
 }

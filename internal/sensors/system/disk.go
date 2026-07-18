@@ -13,7 +13,7 @@ import (
 type diskSpaceSensor struct {
 	sensors.UnimplementedSensor
 	Path      string
-	UsedSpase float64
+	UsedSpace float64
 	FreeSpace float64
 	Ratio     float64
 }
@@ -55,7 +55,7 @@ type UsedDiskSpaceSensor struct {
 func (udss *UsedDiskSpaceSensor) GetValue() float64 {
 	udss.Mutex.RLock()
 	defer udss.Mutex.RUnlock()
-	return udss.UsedSpase
+	return udss.UsedSpace
 }
 
 type FreeDiskSpaceRatioSensor struct {
