@@ -18,7 +18,7 @@ type diskSpaceSensor struct {
 	Ratio     float64
 }
 
-func (ds *diskSpaceSensor) Init(ctx context.Context) error {
+func (ds *diskSpaceSensor) Init(context.Context) error {
 	ds.Mutex = &sync.RWMutex{}
 	if ds.Tags == nil {
 		ds.Tags = make(map[string]string, 0)
@@ -30,11 +30,11 @@ func (ds *diskSpaceSensor) Init(ctx context.Context) error {
 	return nil
 }
 
-func (ds *diskSpaceSensor) Ping(ctx context.Context) error {
+func (ds *diskSpaceSensor) Ping(context.Context) error {
 	return nil
 }
 
-func (ds *diskSpaceSensor) Close(ctx context.Context) error {
+func (ds *diskSpaceSensor) Close(context.Context) error {
 	return nil
 }
 
