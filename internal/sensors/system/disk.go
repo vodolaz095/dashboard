@@ -13,12 +13,12 @@ import (
 type diskSpaceSensor struct {
 	sensors.UnimplementedSensor
 	Path      string
-	UsedSpase float64
+	UsedSpace float64
 	FreeSpace float64
 	Ratio     float64
 }
 
-func (ds *diskSpaceSensor) Init(ctx context.Context) error {
+func (ds *diskSpaceSensor) Init(context.Context) error {
 	ds.Mutex = &sync.RWMutex{}
 	if ds.Tags == nil {
 		ds.Tags = make(map[string]string, 0)
@@ -30,11 +30,11 @@ func (ds *diskSpaceSensor) Init(ctx context.Context) error {
 	return nil
 }
 
-func (ds *diskSpaceSensor) Ping(ctx context.Context) error {
+func (ds *diskSpaceSensor) Ping(context.Context) error {
 	return nil
 }
 
-func (ds *diskSpaceSensor) Close(ctx context.Context) error {
+func (ds *diskSpaceSensor) Close(context.Context) error {
 	return nil
 }
 
@@ -55,7 +55,7 @@ type UsedDiskSpaceSensor struct {
 func (udss *UsedDiskSpaceSensor) GetValue() float64 {
 	udss.Mutex.RLock()
 	defer udss.Mutex.RUnlock()
-	return udss.UsedSpase
+	return udss.UsedSpace
 }
 
 type FreeDiskSpaceRatioSensor struct {

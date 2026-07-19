@@ -2,17 +2,40 @@ package system
 
 import (
 	"testing"
-
-	"github.com/vodolaz095/dashboard/internal/sensors"
 )
 
 func TestFreeRAMSensor(t *testing.T) {
-	s := FreeRAMSensor{}
-	val, err := sensors.DoGetSensorValue(t, &s)
+	sensor := FreeRAMSensor{}
+
+	err := sensor.Init(t.Context())
 	if err != nil {
-		t.Errorf("error getting sensor value: %s", err)
-		return
+		t.Errorf("expected no error, got %v", err)
 	}
-	// assert.Greater(t, val, float64(0))
-	t.Logf("Free ram in Mbytes : %v", val)
+
+	err = sensor.Ping(t.Context())
+	if err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	err = sensor.Update(t.Context())
+	if err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
+
+	if sensor.Error != nil {
+		t.Errorf("sensor error: %v", sensor.Error)
+	}
+	result := sensor.GetValue()
+	if result == 0 {
+		t.Errorf("expected non-zero value, got 0")
+	}
+	if result < 0 {
+		t.Errorf("expected non-negative value, got %f", result)
+	}
+	t.Logf("Free RAM: %f", result)
+
+	err = sensor.Close(t.Context())
+	if err != nil {
+		t.Errorf("expected no error, got %v", err)
+	}
 }

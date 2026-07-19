@@ -23,7 +23,12 @@ func (ds *diskSpaceSensor) Update(ctx context.Context) (err error) {
 	}
 	ds.Error = nil
 	ds.FreeSpace = float64(stat.Bavail*uint64(stat.Bsize)) / 1024 / 1024
-	ds.UsedSpase = float64((stat.Blocks-stat.Bavail)*uint64(stat.Bsize)) / 1024 / 1024
-	ds.Ratio = 100 * ds.UsedSpase / (ds.FreeSpace + ds.UsedSpase)
+	ds.UsedSpace = float64((stat.Blocks-stat.Bavail)*uint64(stat.Bsize)) / 1024 / 1024
+	total := ds.FreeSpace + ds.UsedSpace
+	if total > 0 {
+		ds.Ratio = 100 * ds.UsedSpace / total
+	} else {
+		ds.Ratio = 0
+	}
 	return nil
 }
