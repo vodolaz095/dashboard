@@ -7,46 +7,36 @@ import (
 	"github.com/vodolaz095/dashboard/internal/sensors"
 )
 
-func TestLoadAverage1Sensor(t *testing.T) {
-	s := LoadAverage1Sensor{}
+func TestFreeDiskSpaceSensor(t *testing.T) {
+	s := FreeDiskSpaceSensor{diskSpaceSensor{Path: "/"}}
 	val, err := sensors.DoGetSensorValue(t, &s)
 	if err != nil {
 		t.Errorf("error getting sensor value: %s", err)
 		return
 	}
 	assert.Greater(t, val, float64(0))
-	t.Logf("Load1 : %v", val)
+	t.Logf("Free : %v", val)
 }
 
-func TestLoadAverage5Sensor(t *testing.T) {
-	s := LoadAverage5Sensor{}
+func TestUsedDiskSpaceSensor(t *testing.T) {
+	s := UsedDiskSpaceSensor{diskSpaceSensor{Path: "/"}}
 	val, err := sensors.DoGetSensorValue(t, &s)
 	if err != nil {
 		t.Errorf("error getting sensor value: %s", err)
 		return
 	}
 	assert.Greater(t, val, float64(0))
-	t.Logf("Load5 : %v", val)
+	t.Logf("Used : %v", val)
 }
 
-func TestLoadAverage15Sensor(t *testing.T) {
-	s := LoadAverage15Sensor{}
+func TestFreeDiskSpaceRatioSensor(t *testing.T) {
+	s := FreeDiskSpaceRatioSensor{diskSpaceSensor{Path: "/"}}
 	val, err := sensors.DoGetSensorValue(t, &s)
 	if err != nil {
 		t.Errorf("error getting sensor value: %s", err)
 		return
 	}
 	assert.Greater(t, val, float64(0))
-	t.Logf("Load15 : %v", val)
-}
-
-func TestTotalProcessSensor(t *testing.T) {
-	s := TotalProcessSensor{}
-	val, err := sensors.DoGetSensorValue(t, &s)
-	if err != nil {
-		t.Errorf("error getting sensor value: %s", err)
-		return
-	}
-	assert.Greater(t, val, float64(0))
-	t.Logf("Processes : %v", val)
+	assert.Less(t, val, float64(100))
+	t.Logf("Ratio : %.2f%%", val)
 }
