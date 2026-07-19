@@ -193,3 +193,36 @@ func DoTestSensor(t *testing.T, sensor ISensor, expected float64) (err error) {
 	t.Logf("Sensor closed!")
 	return nil
 }
+
+func DoGetSensorValue(t *testing.T, sensor ISensor) (value float64, err error) {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), DefaultTestTimeout)
+	defer cancel()
+	err = sensor.Init(ctx)
+	if err != nil {
+		t.Errorf("error initializing: %s", err)
+		return
+	}
+	t.Logf("Sensor initialized!")
+	err = sensor.Ping(ctx)
+	if err != nil {
+		t.Errorf("error pinging: %s", err)
+		return
+	}
+	t.Logf("Sensor pinged!")
+	err = sensor.Update(ctx)
+	if err != nil {
+		t.Errorf("error updating: %s", err)
+		return
+	}
+	if time.Since(sensor.GetUpdatedAt()) > time.Second {
+		t.Error("update time is not set")
+	}
+	err = sensor.Close(ctx)
+	if err != nil {
+		t.Errorf("error closing: %s", err)
+		return
+	}
+	t.Logf("Sensor closed!")
+	return sensor.GetValue(), nil
+}
