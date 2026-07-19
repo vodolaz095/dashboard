@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"sync"
 	"time"
 
@@ -47,11 +48,16 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	s.Value = 0
+	err = s.Con.PingContext(ctx)
+	if err != nil {
+		s.Error = fmt.Errorf("connection check failed: %w", err)
+		return s.Error
+	}
 	var val float64
 	err = s.Con.QueryRowContext(ctx, s.Query).Scan(&val)
 	if err != nil {
-		s.Error = err
-		return err
+		s.Error = fmt.Errorf("query failed: %w", err)
+		return s.Error
 	}
 	s.Value = val
 	s.Error = nil
