@@ -30,17 +30,18 @@ func (ss *SensorsService) StartCheckingForgottenSensors(ctx context.Context) {
 					continue
 				}
 
-				// if sensor have missed 2 updates it should be queued for refreshing
+				// if sensor have missed 2 updates it should be updated
 				shouldBeUpdatedAt = ss.Sensors[k].GetUpdatedAt().Add(2 * ss.Sensors[k].GetRefreshRate())
 				if shouldBeUpdatedAt.Before(time.Now()) {
-					next := time.Now().Add(ss.Sensors[k].GetRefreshRate())
-					log.Warn().
-						Str("sensor", ss.Sensors[k].GetName()).
-						Time("next", next).
-						Msgf("Sensor %s update forgotten - requeue on %s",
-							ss.Sensors[k].GetName(), next.Format("15:04:05.000"),
-						)
-					ss.UpdateQueue.ExecuteAt(k, next)
+					go func() {
+						ctx2, cancel := context.WithTimeout(ctx, ss.Sensors[k].GetRefreshRate()/2)
+						defer cancel()
+						err := ss.Sensors[k].Update(ctx2)
+						if err != nil {
+							log.Error().Err(err).Msgf("Error updating sensod %v %s: %s",
+								k, ss.Sensors[k].GetName(), err)
+						}
+					}()
 				}
 			}
 		}
