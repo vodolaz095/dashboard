@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 )
@@ -37,6 +38,7 @@ func (s *Sensor) String() string {
 		tags[i] = fmt.Sprintf("%q=%q", k, s.Tags[k])
 		i++
 	}
+	sort.Strings(tags)
 	buh := bytes.NewBufferString("")
 	if len(s.Tags) > 0 {
 		labels.WriteString("{")
