@@ -51,7 +51,7 @@ func (s *SyncSensor) Update(ctx context.Context) error {
 	defer s.Mutex.Unlock()
 	s.UpdatedAt = time.Now()
 	args := strings.Split(s.Query, " ")
-	b := make([]interface{}, len(args))
+	b := make([]any, len(args))
 	for i := range args {
 		b[i] = args[i]
 	}

@@ -62,7 +62,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		return nil
 	}
 	// readings file contains json we need to execute jsonpath query against
-	var data interface{}
+	var data any
 	err = json.Unmarshal(raw, &data)
 	if err != nil {
 		s.Error = err
