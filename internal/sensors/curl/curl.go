@@ -111,7 +111,7 @@ func (s *Sensor) Update(ctx context.Context) (err error) {
 		return
 	}
 
-	var data interface{}
+	var data any
 	err = json.Unmarshal(raw, &data)
 	if err != nil {
 		s.Error = err

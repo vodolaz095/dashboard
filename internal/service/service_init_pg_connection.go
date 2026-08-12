@@ -26,10 +26,7 @@ func (ss *SensorsService) initPostgresConnection(ctx context.Context, opts confi
 		}
 		db.SetMaxIdleConns(opts.MaxIdleCons)
 	} else {
-		idle := opts.MaxOpenCons / 4
-		if idle < 2 {
-			idle = 2
-		}
+		idle := max(opts.MaxOpenCons/4, 2)
 		db.SetMaxIdleConns(idle)
 	}
 
